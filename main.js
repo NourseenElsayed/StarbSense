@@ -359,7 +359,16 @@ document.addEventListener("fullscreenchange", () => {
 });
 
 function disableCamera() {
+  const hadActiveSession = gameRunning;
   stopAdventure();
+
+  if (hadActiveSession) {
+    exportButton.disabled = samples.length === 0;
+    updateStats();
+    renderDashboard();
+    void runPythonAnalysis();
+  }
+
   stopCameraTracks();
 
   cameraReady = false;
@@ -769,6 +778,8 @@ function recordFrame(now) {
     camera.readyState >= 2 &&
     now - lastFrameTime >= FRAME_INTERVAL_MS
   ) {
+    const actualFrameIntervalMs =
+      lastFrameTime >= 0 ? Number((now - lastFrameTime).toFixed(2)) : null;
     lastFrameTime = now;
 
     try {
@@ -805,6 +816,11 @@ function recordFrame(now) {
         session_id: sessionId,
         session_started_at_iso: sessionStartedAt,
         elapsed_ms: Math.round(now - startTime),
+        task_elapsed_ms: Math.max(
+          0,
+          Math.round(now - startTime - Math.max(taskIndex, 0) * TASK_DURATION_MS)
+        ),
+        actual_frame_interval_ms: actualFrameIntervalMs,
         timestamp_iso: new Date().toISOString(),
         timezone_offset_minutes: new Date().getTimezoneOffset(),
         video_frame_width: camera.videoWidth || null,
@@ -821,6 +837,7 @@ function recordFrame(now) {
         target_y_percent: currentTask?.y ?? "",
 
         face_landmarks_detected: landmarks ? 1 : 0,
+        face_landmark_count: landmarks ? landmarks.length : 0,
 
         left_eye_outer_x: leftOuter.x,
         left_eye_outer_y: leftOuter.y,
