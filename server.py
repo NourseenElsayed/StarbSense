@@ -33,6 +33,11 @@ def add_headers(response):
     return response
 
 
+@app.errorhandler(413)
+def request_too_large(_error):
+    return jsonify({"error": "Request is too large. Reduce the session sample count."}), 413
+
+
 @app.get("/api/health")
 def health():
     return jsonify({
