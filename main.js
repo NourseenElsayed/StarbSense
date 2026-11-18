@@ -730,19 +730,19 @@ function recordFrame(now) {
 
       const bright = analyzeBrightPixels(landmarks);
 
-      const currentTask =
-        sequence[Math.max(taskIndex, 0)];
+      const currentTask = sequence[Math.max(taskIndex, 0)];
+      const matrixJson = getFaceTransformationMatrix(result);
+      let matrixData = null;
 
-        
-Object.assign(
-  sample,
-  calculateAdvancedMetrics(
-    landmarks,
-    matrixData ? Array.from(matrixData) : null
-  )
-);
+      if (matrixJson) {
+        try {
+          matrixData = JSON.parse(matrixJson);
+        } catch (error) {
+          console.warn("Could not parse facial transformation matrix:", error);
+        }
+      }
 
-      samples.push({
+      const sample = {
         session_id: sessionId,
         elapsed_ms: Math.round(now - startTime),
         task_index: Math.max(taskIndex, 0) + 1,
@@ -767,8 +767,7 @@ Object.assign(
         right_iris_landmark_x: rightIris.x,
         right_iris_landmark_y: rightIris.y,
 
-        face_transformation_matrix:
-          getFaceTransformationMatrix(result),
+        face_transformation_matrix: matrixJson,
 
         left_bright_candidate_detected: bright.left_detected,
         left_bright_candidate_x: bright.left_x,
@@ -781,10 +780,15 @@ Object.assign(
         right_bright_pixel_count: bright.right_pixel_count,
 
         image_analysis_status: bright.analysis_status,
-        bright_pixel_threshold: openCVReady
-          ? BRIGHT_THRESHOLD
-          : ""
-      });
+        bright_pixel_threshold: openCVReady ? BRIGHT_THRESHOLD : ""
+      };
+
+      Object.assign(
+        sample,
+        calculateAdvancedMetrics(landmarks, matrixData)
+      );
+
+      samples.push(sample);
 
       updateStats();
     } catch (error) {
