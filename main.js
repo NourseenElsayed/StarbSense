@@ -1465,8 +1465,9 @@ function finishAdventure() {
 
   gameMessage.append(emoji, heading, description);
 
-  startButton.disabled = !cameraReady;
+  startButton.disabled = true;
   exportButton.disabled = samples.length === 0;
+  if (cameraReady) startQualityMonitor();
 
   setMessage(
     $("report-message"),
