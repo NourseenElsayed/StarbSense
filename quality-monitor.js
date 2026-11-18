@@ -59,6 +59,17 @@ export function startCameraQualityMonitor({ video, landmarker, canvas, onUpdate 
       const x=geometry.face_center_x*w-geometry.face_width_norm*w/2;
       const y=geometry.face_center_y*h-geometry.face_height_norm*h/2;
       ctx.strokeRect(x,y,geometry.face_width_norm*w,geometry.face_height_norm*h);
+      for (const contour of [[33,160,158,133,153,144],[362,385,387,263,373,380]]) {
+        ctx.beginPath();
+        contour.forEach((index, position) => {
+          const point = landmarks[index];
+          if (!point) return;
+          if (position === 0) ctx.moveTo(point.x * w, point.y * h);
+          else ctx.lineTo(point.x * w, point.y * h);
+        });
+        ctx.closePath();
+        ctx.stroke();
+      }
       for(const i of [468,473]){const p=landmarks[i];if(!p)continue;ctx.beginPath();ctx.arc(p.x*w,p.y*h,Math.max(5,w/100),0,Math.PI*2);ctx.stroke();}
     }
     ctx.restore();
