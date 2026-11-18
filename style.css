@@ -661,3 +661,135 @@ a:focus-visible {
     transition-duration: 0.01ms !important;
   }
 }
+
+
+/* Structured protocol and responsible result guidance */
+.protocol-panel,
+.guidance-panel {
+  margin: 0 0 24px;
+  padding: clamp(20px, 3vw, 30px);
+  border: 1px solid #e5e1ff;
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at 92% 8%, rgb(199 190 255 / 28%), transparent 34%),
+    linear-gradient(135deg, #ffffff 0%, #f7f5ff 100%);
+  box-shadow: 0 14px 38px rgb(57 48 117 / 6%);
+}
+
+.protocol-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.protocol-heading h2,
+.guidance-panel h2 {
+  margin: 6px 0 8px;
+  font-size: clamp(1.35rem, 3vw, 1.85rem);
+  letter-spacing: -0.025em;
+}
+
+.protocol-heading .section-description {
+  margin: 0;
+}
+
+.protocol-count {
+  padding: 9px 13px;
+  border: 1px solid #ded8ff;
+  border-radius: 999px;
+  color: #5145a6;
+  background: #efedff;
+  font-size: 0.75rem;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
+.protocol-steps {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.protocol-steps span {
+  display: grid;
+  min-height: 64px;
+  place-items: center;
+  padding: 12px;
+  border: 1px solid #e8e5fa;
+  border-radius: 14px;
+  color: #49436f;
+  background: rgb(255 255 255 / 82%);
+  font-size: 0.88rem;
+  font-weight: 750;
+  text-align: center;
+}
+
+.protocol-caution {
+  margin: 18px 0 0;
+  padding-top: 15px;
+  border-top: 1px solid #e8e5fa;
+  color: #6b6685;
+  font-size: 0.88rem;
+  line-height: 1.65;
+}
+
+.guidance-panel {
+  border-color: #dce9f3;
+  background:
+    radial-gradient(circle at 8% 0%, rgb(192 228 255 / 24%), transparent 35%),
+    linear-gradient(135deg, #ffffff 0%, #f4faff 100%);
+}
+
+.guidance-panel > p:not(.eyebrow):not(.guidance-footnote) {
+  max-width: 850px;
+  color: #596879;
+  line-height: 1.75;
+}
+
+.guidance-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.guidance-grid article {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  padding: 18px;
+  border: 1px solid #e0eaf2;
+  border-radius: 15px;
+  background: rgb(255 255 255 / 85%);
+}
+
+.guidance-grid strong {
+  color: #26384a;
+}
+
+.guidance-grid span,
+.guidance-footnote {
+  color: #637386;
+  font-size: 0.91rem;
+  line-height: 1.7;
+}
+
+.guidance-footnote {
+  margin: 18px 0 0;
+  padding-top: 15px;
+  border-top: 1px solid #e0eaf2;
+}
+
+@media (max-width: 760px) {
+  .protocol-steps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .guidance-grid {
+    grid-template-columns: 1fr;
+  }
+}
