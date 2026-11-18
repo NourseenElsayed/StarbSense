@@ -1085,11 +1085,11 @@ function showPythonChart(id, src, alt) {
     card.className = "python-chart-card";
 
     const heading = document.createElement("h3");
-    heading.textContent = alt;
+    heading.textContent = t(alt);
 
     image = document.createElement("img");
     image.id = id;
-    image.alt = alt;
+    image.alt = t(alt);
     image.loading = "lazy";
     image.style.display = "block";
     image.style.width = "100%";
@@ -1333,13 +1333,15 @@ function renderDashboard() {
     `${tasksWithFrames} / ${sequence.length}`;
 
   $("analytics-summary").textContent = stats.total
-    ? `${stats.detected} of ${stats.total} frames contained a detected face. ` +
-      `${stats.validIrisSamples} frames had valid coordinates for both iris landmarks. ` +
-      `Bright-pixel candidates: left ${stats.leftBrightSamples}, right ${stats.rightBrightSamples}. ` +
-      `OpenCV image analysis processed ${stats.imageAnalysisFrames} frames. ` +
-      `${tasksWithFrames} of ${sequence.length} tasks had recorded frames. ` +
-      "Bright-pixel candidates are not verified corneal reflections. These statistics do not determine gaze direction, eye alignment, or visual health."
-    : "No frames were recorded. Start a session and try again.";
+    ? currentLanguage === "ar"
+      ? `ظهر وجه في ${stats.detected} من أصل ${stats.total} إطارًا. توفرت إحداثيات صالحة لمعالم القزحيتين في ${stats.validIrisSamples} إطارًا. مؤشرات البكسلات الساطعة: اليسرى ${stats.leftBrightSamples}، واليمنى ${stats.rightBrightSamples}. عالج OpenCV عدد ${stats.imageAnalysisFrames} إطارًا. سُجلت إطارات في ${tasksWithFrames} من أصل ${sequence.length} مهمة. مؤشرات البكسلات الساطعة ليست انعكاسات قرنية مؤكدة، وهذه الإحصاءات لا تحدد اتجاه النظر أو محاذاة العين أو صحة الإبصار.`
+      : `${stats.detected} of ${stats.total} frames contained a detected face. ` +
+        `${stats.validIrisSamples} frames had valid coordinates for both iris landmarks. ` +
+        `Bright-pixel candidates: left ${stats.leftBrightSamples}, right ${stats.rightBrightSamples}. ` +
+        `OpenCV image analysis processed ${stats.imageAnalysisFrames} frames. ` +
+        `${tasksWithFrames} of ${sequence.length} tasks had recorded frames. ` +
+        "Bright-pixel candidates are not verified corneal reflections. These statistics do not determine gaze direction, eye alignment, or visual health."
+    : t("No frames were recorded. Start a session and try again.");
 
   if (irisChart) {
     irisChart.destroy();
