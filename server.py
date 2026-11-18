@@ -20,6 +20,7 @@ CHART_FILES = {
     "head_rotation_chart": "head_rotation_over_time.png",
     "relative_iris_task_chart": "relative_iris_by_task.png",
     "lighting_quality_chart": "lighting_quality_over_time.png",
+    "task_group_chart": "technical_data_availability_by_task_group.png",
 }
 
 
