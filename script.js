@@ -170,7 +170,7 @@ function exportCSV() {
   const link = document.createElement("a");
 
   link.href = url;
-  link.download = "eyeplay-task-log.csv";
+  link.download = "starbsense-task-log.csv";
 
   document.body.appendChild(link);
   link.click();
