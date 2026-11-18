@@ -1,56 +1,72 @@
 # StarbSense
 
-**StarbSense** is an experimental, child-friendly visual-tracking research prototype developed for an ISEF project focused on exploring eye-movement and facial-landmark data.
+StarbSense is an experimental, child-friendly visual-target-following and facial-landmark data-collection prototype. It is a research tool, **not a medical device** and does not diagnose, screen for, or rule out strabismus.
 
-## What it currently does
+## Current pipeline
 
-- Guides a participant through a short visual-target-following activity.
-- Uses MediaPipe Face Landmarker to collect facial landmarks and iris landmark coordinates.
-- Calculates exploratory iris-position metrics relative to eye-corner axes.
-- Records experimental head-rotation proxies from facial transformation matrices.
-- Uses OpenCV.js for exploratory bright-pixel candidate analysis around eye regions.
-- Exports session measurements as CSV.
-- Sends session samples to a local Flask/Python service for data-quality summaries and plots.
+- Browser camera capture with participant permission.
+- MediaPipe Face Landmarker for facial and iris landmarks.
+- Relative iris-to-eye-corner geometric features (exploratory, not gaze-calibrated).
+- Facial transformation matrix proxies (not validated head-pose angles).
+- OpenCV bright-pixel candidates (not verified corneal reflections).
+- Per-frame technical metadata: timestamps, camera resolution/frame rate where exposed, task metadata, page visibility, and non-identifying lighting summaries.
+- CSV export and local Flask/Python analysis.
+- Data-quality summaries and six charts, including task-level coverage and heuristic lighting trends.
 
-## Technology
-
-- Frontend: Vite, JavaScript, MediaPipe Tasks Vision, OpenCV.js, Chart.js
-- Analysis service: Python, Flask, pandas, NumPy, Matplotlib
+No raw camera frames, camera device identifiers, or audio are saved or sent to the Python service. The local service processes only the numeric/session fields submitted by the browser.
 
 ## Run locally
 
-Install JavaScript dependencies:
+Use two terminals from the project folder.
 
-```bash
-npm install
-```
-
-Install Python dependencies in a virtual environment:
-
+Terminal 1:
 ```bash
 python -m pip install -r requirements.txt
-```
-
-Start the Python analysis service in one terminal:
-
-```bash
 python server.py
 ```
 
-Start the frontend in another terminal:
-
+Terminal 2:
 ```bash
+npm install
 npm run dev
 ```
 
-Open the local Vite address printed in the terminal. Camera access requires localhost or HTTPS and the participant's permission.
+Open the Vite localhost URL printed in the terminal. Camera access requires localhost or HTTPS and browser permission.
 
-## Research and safety limitations
+Health check: `http://127.0.0.1:5000/api/health`.
 
-StarbSense is a research prototype, **not a medical device or diagnostic system**. Its landmark coordinates, relative iris metrics, head-rotation proxies, and bright-pixel candidates are exploratory measurements. They have not been clinically validated to diagnose, screen for, or rule out strabismus or any other eye condition.
+## Tests
 
-Do not interpret the generated charts as a clinical result. Any research involving children should follow the applicable school, competition, ethics, privacy, and informed-consent requirements. Avoid publishing identifiable participant data or raw session CSV files.
+Run Python tests:
+```bash
+python -m unittest discover -s tests -v
+```
 
-## Current development status
+Run the frontend production build:
+```bash
+npm run build
+```
 
-The project is under active development. Results depend on camera quality, lighting, participant positioning, model performance, and the quality of the collected samples. Validation against an appropriate reference protocol and expert review are required before making research-performance claims.
+GitHub Actions runs the Python checks and Vite build on pushes and pull requests.
+
+## Research limitations
+
+- MediaPipe landmarks are not equivalent to calibrated gaze direction or ocular alignment.
+- Relative iris features depend on camera geometry, face pose, lighting, and landmark quality.
+- Head-rotation values are exploratory proxies; matrix conventions require independent validation.
+- Bright-pixel candidates can arise from reflections, glasses, skin, sclera, and lighting. They are not proof of corneal reflections.
+- Lighting flags use heuristic thresholds only; they are not validated participant-exclusion criteria.
+- The current star-following sequence is an experimental task, not a clinical cover test or validated examination protocol.
+- No diagnostic classifier or clinical threshold is implemented.
+
+Do not claim diagnostic accuracy, sensitivity, specificity, or screening performance without an appropriately designed, independently supervised validation study and a suitable clinical reference standard.
+
+## Participant privacy and research governance
+
+Obtain the required school/competition approvals, parent/guardian permission, and participant assent before collecting data from minors. Minimize collected metadata, use coded participant IDs, store exports securely, and do not publish identifiable data. This prototype does not upload recordings to a remote service; the Flask endpoint is local-only by default.
+
+## Project documentation
+
+- [Data dictionary](docs/DATA_DICTIONARY.md)
+- [External datasets and research references](docs/RESEARCH_DATASETS.md)
+- [Research validation checklist](docs/VALIDATION_CHECKLIST.md)
