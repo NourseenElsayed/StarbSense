@@ -42,6 +42,10 @@ Each step has a fixed duration defined in `main.js`. The sequence order, target 
 - `task_elapsed_ms`: elapsed time since the current step began.
 - `elapsed_ms` and `actual_frame_interval_ms`: session timing information.
 
+### Sampling cadence note
+
+The browser requests a sample no sooner than every 120 ms. With a 30 fps camera, new camera frames arrive in roughly 33.3 ms increments, so observed sample intervals commonly land around 133 ms (four camera frames), rather than exactly 120 ms. The recorded `actual_frame_interval_ms` is the value to use when describing the observed cadence; the target interval is a scheduling threshold, not a guaranteed sampling rate. The first elapsed-time value is clamped to zero to prevent a negative startup timestamp.
+
 ## Interpretation
 
 The sequence only defines where the visual target is presented and when. A webcam face/iris landmark is not a validated measure of where the participant is looking. The app must not infer that the participant successfully followed the target, that both eyes were aligned, or that a participant does or does not have strabismus.
