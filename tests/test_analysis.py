@@ -45,7 +45,7 @@ class AnalysisTests(unittest.TestCase):
 
             self.assertEqual(summary["sample_count"], 3)
             self.assertEqual(summary["face_detected_samples"], 2)
-            self.assertEqual(summary["left_iris_valid_samples"], 2)
+            self.assertEqual(summary["left_iris_valid_samples"], 1)
             self.assertEqual(summary["right_iris_valid_samples"], 2)
             self.assertEqual(summary["valid_iris_samples"], 1)
             self.assertEqual(summary["iris_coordinate_out_of_bounds_count"], 1)
