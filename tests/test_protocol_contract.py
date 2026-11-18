@@ -31,6 +31,12 @@ class ProtocolContractTests(unittest.TestCase):
         self.assertEqual(steps[0][1:5], ("Baseline fixation", "center", "50", "50"))
         self.assertEqual(steps[-1][1:5], ("Final fixation", "center", "50", "50"))
 
+    def test_first_frame_elapsed_time_cannot_be_negative(self):
+        self.assertIn(
+            "elapsed_ms: Math.max(0, Math.round(now - startTime))",
+            self.main_js,
+        )
+
     def test_protocol_records_context_for_each_frame(self):
         required_fields = (
             "protocol_id: PROTOCOL_ID",
