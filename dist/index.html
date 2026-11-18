@@ -1,0 +1,243 @@
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="EyePlay experimental eye-landmark game and data-quality dashboard."
+    />
+    <title>EyePlay | Interactive Vision Prototype</title>
+    <script type="module" crossorigin src="/assets/index-BvJxFSgY.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index--jFvG9UZ.css">
+  </head>
+
+  <body>
+    <header class="site-header">
+      <a class="brand" href="#" aria-label="EyePlay home">
+        <span class="brand-icon">✦</span>
+        <span>EyePlay</span>
+      </a>
+      <span class="prototype-label">RESEARCH PROTOTYPE</span>
+    </header>
+
+    <main class="page-content">
+      <section class="intro">
+        <p class="eyebrow">PLAY · OBSERVE · ANALYZE</p>
+        <h1>A little adventure for curious eyes.</h1>
+        <p class="intro-copy">
+          Follow the star as it moves around the screen. EyePlay records
+          experimental face-landmark data for technical evaluation.
+        </p>
+      </section>
+
+      <section class="setup-panel" aria-labelledby="setup-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">GETTING READY</p>
+            <h2 id="setup-title">Prepare your adventure</h2>
+          </div>
+          <span id="camera-status" class="status-pill">Camera off</span>
+        </div>
+
+        <div class="setup-layout">
+          <div class="camera-panel">
+            <div id="camera-placeholder" class="camera-placeholder">
+              <span class="camera-icon">◎</span>
+              <strong>Your camera preview</strong>
+              <span>Enable your camera to get started.</span>
+            </div>
+            <video
+              id="camera"
+              autoplay
+              playsinline
+              muted
+              aria-label="Camera preview"
+            ></video>
+          </div>
+
+          <div class="setup-controls">
+            <h3>Ready when you are</h3>
+            <p>
+              Place your face comfortably in front of the camera and try to
+              keep the lighting steady.
+            </p>
+
+            <button id="camera-btn" class="button button-primary" type="button">
+              Enable camera
+            </button>
+
+            <button id="start-btn" class="button button-secondary" type="button" disabled>
+              Start adventure
+            </button>
+
+            <p id="setup-message" class="message" role="status" aria-live="polite">
+              Enable the camera to load the game model.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="game-section" aria-labelledby="game-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">THE ADVENTURE</p>
+            <h2 id="game-title">Follow the star</h2>
+          </div>
+          <span id="round-counter" class="status-pill">Waiting to start</span>
+        </div>
+
+        <div id="game-stage" class="game-stage">
+          <div class="stage-topbar">
+            <span class="stage-brand">✦ EyePlay</span>
+            <span id="task-label">Your star is waiting</span>
+            <button id="stop-btn" class="button button-stop" type="button" disabled>
+              Stop
+            </button>
+          </div>
+
+          <div class="stage-hint" aria-hidden="true">
+            Follow the star at your own comfortable pace
+          </div>
+
+          <div id="target" class="target" aria-label="Star target">
+            <span>★</span>
+          </div>
+
+          <div id="game-message" class="game-message">
+            <span class="game-emoji">⭐</span>
+            <strong>Your adventure starts here</strong>
+            <span>Enable the camera, then select Start adventure.</span>
+          </div>
+
+          <div class="progress-track" aria-label="Adventure progress">
+            <div id="progress-bar" class="progress-bar"></div>
+          </div>
+        </div>
+
+        <p class="game-footnote">
+          During play, the game enters distraction-reduced full-screen mode
+          when supported by your browser. Press Esc to exit full screen.
+        </p>
+      </section>
+
+      <section class="stats-strip" aria-label="Live session counters">
+        <article class="mini-stat">
+          <span>Tasks completed</span>
+          <strong id="tasks-completed">0</strong>
+        </article>
+        <article class="mini-stat">
+          <span>Frames processed</span>
+          <strong id="frames-count">0</strong>
+        </article>
+        <article class="mini-stat">
+          <span>Frames with a face</span>
+          <strong id="face-count">0</strong>
+        </article>
+      </section>
+
+      <section class="report-section" aria-labelledby="report-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">YOUR SESSION</p>
+            <h2 id="report-title">Session data</h2>
+          </div>
+        </div>
+
+        <p id="report-message" class="message" role="status" aria-live="polite">
+          Complete or stop a session to review and export recorded data.
+        </p>
+
+        <button id="export-btn" class="button button-secondary" type="button" disabled>
+          Export CSV
+        </button>
+      </section>
+
+      <section
+        id="analytics-dashboard"
+        class="analytics-dashboard"
+        aria-labelledby="analytics-title"
+        hidden
+      >
+        <div class="section-heading analytics-heading">
+          <div>
+            <p class="eyebrow">SESSION ANALYTICS</p>
+            <h2 id="analytics-title">Session dashboard</h2>
+            <p class="section-description">
+              Experimental data-quality statistics and landmark visualizations.
+            </p>
+          </div>
+          <span id="analytics-status" class="status-pill">Waiting for a session</span>
+        </div>
+
+        <div class="analytics-cards">
+          <article class="analytics-card">
+            <span>Processed frames</span>
+            <strong id="analytics-frames">—</strong>
+          </article>
+          <article class="analytics-card">
+            <span>Face detection rate</span>
+            <strong id="analytics-face-rate">—</strong>
+          </article>
+          <article class="analytics-card">
+            <span>Valid iris samples</span>
+            <strong id="analytics-iris-valid">—</strong>
+          </article>
+          <article class="analytics-card">
+            <span>Tasks with recorded frames</span>
+            <strong id="analytics-tasks">—</strong>
+          </article>
+        </div>
+
+        <div class="analytics-grid">
+          <article class="analytics-panel">
+            <h3>Iris landmark coordinates over time</h3>
+            <p>
+              Normalized image x-coordinates recorded by MediaPipe.
+              These are not validated gaze measurements.
+            </p>
+            <div class="analytics-chart">
+              <canvas id="iris-chart"></canvas>
+            </div>
+          </article>
+
+          <article class="analytics-panel">
+            <h3>Face detection by task</h3>
+            <p>
+              Recorded frames with and without a detected face for each task.
+            </p>
+            <div class="analytics-chart">
+              <canvas id="quality-chart"></canvas>
+            </div>
+          </article>
+        </div>
+
+        <article class="analytics-panel analytics-notice">
+          <h3>Interpretation and limitations</h3>
+          <p id="analytics-summary">
+            Complete a session to generate its summary.
+          </p>
+          <p>
+            EyePlay is an experimental prototype. These statistics and facial
+            landmarks do not establish gaze direction, eye alignment, or a
+            medical diagnosis.
+          </p>
+        </article>
+      </section>
+
+      <section class="privacy-note">
+        <strong>Privacy and responsible use</strong>
+        <p>
+          Camera processing is performed in the browser. Session CSV files
+          contain derived facial landmark coordinates; handle them carefully,
+          especially when working with children.
+        </p>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      EyePlay · Experimental prototype · Not a medical device
+    </footer>
+  </body>
+</html>
