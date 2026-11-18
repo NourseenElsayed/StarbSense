@@ -912,67 +912,45 @@ function stopAdventure() {
   stopButton.disabled = true;
 }
 
-function showPythonChart(container, title, imageUrl) {
-  if (!container || !imageUrl) return;
+function showPythonChart(id, src, alt) {
+  const container = document.getElementById("python-charts");
+  if (!container || !src) return;
 
-  const card = document.createElement("section");
-  card.className = "python-chart-card";
+  let image = document.getElementById(id);
 
-  const heading = document.createElement("h3");
-  heading.textContent = title;
+  if (!image) {
+    const card = document.createElement("section");
+    card.className = "python-chart-card";
 
-  const image = document.createElement("img");
-  image.src = imageUrl;
-  image.alt = title;
-  image.loading = "lazy";
+    const heading = document.createElement("h3");
+    heading.textContent = alt;
 
-  card.append(heading, image);
-  container.appendChild(card);
+    image = document.createElement("img");
+    image.id = id;
+    image.alt = alt;
+    image.loading = "lazy";
+    image.style.display = "block";
+    image.style.width = "100%";
+    image.style.height = "auto";
+
+    card.append(heading, image);
+    container.appendChild(card);
+  }
+
+  image.src = src;
 }
 
 async function runPythonAnalysis() {
   const status = document.getElementById("analytics-status");
   const summary = document.getElementById("analytics-summary");
+  const chartContainer = document.getElementById("python-charts");
+
+  if (!status || !summary) return;
 
   status.textContent = "Running Python analysis…";
-  summary.textContent = "Sending session data to the local Python server.";
-  
-const chartContainer = document.getElementById("python-charts");
+  summary.textContent = "Sending recorded session data to the local Python service.";
 
-if (chartContainer) {
-  chartContainer.replaceChildren();
-
-  showPythonChart(
-    chartContainer,
-    "Face detection by task",
-    data.face_detection_chart
-  );
-
-  showPythonChart(
-    chartContainer,
-    "Raw iris coordinates",
-    data.iris_coordinates_chart
-  );
-
-  showPythonChart(
-    chartContainer,
-    "Relative iris position",
-    data.relative_iris_chart
-  );
-
-  showPythonChart(
-    chartContainer,
-    "Head rotation proxies",
-    data.head_rotation_chart
-  );
-
-  showPythonChart(
-    chartContainer,
-    "Relative iris comparison by task",
-    data.relative_iris_task_chart
-  );
-}
-
+  if (chartContainer) chartContainer.replaceChildren();
 
   try {
     const response = await fetch("/api/analyze", {
@@ -992,71 +970,49 @@ if (chartContainer) {
     status.textContent = "Python analysis complete";
 
     const lines = [
-      `Python analyzed ${result.total_recorded_frames} recorded frames.`,
-      `Face detection rate: ${result.face_detection_rate_percent ?? "N/A"}%.`,
-      `Valid iris-coordinate samples: ${result.frames_with_valid_iris_coordinates}.`,
-      `Tasks with recorded frames: ${result.tasks_with_recorded_frames}.`,
-      `Negative timestamps: ${result.negative_timestamp_count}.`,
-      `Decreasing timestamps: ${result.non_monotonic_timestamp_count}.`,
-      result.timestamp_warning,
-      result.interpretation
+      `Python analyzed ${result.sample_count ?? 0} recorded frames.`,
+      `Face detection rate: ${result.face_detection_rate_pct ?? "N/A"}%.`,
+      `Valid iris-coordinate samples: ${result.valid_iris_samples ?? 0}.`,
+      `Tasks with recorded frames: ${result.task_count ?? 0}.`,
+      `Out-of-order timestamp steps: ${result.negative_time_steps ?? 0}.`,
+      `Duplicate timestamp steps: ${result.duplicate_time_steps ?? 0}.`,
+      `Median sample interval: ${result.median_sample_interval_ms ?? "N/A"} ms.`,
+      result.interpretation || ""
     ];
 
-    summary.textContent = lines.join(" ");
+    summary.textContent = lines.filter(Boolean).join(" ");
 
     showPythonChart(
       "python-face-chart",
       result.face_detection_chart,
-      "Python face-detection chart"
+      "Face detection by task"
     );
-
     showPythonChart(
       "python-iris-chart",
       result.iris_coordinates_chart,
-      "Python iris-coordinate chart"
+      "Raw iris coordinates over time"
+    );
+    showPythonChart(
+      "python-relative-chart",
+      result.relative_iris_chart,
+      "Relative iris position"
+    );
+    showPythonChart(
+      "python-head-chart",
+      result.head_rotation_chart,
+      "Experimental head-rotation proxies"
+    );
+    showPythonChart(
+      "python-task-chart",
+      result.relative_iris_task_chart,
+      "Relative iris comparison by task"
     );
   } catch (error) {
     console.error("Python analysis error:", error);
     status.textContent = "Python analysis unavailable";
     summary.textContent =
-      `The in-browser dashboard is still available. ` +
-      `Python analysis could not be completed: ${error.message}`;
+      `The in-browser dashboard remains available. Python analysis could not be completed: ${error.message}`;
   }
-  showPythonChart(
-  "python-relative-chart",
-  result.relative_iris_chart,
-  "Relative iris coordinates"
-);
-
-showPythonChart(
-  "python-head-chart",
-  result.head_rotation_chart,
-  "Facial transformation rotation proxies"
-);
-}
-
-function showPythonChart(id, src, alt) {
-  let image = document.getElementById(id);
-
-  if (!src) {
-    if (image) image.remove();
-    return;
-  }
-
-  if (!image) {
-    image = document.createElement("img");
-    image.id = id;
-    image.alt = alt;
-    image.style.display = "block";
-    image.style.width = "100%";
-    image.style.height = "auto";
-    image.style.marginTop = "16px";
-
-    const dashboard = document.getElementById("analytics-dashboard");
-    dashboard.appendChild(image);
-  }
-
-  image.src = src;
 }
 
 function finishAdventure() {
