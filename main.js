@@ -48,23 +48,40 @@ const analysisContext = analysisCanvas.getContext("2d", {
   willReadFrequently: true
 });
 
-// Experimental game timing, not a validated clinical protocol.
-const TASK_DURATION_MS = 1600;
+// Structured visual-following research protocol v2.
+// This is an experimental interaction sequence, NOT a clinical eye test.
+const PROTOCOL_ID = "starbsense-structured-v2";
 const FRAME_INTERVAL_MS = 120;
 const ANALYSIS_MAX_WIDTH = 640;
 const BRIGHT_THRESHOLD = 240;
 
 const sequence = [
-  { label: "Center star", x: 50, y: 50 },
-  { label: "Star to the left", x: 22, y: 50 },
-  { label: "Back to center", x: 50, y: 50 },
-  { label: "Star to the right", x: 78, y: 50 },
-  { label: "Back to center", x: 50, y: 50 },
-  { label: "Star up high", x: 50, y: 23 },
-  { label: "Back to center", x: 50, y: 50 },
-  { label: "Star down low", x: 50, y: 77 },
-  { label: "Final center star", x: 50, y: 50 }
+  { label: "Look at the center", group: "Baseline fixation", phase: "center", x: 50, y: 50, durationMs: 1800 },
+  { label: "Follow left", group: "Horizontal", phase: "left", x: 24, y: 50, durationMs: 1400 },
+  { label: "Return to center", group: "Horizontal", phase: "center-return", x: 50, y: 50, durationMs: 1000 },
+  { label: "Follow right", group: "Horizontal", phase: "right", x: 76, y: 50, durationMs: 1400 },
+  { label: "Return to center", group: "Horizontal", phase: "center-return", x: 50, y: 50, durationMs: 1000 },
+  { label: "Follow upward", group: "Vertical", phase: "up", x: 50, y: 25, durationMs: 1400 },
+  { label: "Return to center", group: "Vertical", phase: "center-return", x: 50, y: 50, durationMs: 1000 },
+  { label: "Follow downward", group: "Vertical", phase: "down", x: 50, y: 75, durationMs: 1400 },
+  { label: "Return to center", group: "Vertical", phase: "center-return", x: 50, y: 50, durationMs: 1000 },
+  { label: "Follow upper-left", group: "Diagonal", phase: "upper-left", x: 29, y: 29, durationMs: 1400 },
+  { label: "Return to center", group: "Diagonal", phase: "center-return", x: 50, y: 50, durationMs: 1000 },
+  { label: "Follow upper-right", group: "Diagonal", phase: "upper-right", x: 71, y: 29, durationMs: 1400 },
+  { label: "Return to center", group: "Diagonal", phase: "center-return", x: 50, y: 50, durationMs: 1000 },
+  { label: "Follow lower-left", group: "Diagonal", phase: "lower-left", x: 29, y: 71, durationMs: 1400 },
+  { label: "Return to center", group: "Diagonal", phase: "center-return", x: 50, y: 50, durationMs: 1000 },
+  { label: "Follow lower-right", group: "Diagonal", phase: "lower-right", x: 71, y: 71, durationMs: 1400 },
+  { label: "Final center fixation", group: "Final fixation", phase: "center", x: 50, y: 50, durationMs: 1800 }
 ];
+
+function getTaskStartOffset(index) {
+  return sequence.slice(0, index).reduce((total, task) => total + task.durationMs, 0);
+}
+
+function getProtocolDuration() {
+  return sequence.reduce((total, task) => total + task.durationMs, 0);
+}
 
 function setMessage(element, message, type = "") {
   if (!element) return;
@@ -818,7 +835,7 @@ function recordFrame(now) {
         elapsed_ms: Math.round(now - startTime),
         task_elapsed_ms: Math.max(
           0,
-          Math.round(now - startTime - Math.max(taskIndex, 0) * TASK_DURATION_MS)
+          Math.round(now - startTime - getTaskStartOffset(Math.max(taskIndex, 0)))
         ),
         actual_frame_interval_ms: actualFrameIntervalMs,
         timestamp_iso: new Date().toISOString(),
@@ -826,7 +843,10 @@ function recordFrame(now) {
         video_frame_width: camera.videoWidth || null,
         video_frame_height: camera.videoHeight || null,
         frame_interval_target_ms: FRAME_INTERVAL_MS,
-        task_duration_target_ms: TASK_DURATION_MS,
+        protocol_id: PROTOCOL_ID,
+        task_group: currentTask?.group ?? "",
+        task_phase: currentTask?.phase ?? "",
+        task_duration_target_ms: currentTask?.durationMs ?? null,
         sequence_length: sequence.length,
         page_visibility_state: document.visibilityState,
         ...cameraMetadata,
@@ -911,24 +931,29 @@ function runSequence() {
   if (!gameRunning) return;
 
   const elapsed = performance.now() - startTime;
-  const nextIndex = Math.floor(elapsed / TASK_DURATION_MS);
+  const totalDuration = getProtocolDuration();
+  let elapsedBeforeTask = 0;
+  let nextIndex = -1;
+
+  for (let index = 0; index < sequence.length; index++) {
+    const taskEnd = elapsedBeforeTask + sequence[index].durationMs;
+    if (elapsed < taskEnd) {
+      nextIndex = index;
+      break;
+    }
+    elapsedBeforeTask = taskEnd;
+  }
 
   progressBar.style.width =
-    `${Math.min(
-      100,
-      (elapsed / (sequence.length * TASK_DURATION_MS)) * 100
-    )}%`;
+    `${Math.min(100, (elapsed / totalDuration) * 100)}%`;
 
-  if (
-    nextIndex !== taskIndex &&
-    nextIndex < sequence.length
-  ) {
+  if (nextIndex !== taskIndex && nextIndex >= 0) {
     taskIndex = nextIndex;
     showTask(taskIndex);
     updateStats();
   }
 
-  if (elapsed >= sequence.length * TASK_DURATION_MS) {
+  if (elapsed >= totalDuration) {
     finishAdventure();
     return;
   }
