@@ -29,7 +29,7 @@ function applyLanguage(language) {
   let node;
   while ((node = walker.nextNode())) {
     const original = node.nodeValue;
-    const normalized = original.replace(/\\s+/g, " ").trim();
+    const normalized = original.trim().replace(/\s+/g, " ");
     if (!normalized) continue;
     const translated = currentLanguage === "ar"
       ? translations[normalized]
