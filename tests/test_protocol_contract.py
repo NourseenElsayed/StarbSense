@@ -55,7 +55,7 @@ class ProtocolContractTests(unittest.TestCase):
     def test_local_assistant_is_limited_and_non_diagnostic(self):
         self.assertIn('id="assistant-form"', self.index_html)
         self.assertIn("answerAssistantQuestion", self.main_js)
-        self.assertIn("does not diagnose", self.main_js)
+        self.assertIn("cannot confirm or exclude strabismus", self.main_js)
         self.assertIn("latestAnalysis", self.main_js)
         self.assertIn("updateCareGuidance", self.main_js)
 
