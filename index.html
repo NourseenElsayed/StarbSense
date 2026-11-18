@@ -84,8 +84,8 @@
             <p class="eyebrow">STRUCTURED RESEARCH SESSION · V2</p>
             <h2 id="protocol-title">A planned path, not random movement</h2>
             <p class="section-description">
-              The star follows a fixed sequence of center, horizontal, vertical, and diagonal fixation targets.
-              Each target has a defined position and duration so sessions can be compared consistently.
+              The star follows a fixed sequence of center, horizontal, vertical, and diagonal screen targets.
+              This provides a repeatable experimental stimulus path; its positions and timings are design parameters, not clinical test standards.
             </p>
           </div>
           <span class="protocol-count">17 FIXATION STEPS</span>
@@ -98,8 +98,7 @@
           <span>05 · Center</span>
         </div>
         <p class="protocol-caution">
-          This sequence is an experimental visual-following task. It is not a cover test, a calibrated gaze test,
-          or a validated strabismus screening protocol.
+          This sequence is an experimental visual-following task. The star shape is an engagement choice, and the directions are used to sample screen locations. Neither the shape, path, nor timing is clinically validated. This is not a cover test, calibrated gaze test, or validated strabismus screening protocol.
         </p>
       </section>
 
@@ -276,6 +275,26 @@
         <p class="guidance-footnote">
           A reassuring-looking StarbSense session does not replace routine eye care or a professional examination.
         </p>
+      </section>
+
+
+      <section class="assistant-panel" aria-labelledby="assistant-title">
+        <p class="eyebrow">STARBSENSE GUIDE · LOCAL ASSISTANT</p>
+        <h2 id="assistant-title">Ask about your session or eye-health next steps</h2>
+        <p class="assistant-intro">This on-device, rule-based guide explains project measurements and evidence-based next steps. It is not a generative AI model, medical examination, or diagnostic service. Your question is handled in this browser.</p>
+        <div id="care-guidance" class="care-guidance" role="status" aria-live="polite">
+          <strong>Medical next steps</strong>
+          <p>StarbSense measurements alone cannot decide whether an eye examination is needed. If you have a concern about vision or eye alignment, arrange an eye-care assessment.</p>
+        </div>
+        <div id="assistant-messages" class="assistant-messages" aria-live="polite">
+          <p class="assistant-message assistant-message-system">You can ask about the session summary, data quality, the star-following protocol, privacy, or when to seek professional eye care.</p>
+        </div>
+        <form id="assistant-form" class="assistant-form">
+          <label for="assistant-input">Your question</label>
+          <textarea id="assistant-input" rows="2" maxlength="500" required placeholder="For example: What do these session results mean?"></textarea>
+          <button class="button button-primary" type="submit">Ask StarbSense Guide</button>
+        </form>
+        <p class="assistant-disclaimer">This assistant uses a limited local knowledge base and simple rules. It does not understand every possible question, provide a diagnosis, or replace a clinician.</p>
       </section>
 
       <section class="privacy-note">
