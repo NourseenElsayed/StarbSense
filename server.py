@@ -35,7 +35,7 @@ def add_headers(response):
 def health():
     return jsonify({
         "status": "ok",
-        "service": "EyePlay analysis server",
+        "service": "StarbSense research analysis server",
     })
 
 
@@ -70,7 +70,7 @@ def analyze_session():
         return jsonify({"error": "No sample columns were provided."}), 400
 
     try:
-        with tempfile.TemporaryDirectory(prefix="eyeplay_") as temp_dir:
+        with tempfile.TemporaryDirectory(prefix="starbsense_") as temp_dir:
             csv_path = Path(temp_dir) / "session.csv"
 
             with csv_path.open(
@@ -101,7 +101,7 @@ def analyze_session():
     except (ValueError, KeyError, csv.Error) as error:
         return jsonify({"error": str(error)}), 400
     except Exception:
-        app.logger.exception("EyePlay analysis failed")
+        app.logger.exception("StarbSense analysis failed")
         return jsonify({
             "error": "Analysis failed. Check the Python server terminal."
         }), 500
