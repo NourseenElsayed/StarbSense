@@ -91,8 +91,12 @@ def analyze(csv_file):
     right_x = numeric_column(df, "right_iris_landmark_x")
     right_y = numeric_column(df, "right_iris_landmark_y")
 
-    left_valid = face_detected & left_x.notna() & left_y.notna()
-    right_valid = face_detected & right_x.notna() & right_y.notna()
+    left_valid = (
+        face_detected & left_x.between(0, 1) & left_y.between(0, 1)
+    )
+    right_valid = (
+        face_detected & right_x.between(0, 1) & right_y.between(0, 1)
+    )
     both_iris_valid = left_valid & right_valid
 
     coordinate_out_of_bounds = (
