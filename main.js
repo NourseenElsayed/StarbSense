@@ -37,6 +37,8 @@ let processedFrames = 0;
 let faceFrames = 0;
 let samples = [];
 let sessionId = "";
+let sessionStartedAt = "";
+let cameraMetadata = {};
 let irisChart = null;
 let qualityChart = null;
 
@@ -83,9 +85,65 @@ function stopCameraTracks() {
   }
 
   stream = null;
+  cameraMetadata = {};
 
   if (camera) {
     camera.srcObject = null;
+  }
+}
+
+function readCameraMetadata() {
+  const track = stream?.getVideoTracks?.()[0];
+  const settings = track?.getSettings?.() || {};
+
+  // Deliberately omit deviceId, groupId, and other persistent identifiers.
+  return {
+    camera_width: Number.isFinite(settings.width) ? settings.width : null,
+    camera_height: Number.isFinite(settings.height) ? settings.height : null,
+    camera_frame_rate: Number.isFinite(settings.frameRate)
+      ? Number(settings.frameRate.toFixed(2))
+      : null,
+    camera_facing_mode: settings.facingMode || "unknown"
+  };
+}
+
+function measureFrameLighting() {
+  const empty = {
+    lighting_mean_gray: null,
+    lighting_std_gray: null,
+    lighting_sampled_pixels: 0
+  };
+
+  if (!prepareAnalysisCanvas()) return empty;
+
+  try {
+    const image = analysisContext.getImageData(
+      0, 0, analysisCanvas.width, analysisCanvas.height
+    );
+    const data = image.data;
+    const values = [];
+    const stride = 64; // sample one pixel per 16 RGBA pixels
+
+    for (let i = 0; i < data.length; i += stride) {
+      const gray = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
+      values.push(gray);
+    }
+
+    if (!values.length) return empty;
+
+    const mean = values.reduce((sum, value) => sum + value, 0) / values.length;
+    const variance = values.reduce(
+      (sum, value) => sum + (value - mean) ** 2, 0
+    ) / values.length;
+
+    return {
+      lighting_mean_gray: Number(mean.toFixed(2)),
+      lighting_std_gray: Number(Math.sqrt(variance).toFixed(2)),
+      lighting_sampled_pixels: values.length
+    };
+  } catch (error) {
+    console.warn("Frame-lighting measurement failed:", error);
+    return empty;
   }
 }
 
@@ -729,6 +787,7 @@ function recordFrame(now) {
       const rightIris = getPoint(landmarks, 473);
 
       const bright = analyzeBrightPixels(landmarks);
+      const lighting = measureFrameLighting();
 
       const currentTask = sequence[Math.max(taskIndex, 0)];
       const matrixJson = getFaceTransformationMatrix(result);
@@ -744,7 +803,18 @@ function recordFrame(now) {
 
       const sample = {
         session_id: sessionId,
+        session_started_at_iso: sessionStartedAt,
         elapsed_ms: Math.round(now - startTime),
+        timestamp_iso: new Date().toISOString(),
+        timezone_offset_minutes: new Date().getTimezoneOffset(),
+        video_frame_width: camera.videoWidth || null,
+        video_frame_height: camera.videoHeight || null,
+        frame_interval_target_ms: FRAME_INTERVAL_MS,
+        task_duration_target_ms: TASK_DURATION_MS,
+        sequence_length: sequence.length,
+        page_visibility_state: document.visibilityState,
+        ...cameraMetadata,
+        ...lighting,
         task_index: Math.max(taskIndex, 0) + 1,
         task_label: currentTask?.label ?? "",
         target_x_percent: currentTask?.x ?? "",
@@ -858,8 +928,10 @@ function startAdventure() {
   taskIndex = -1;
   lastFrameTime = -1;
 
+  sessionStartedAt = new Date().toISOString();
   sessionId =
-    `session_${new Date().toISOString().replace(/[:.]/g, "-")}`;
+    `session_${sessionStartedAt.replace(/[:.]/g, "-")}`;
+  cameraMetadata = readCameraMetadata();
 
   startTime = performance.now();
   gameRunning = true;
@@ -877,9 +949,7 @@ function startAdventure() {
   roundCounter.textContent = "Adventure in progress";
 
   $("analytics-dashboard").hidden = true;
-  for (const id of ["python-face-chart", "python-iris-chart"]) {
-  document.getElementById(id)?.remove();
-}
+  $("python-charts")?.replaceChildren();
 
   setMessage(
     setupMessage,
@@ -947,6 +1017,13 @@ async function runPythonAnalysis() {
 
   if (!status || !summary) return;
 
+  if (!samples.length) {
+    status.textContent = "No session data";
+    summary.textContent = "No frames were recorded, so Python analysis was skipped.";
+    if (chartContainer) chartContainer.replaceChildren();
+    return;
+  }
+
   status.textContent = "Running Python analysis…";
   summary.textContent = "Sending recorded session data to the local Python service.";
 
@@ -977,6 +1054,9 @@ async function runPythonAnalysis() {
       `Out-of-order timestamp steps: ${result.negative_time_steps ?? 0}.`,
       `Duplicate timestamp steps: ${result.duplicate_time_steps ?? 0}.`,
       `Median sample interval: ${result.median_sample_interval_ms ?? "N/A"} ms.`,
+      `Left-eye valid samples: ${result.left_iris_valid_samples ?? 0}; right-eye valid samples: ${result.right_iris_valid_samples ?? 0}.`,
+      `Out-of-range iris coordinates: ${result.iris_coordinate_out_of_bounds_count ?? 0}.`,
+      `Lighting samples: ${result.lighting_sample_count ?? 0}; low-light frames (heuristic): ${result.low_light_frame_count ?? 0}; high-brightness frames (heuristic): ${result.high_brightness_frame_count ?? 0}.`,
       result.interpretation || ""
     ];
 
@@ -1006,6 +1086,11 @@ async function runPythonAnalysis() {
       "python-task-chart",
       result.relative_iris_task_chart,
       "Relative iris comparison by task"
+    );
+    showPythonChart(
+      "python-lighting-chart",
+      result.lighting_quality_chart,
+      "Frame lighting quality over time"
     );
   } catch (error) {
     console.error("Python analysis error:", error);
@@ -1366,6 +1451,7 @@ stopButton.onclick = () => {
 
   updateStats();
   renderDashboard();
+  void runPythonAnalysis();
 };
 
 exportButton.onclick = exportSession;
