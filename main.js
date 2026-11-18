@@ -1317,7 +1317,7 @@ function exportSession() {
   const link = document.createElement("a");
 
   link.href = url;
-  link.download = "eyeplay_session_data.csv";
+  link.download = "starbsense_session_data.csv";
   document.body.appendChild(link);
   link.click();
   link.remove();
