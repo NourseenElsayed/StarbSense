@@ -180,6 +180,9 @@ Object.assign(translations, {
   "Repeat the session": "يُفضّل إعادة الجلسة",
   "Technical recording looks usable": "التسجيل التقني قابل للاستخدام مبدئيًا"
 });
+Object.assign(reverseTranslations, Object.fromEntries(
+  Object.entries(translations).map(([english, arabic]) => [arabic, english])
+));
 
 function updateReadiness(state) {
   latestCameraQuality = state;
