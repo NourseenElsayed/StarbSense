@@ -10,6 +10,9 @@ Each CSV row represents one processed camera frame. Empty values mean that the r
 | `session_started_at_iso` | Session start timestamp. |
 | `timestamp_iso` | Browser timestamp when the frame sample was assembled. |
 | `elapsed_ms` | Elapsed time from session start, in milliseconds. |
+| `task_elapsed_ms` | Approximate elapsed time within the current task. |
+| `actual_frame_interval_ms` | Actual interval since the preceding processed frame; first frame is empty. |
+| `face_landmark_count` | Number of face landmarks returned by MediaPipe for the frame.
 | `timezone_offset_minutes` | Browser timezone offset; not needed for most analysis. |
 | `frame_interval_target_ms` | Requested sampling interval (120 ms). |
 | `task_duration_target_ms` | Intended duration of each visual task. |
