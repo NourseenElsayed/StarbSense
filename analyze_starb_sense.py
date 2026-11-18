@@ -116,8 +116,14 @@ def analyze(csv_file):
     for col in RELATIVE_COLUMNS + HEAD_COLUMNS + LIGHTING_COLUMNS:
         df[col] = numeric_column(df, col)
 
+    task_group = (
+        df["task_group"].fillna("Unknown").astype(str)
+        if "task_group" in df.columns
+        else pd.Series("Unknown", index=df.index)
+    )
     task_summary = pd.DataFrame({
         "task_index": task_index,
+        "task_group": task_group,
         "task_label": task_label,
         "samples": 1,
         "face_detected": face_detected.astype(int),
@@ -146,6 +152,35 @@ def analyze(csv_file):
     )
     grouped.to_csv(output_dir / "task_summary.csv", index=False)
 
+    grouped_by_direction = (
+        task_summary.groupby("task_group", dropna=False)
+        .agg(
+            samples=("samples", "sum"),
+            face_detected_samples=("face_detected", "sum"),
+            left_iris_valid_samples=("left_iris_valid", "sum"),
+            right_iris_valid_samples=("right_iris_valid", "sum"),
+            both_iris_valid_samples=("both_iris_valid", "sum"),
+        )
+        .reset_index()
+    )
+    grouped_by_direction["face_detection_rate_pct"] = (
+        grouped_by_direction["face_detected_samples"]
+        / grouped_by_direction["samples"] * 100
+    ).round(2)
+    grouped_by_direction["left_iris_valid_rate_pct"] = (
+        grouped_by_direction["left_iris_valid_samples"]
+        / grouped_by_direction["samples"] * 100
+    ).round(2)
+    grouped_by_direction["right_iris_valid_rate_pct"] = (
+        grouped_by_direction["right_iris_valid_samples"]
+        / grouped_by_direction["samples"] * 100
+    ).round(2)
+    grouped_by_direction["both_iris_valid_rate_pct"] = (
+        grouped_by_direction["both_iris_valid_samples"]
+        / grouped_by_direction["samples"] * 100
+    ).round(2)
+    grouped_by_direction.to_csv(output_dir / "task_group_summary.csv", index=False)
+
     total = int(len(df))
     detected = int(face_detected.sum())
     left_count = int(left_valid.sum())
@@ -172,6 +207,8 @@ def analyze(csv_file):
         "right_iris_valid_rate_pct": round(right_count / total * 100, 2),
         "iris_coordinate_out_of_bounds_count": int(coordinate_out_of_bounds.sum()),
         "task_count": int(task_index.nunique(dropna=True)),
+        "task_group_count": int(task_group.nunique(dropna=True)),
+        "task_group_summary": grouped_by_direction.to_dict(orient="records"),
         "tasks_with_recorded_frames": int(task_index.nunique(dropna=True)),
         "negative_time_steps": negative_time_steps,
         "negative_timestamp_count": negative_time_steps,
@@ -259,6 +296,24 @@ def analyze(csv_file):
     save_chart(output_dir / "lighting_quality_over_time.png",
                "Frame Lighting Quality (Heuristic)", "Elapsed time (seconds)",
                "Grayscale intensity (0–255)")
+
+    plt.figure(figsize=(9, 5))
+    if len(grouped_by_direction):
+        x = np.arange(len(grouped_by_direction))
+        width = 0.2
+        plt.bar(x - 1.5 * width, grouped_by_direction["face_detection_rate_pct"], width, label="Face detected")
+        plt.bar(x - 0.5 * width, grouped_by_direction["left_iris_valid_rate_pct"], width, label="Left iris coordinates valid")
+        plt.bar(x + 0.5 * width, grouped_by_direction["right_iris_valid_rate_pct"], width, label="Right iris coordinates valid")
+        plt.bar(x + 1.5 * width, grouped_by_direction["both_iris_valid_rate_pct"], width, label="Both iris coordinates valid")
+        plt.xticks(x, grouped_by_direction["task_group"].astype(str), rotation=20, ha="right")
+        plt.ylim(0, 100)
+        plt.legend(fontsize=8)
+    save_chart(
+        output_dir / "technical_data_availability_by_task_group.png",
+        "Technical Data Availability by Task Group",
+        "Experimental task group",
+        "Frames with available data (%)"
+    )
 
     with (output_dir / "summary.json").open("w", encoding="utf-8") as file:
         json.dump(summary, file, indent=2, ensure_ascii=False)
