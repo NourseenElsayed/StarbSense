@@ -8,11 +8,17 @@ This checklist is a protocol-planning aid, not permission to conduct human-subje
 - [ ] Flask health endpoint returns HTTP 200.
 - [ ] Camera permission denial is handled without leaving the UI stuck.
 - [ ] MediaPipe initializes and reports GPU/CPU fallback clearly.
-- [ ] A complete session records samples for all nine tasks.
+- [ ] A complete session records samples for all 17 tasks in protocol v2.
 - [ ] Manual Stop still runs Python analysis on the partial session.
 - [ ] CSV export includes a header and consistent columns.
 - [ ] Python API rejects empty, malformed, and oversized requests.
-- [ ] Browser refresh/page close releases camera tracks.\n- [ ] Stopping the camera during a session safely stops recording and releases all media tracks.\n- [ ] Dashboard counts and Python summary agree for left, right, and paired iris-coordinate validity.
+- [ ] Browser refresh/page close releases camera tracks.
+- [ ] Stopping the camera during a session safely stops recording and releases all media tracks.
+- [ ] Dashboard counts and Python summary agree for left, right, and paired iris-coordinate validity.
+- [ ] Task-group summary reports sample counts and separate left/right/bilateral coordinate availability.
+- [ ] Assistant answers only supported topics, clearly identifies its rule-based limitations, and never diagnoses.
+- [ ] Medical next-step guidance is based on user-reported symptoms and established referral guidance, never on webcam measurements.
+- [ ] Arabic and English assistant responses and care guidance are checked manually.
 
 ## B. Measurement and repeatability
 - [ ] Compare recorded task timing with actual display timing.
