@@ -940,7 +940,7 @@ function recordFrame(now) {
       const sample = {
         session_id: sessionId,
         session_started_at_iso: sessionStartedAt,
-        elapsed_ms: Math.round(now - startTime),
+        elapsed_ms: Math.max(0, Math.round(now - startTime)),
         task_elapsed_ms: Math.max(
           0,
           Math.round(now - startTime - getTaskStartOffset(Math.max(taskIndex, 0)))
