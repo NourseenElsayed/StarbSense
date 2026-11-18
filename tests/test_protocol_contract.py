@@ -52,6 +52,13 @@ class ProtocolContractTests(unittest.TestCase):
         self.assertIn('languageToggle?.addEventListener("click"', self.main_js)
         self.assertIn('document.documentElement.dir = currentLanguage === "ar" ? "rtl" : "ltr"', self.main_js)
 
+    def test_local_assistant_is_limited_and_non_diagnostic(self):
+        self.assertIn('id="assistant-form"', self.index_html)
+        self.assertIn("answerAssistantQuestion", self.main_js)
+        self.assertIn("does not diagnose", self.main_js)
+        self.assertIn("latestAnalysis", self.main_js)
+        self.assertIn("updateCareGuidance", self.main_js)
+
     def test_generated_python_chart_titles_update_with_language(self):
         self.assertIn("heading.dataset.translationKey = alt", self.main_js)
         self.assertIn("image.dataset.translationKey = alt", self.main_js)
