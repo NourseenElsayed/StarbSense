@@ -53,6 +53,9 @@ class AnalysisTests(unittest.TestCase):
             self.assertEqual(summary["low_light_frame_count"], 1)
             self.assertTrue((output_dir / "task_summary.csv").is_file())
             self.assertTrue((output_dir / "lighting_quality_over_time.png").is_file())
+            self.assertTrue((output_dir / "task_group_summary.csv").is_file())
+            self.assertTrue((output_dir / "technical_data_availability_by_task_group.png").is_file())
+            self.assertEqual(summary["task_group_summary"][0]["task_group"], "Unknown")
 
 
 if __name__ == "__main__":
