@@ -1310,7 +1310,7 @@ function answerAssistantQuestion(rawQuestion) {
   const hasAny = (...terms) => terms.some((term) => q.includes(term));
   const urgent = hasAny(
     "sudden", "suddenly", "new double vision", "sudden double vision",
-    "sudden vision loss", "sudden eye turn", "فجأة", "مفاجئ", "ازدواج مفاجئ",
+    "sudden vision loss", "sudden eye turn", "new onset diplopia", "فجأة", "مفاجئ", "ازدواج مفاجئ", "ازدواج جديد", "تغير مفاجئ في اتجاه العين",
     "فقدان الرؤية المفاجئ", "فقدان مفاجئ للنظر", "انحراف مفاجئ"
   );
   const concern = hasAny(
@@ -1326,6 +1326,10 @@ function answerAssistantQuestion(rawQuestion) {
   if (concern) {
     updateCareGuidance("concern");
     return t("Your message describes an eye or vision concern. Please tell a parent or guardian and arrange a comprehensive assessment with an eye-care professional. StarbSense cannot confirm or exclude strabismus.");
+  }
+  if (hasAny("doctor", "ophthalmologist", "eye doctor", "طبيب", "دكتور", "كشف", "اكشف", "أكشف", "محتاج", "لازم اروح")) {
+    updateCareGuidance("general");
+    return t("If there are no symptoms or concerns and routine eye checks are up to date, this session alone does not create a reason for an extra appointment. Continue routine age-appropriate eye care. This is not a statement that the eyes are healthy; StarbSense cannot assess that.");
   }
   if (hasAny("result", "results", "session", "frames", "iris", "analysis", "نتيجة", "النتايج", "الجلسة", "الإطارات", "القزحية", "التحليل")) {
     if (!latestAnalysis) {
@@ -1345,10 +1349,6 @@ function answerAssistantQuestion(rawQuestion) {
   }
   if (hasAny("privacy", "camera", "video", "csv", "data", "خصوصية", "كاميرا", "فيديو", "بيانات", "ملف")) {
     return t("The browser processes camera frames locally. The Python service receives derived numeric measurements for analysis; it does not receive or store raw video in this project. CSV exports contain facial-landmark coordinates and should be treated as sensitive research data, especially for children.");
-  }
-  if (hasAny("doctor", "ophthalmologist", "eye doctor", "طبيب", "دكتور", "كشف", "اكشف", "أكشف", "محتاج", "لازم اروح")) {
-    updateCareGuidance("general");
-    return t("If there are no symptoms or concerns and routine eye checks are up to date, this session alone does not create a reason for an extra appointment. Continue routine age-appropriate eye care. This is not a statement that the eyes are healthy; StarbSense cannot assess that.");
   }
   return t("I can explain the session metrics, protocol design, privacy, and general care guidance. I cannot interpret webcam measurements as a diagnosis or answer questions outside this limited project guide. Please rephrase your question or ask an eye-care professional for personal medical advice.");
 }
