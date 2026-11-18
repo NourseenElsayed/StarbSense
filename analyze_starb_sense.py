@@ -176,10 +176,8 @@ def analyze(csv_file):
         "negative_timestamp_count": negative_time_steps,
         "decreasing_timestamp_count": negative_time_steps,
         "duplicate_timestamp_count": duplicate_time_steps,
-        "median_sample_interval_ms": median_interval_ms,
         "negative_time_steps": negative_time_steps,
         "duplicate_time_steps": duplicate_time_steps,
-        "median_sample_interval_ms": median_interval_ms,
         "max_sample_interval_ms": max_interval_ms,
         "relative_iris_metrics_available": bool(
             df[RELATIVE_COLUMNS].notna().any().any()
