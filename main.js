@@ -14,6 +14,27 @@ Object.assign(translations, {
   "Session stopped early. You can export the recorded frames.": "تم إيقاف الجلسة مبكرًا. يمكنك تصدير الإطارات المسجلة.",
   "StarbSense home": "الصفحة الرئيسية لـ StarbSense"
 });
+
+Object.assign(translations, {
+  "STARBSENSE GUIDE · LOCAL ASSISTANT": "مساعد StarbSense المحلي",
+  "Ask about your session or eye-health next steps": "اسأل عن جلستك أو الخطوات المناسبة لصحة العين",
+  "This on-device, rule-based guide explains project measurements and evidence-based next steps. It is not a generative AI model, medical examination, or diagnostic service. Your question is handled in this browser.": "يساعدك هذا الدليل المحلي القائم على قواعد محددة في فهم قياسات المشروع والخطوات التالية المستندة إلى الأدلة. لكنه ليس نموذج ذكاء اصطناعي توليديًا أو فحصًا طبيًا أو خدمة تشخيص. تتم معالجة سؤالك داخل المتصفح.",
+  "Medical next steps": "الخطوات الطبية التالية",
+  "StarbSense measurements alone cannot decide whether an eye examination is needed. If you have a concern about vision or eye alignment, arrange an eye-care assessment.": "لا تستطيع قياسات StarbSense وحدها تحديد الحاجة إلى فحص العين. إذا كان لديك قلق بشأن الرؤية أو اتجاه العين، فرتّب تقييمًا لدى مختص عيون.",
+  "You can ask about the session summary, data quality, the star-following protocol, privacy, or when to seek professional eye care.": "يمكنك السؤال عن ملخص الجلسة أو جودة البيانات أو بروتوكول تتبّع النجمة أو الخصوصية أو توقيت طلب رعاية متخصصة للعين.",
+  "Your question": "سؤالك",
+  "For example: What do these session results mean?": "مثال: ماذا تعني نتائج هذه الجلسة؟",
+  "Ask StarbSense Guide": "اسأل مساعد StarbSense",
+  "This assistant uses a limited local knowledge base and simple rules. It does not understand every possible question, provide a diagnosis, or replace a clinician.": "يستخدم هذا المساعد قاعدة معرفة محلية محدودة وقواعد بسيطة. لا يفهم كل الأسئلة المحتملة، ولا يقدم تشخيصًا، ولا يحل محل الطبيب.",
+  "I noticed a possible urgent symptom in your message. Sudden new double vision, sudden eye misalignment, or sudden vision loss needs urgent medical assessment. Tell a parent or guardian now and seek urgent medical care.": "يبدو أنك ذكرت عرضًا قد يحتاج إلى تقييم عاجل. ظهور ازدواج جديد في الرؤية فجأة، أو انحراف مفاجئ بالعين، أو فقدان مفاجئ للرؤية يستلزم تقييمًا طبيًا عاجلًا. أخبر ولي أمرك الآن واطلبوا رعاية طبية عاجلة.",
+  "Your message describes an eye or vision concern. Please tell a parent or guardian and arrange a comprehensive assessment with an eye-care professional. StarbSense cannot confirm or exclude strabismus.": "رسالتك تصف قلقًا متعلقًا بالعين أو الرؤية. أخبر ولي أمرك ورتّبوا فحصًا شاملًا لدى مختص عيون. لا يستطيع StarbSense تأكيد الحَوَل أو استبعاده.",
+  "If there are no symptoms or concerns and routine eye checks are up to date, this session alone does not create a reason for an extra appointment. Continue routine age-appropriate eye care. This is not a statement that the eyes are healthy; StarbSense cannot assess that.": "إذا لم توجد أعراض أو مخاوف وكانت فحوصات العين الدورية محدثة، فهذه الجلسة وحدها لا تُنشئ سببًا لموعد إضافي. استمر في رعاية العين الدورية المناسبة للعمر. هذا لا يعني أن العين سليمة؛ فـStarbSense لا يستطيع تقييم ذلك.",
+  "The star path samples center, left/right, up/down, and diagonal screen positions. These directions make the task repeatable and easy to describe. The exact path, star shape, and durations are experimental design choices, not a clinically validated eye-movement test.": "يمر مسار النجمة بالمركز واليمين/اليسار والأعلى/الأسفل والاتجاهات القطرية. تساعد هذه الاتجاهات على جعل المهمة قابلة للتكرار وسهلة الوصف. أما المسار الدقيق وشكل النجمة والمدد فهي اختيارات تصميم تجريبية وليست اختبارًا سريريًا معتمدًا لحركة العين.",
+  "The browser processes camera frames locally. The Python service receives derived numeric measurements for analysis; it does not receive or store raw video in this project. CSV exports contain facial-landmark coordinates and should be treated as sensitive research data, especially for children.": "يعالج المتصفح إطارات الكاميرا محليًا. تستقبل خدمة Python قياسات رقمية مشتقة للتحليل؛ ولا تستقبل أو تخزن فيديو خامًا في هذا المشروع. تحتوي ملفات CSV على إحداثيات معالم الوجه ويجب التعامل معها كبيانات بحثية حساسة، خاصةً للأطفال.",
+  "I can explain the session metrics, protocol design, privacy, and general care guidance. I cannot interpret webcam measurements as a diagnosis or answer questions outside this limited project guide. Please rephrase your question or ask an eye-care professional for personal medical advice.": "يمكنني شرح مؤشرات الجلسة وتصميم البروتوكول والخصوصية والإرشادات العامة للرعاية. لا يمكنني تفسير قياسات كاميرا الويب على أنها تشخيص أو الإجابة عن أسئلة خارج نطاق دليل المشروع المحدود. أعد صياغة سؤالك أو اسأل مختص عيون للحصول على نصيحة طبية شخصية."
+});
+let latestAnalysis = null;
+
 const reverseTranslations = Object.fromEntries(
   Object.entries(translations).map(([english, arabic]) => [arabic, english])
 );
@@ -52,6 +73,16 @@ function applyLanguage(language) {
     if (element instanceof HTMLImageElement) element.alt = translated || key;
     else element.textContent = translated || key;
   });
+
+  const assistantInput = $("assistant-input");
+  if (assistantInput) assistantInput.placeholder = currentLanguage === "ar"
+    ? "مثال: ماذا تعني نتائج هذه الجلسة؟"
+    : "For example: What do these session results mean?";
+  const assistantLabel = document.querySelector('label[for="assistant-input"]');
+  if (assistantLabel) assistantLabel.textContent = currentLanguage === "ar" ? "سؤالك" : "Your question";
+  const assistantButton = $("assistant-form")?.querySelector('button[type="submit"]');
+  if (assistantButton) assistantButton.textContent = currentLanguage === "ar" ? "اسأل مساعد StarbSense" : "Ask StarbSense Guide";
+  updateCareGuidance();
 
   document.querySelectorAll("[aria-label]").forEach((element) => {
     const value = element.getAttribute("aria-label");
@@ -1166,6 +1197,7 @@ async function runPythonAnalysis() {
     }
 
     status.textContent = t("Python analysis complete");
+    latestAnalysis = result;
 
     const lines = [
       `Python analyzed ${result.sample_count ?? 0} recorded frames.`,
@@ -1222,6 +1254,98 @@ async function runPythonAnalysis() {
       ? `لا تزال لوحة التحليلات داخل المتصفح متاحة. تعذّر إكمال تحليل Python: ${error.message}`
       : `The in-browser dashboard remains available. Python analysis could not be completed: ${error.message}`;
   }
+}
+
+
+function normalizeAssistantText(value) {
+  return String(value || "").toLowerCase().normalize("NFKC")
+    .replace(/[ًٌٍَُِّْـ]/g, "").replace(/\s+/g, " ").trim();
+}
+
+function appendAssistantMessage(message, kind = "assistant") {
+  const container = $("assistant-messages");
+  if (!container) return;
+  const item = document.createElement("p");
+  item.className = kind === "user"
+    ? "assistant-message assistant-message-user"
+    : "assistant-message assistant-message-system";
+  item.textContent = message;
+  container.appendChild(item);
+  container.scrollTop = container.scrollHeight;
+}
+
+function updateCareGuidance(level = "general") {
+  const panel = $("care-guidance");
+  if (!panel) return;
+  const title = currentLanguage === "ar" ? "الخطوات الطبية التالية" : "Medical next steps";
+  let body;
+  if (level === "urgent") {
+    body = currentLanguage === "ar"
+      ? "تحتاج الأعراض المفاجئة مثل ازدواج الرؤية الجديد أو انحراف العين المفاجئ أو فقدان الرؤية المفاجئ إلى تقييم طبي عاجل. أخبر ولي أمرك الآن واطلبوا رعاية عاجلة."
+      : "Sudden new double vision, sudden eye misalignment, or sudden vision loss needs urgent medical assessment. Tell a parent or guardian now and seek urgent care.";
+  } else if (level === "concern") {
+    body = currentLanguage === "ar"
+      ? "عند وجود انحراف ملحوظ بالعين أو شكوى بصرية أو اختلاف في الرؤية، أخبر ولي أمرك ورتّبوا فحصًا شاملًا لدى مختص عيون."
+      : "If an eye appears misaligned, or there is a vision complaint or difference in vision, tell a parent or guardian and arrange a comprehensive eye-care assessment.";
+  } else {
+    body = currentLanguage === "ar"
+      ? "لا يمكن لنتيجة StarbSense تحديد الحاجة إلى الطبيب. إذا لم توجد أعراض وكانت الفحوصات الدورية محدثة، فلا تستلزم هذه الجلسة وحدها موعدًا إضافيًا؛ استمر في الفحوصات الدورية المناسبة للعمر. أي قلق جديد يستحق تقييمًا مهنيًا."
+      : "StarbSense cannot decide whether a clinician is needed. If there are no symptoms and routine checks are up to date, this session alone does not require an extra appointment; continue age-appropriate routine eye care. Any new concern deserves professional assessment.";
+  }
+  panel.replaceChildren();
+  const strong = document.createElement("strong");
+  strong.textContent = title;
+  const p = document.createElement("p");
+  p.textContent = body;
+  panel.append(strong, p);
+}
+
+function answerAssistantQuestion(rawQuestion) {
+  const q = normalizeAssistantText(rawQuestion);
+  const hasAny = (...terms) => terms.some((term) => q.includes(term));
+  const urgent = hasAny(
+    "sudden", "suddenly", "new double vision", "sudden double vision",
+    "sudden vision loss", "sudden eye turn", "فجأة", "مفاجئ", "ازدواج مفاجئ",
+    "فقدان الرؤية المفاجئ", "فقدان مفاجئ للنظر", "انحراف مفاجئ"
+  );
+  const concern = hasAny(
+    "double vision", "diplopia", "crossed eye", "eye turns", "eye turning",
+    "misaligned", "strabismus", "blurred vision", "vision difference",
+    "close one eye", "head tilt", "حول", "حَوَل", "انحراف", "ازدواج",
+    "زغللة", "الرؤية مختلفة", "عينه بتروح", "عين بتتحول"
+  );
+  if (urgent) {
+    updateCareGuidance("urgent");
+    return t("I noticed a possible urgent symptom in your message. Sudden new double vision, sudden eye misalignment, or sudden vision loss needs urgent medical assessment. Tell a parent or guardian now and seek urgent medical care.");
+  }
+  if (concern) {
+    updateCareGuidance("concern");
+    return t("Your message describes an eye or vision concern. Please tell a parent or guardian and arrange a comprehensive assessment with an eye-care professional. StarbSense cannot confirm or exclude strabismus.");
+  }
+  if (hasAny("result", "results", "session", "frames", "iris", "analysis", "نتيجة", "النتايج", "الجلسة", "الإطارات", "القزحية", "التحليل")) {
+    if (!latestAnalysis) {
+      return currentLanguage === "ar"
+        ? "لم تُحلل جلسة بعد. شغّل التجربة وأكملها أو أوقفها، ثم راجع لوحة التحليل. أرقام الإطارات تصف توفر القياسات فقط ولا تشخّص العين."
+        : "No session has been analyzed yet. Run and complete or stop a session, then review the analytics dashboard. Frame counts describe measurement availability only; they do not diagnose the eyes.";
+    }
+    const total = latestAnalysis.sample_count ?? 0;
+    const faceRate = latestAnalysis.face_detection_rate_pct ?? "—";
+    const bilateral = latestAnalysis.valid_iris_rate_pct ?? "—";
+    return currentLanguage === "ar"
+      ? `تحتوي جلستك على ${total} إطارًا مسجلًا. تم اكتشاف معالم الوجه في ${faceRate}% من الإطارات، وتوفرت إحداثيات صالحة للقزحيتين في ${bilateral}% منها. هذه مؤشرات تقنية لتوفر البيانات، وليست دقة لاتجاه النظر أو محاذاة العين أو نتيجة طبية.`
+      : `Your session contains ${total} recorded frames. Face landmarks were detected in ${faceRate}% of frames, and valid coordinates for both iris landmarks were available in ${bilateral}%. These are technical data-availability measures, not gaze accuracy, eye alignment, or a medical result.`;
+  }
+  if (hasAny("star", "movement", "directions", "diagonal", "game", "protocol", "النجمة", "الحركة", "الاتجاهات", "اللعبة", "البروتوكول")) {
+    return t("The star path samples center, left/right, up/down, and diagonal screen positions. These directions make the task repeatable and easy to describe. The exact path, star shape, and durations are experimental design choices, not a clinically validated eye-movement test.");
+  }
+  if (hasAny("privacy", "camera", "video", "csv", "data", "خصوصية", "كاميرا", "فيديو", "بيانات", "ملف")) {
+    return t("The browser processes camera frames locally. The Python service receives derived numeric measurements for analysis; it does not receive or store raw video in this project. CSV exports contain facial-landmark coordinates and should be treated as sensitive research data, especially for children.");
+  }
+  if (hasAny("doctor", "ophthalmologist", "eye doctor", "طبيب", "دكتور", "كشف", "اكشف", "أكشف", "محتاج", "لازم اروح")) {
+    updateCareGuidance("general");
+    return t("If there are no symptoms or concerns and routine eye checks are up to date, this session alone does not create a reason for an extra appointment. Continue routine age-appropriate eye care. This is not a statement that the eyes are healthy; StarbSense cannot assess that.");
+  }
+  return t("I can explain the session metrics, protocol design, privacy, and general care guidance. I cannot interpret webcam measurements as a diagnosis or answer questions outside this limited project guide. Please rephrase your question or ask an eye-care professional for personal medical advice.");
 }
 
 function finishAdventure() {
@@ -1541,6 +1665,21 @@ function exportSession() {
     "success"
   );
 }
+
+
+const assistantForm = $("assistant-form");
+if (assistantForm) {
+  assistantForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const input = $("assistant-input");
+    const question = input?.value?.trim();
+    if (!question) return;
+    appendAssistantMessage(question, "user");
+    appendAssistantMessage(answerAssistantQuestion(question));
+    input.value = "";
+  });
+}
+updateCareGuidance();
 
 // Button handlers
 cameraButton.onclick = enableCamera;
