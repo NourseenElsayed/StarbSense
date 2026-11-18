@@ -5,7 +5,7 @@ import base64
 import csv
 import tempfile
 
-from analyze_eyeplay import analyze
+from analyze_starb_sense import analyze
 
 app = Flask(__name__)
 
