@@ -10,6 +10,7 @@ from analyze_starb_sense import analyze
 app = Flask(__name__)
 
 MAX_ROWS = 5000
+app.config['MAX_CONTENT_LENGTH'] = 8 * 1024 * 1024
 ALLOWED_ORIGIN = "http://127.0.0.1:5173"
 
 CHART_FILES = {
@@ -18,6 +19,7 @@ CHART_FILES = {
     "relative_iris_chart": "relative_iris_over_time.png",
     "head_rotation_chart": "head_rotation_over_time.png",
     "relative_iris_task_chart": "relative_iris_by_task.png",
+    "lighting_quality_chart": "lighting_quality_over_time.png",
 }
 
 
@@ -58,6 +60,9 @@ def analyze_session():
 
     if not all(isinstance(row, dict) for row in rows):
         return jsonify({"error": "Every sample must be an object."}), 400
+
+    if any(len(row) > 100 for row in rows):
+        return jsonify({"error": "A sample contains too many fields."}), 400
 
     columns = list(dict.fromkeys(
         key
