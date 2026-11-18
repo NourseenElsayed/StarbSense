@@ -12,7 +12,8 @@ StarbSense is an experimental, child-friendly visual-target-following and facial
 - OpenCV bright-pixel candidates (not verified corneal reflections).
 - Per-frame technical metadata: timestamps, camera resolution/frame rate where exposed, task metadata, page visibility, and non-identifying lighting summaries.
 - CSV export and local Flask/Python analysis.
-- Data-quality summaries and six charts, including task-level coverage and heuristic lighting trends.
+- Data-quality summaries and seven charts, including task-level and task-group coverage and heuristic lighting trends.
+- A local, rule-based evidence guide for project FAQs and general eye-care next steps; it is not a generative AI model and never diagnoses.
 
 No raw camera frames, camera device identifiers, or audio are saved or sent to the Python service. The local service processes only the numeric/session fields submitted by the browser.
 
@@ -74,3 +75,15 @@ Obtain the required school/competition approvals, parent/guardian permission, an
 - [Structured visual-following protocol v2](docs/PROTOCOL_V2.md)
 - [Research libraries and dataset registry](docs/RESEARCH_RESOURCES.md)
 \n\n## Interface languages\n\nThe interface opens in Arabic (RTL) by default and includes an Arabic/English language switch. The selected language is stored locally in the browser.\n
+
+## Medical evidence and design boundaries
+
+The visual-following sequence is an experimental stimulus, not a validated medical test. Its star shape, colors, screen positions, and durations are interface/design choices. They must not be described as medically validated or used to infer normal eye movement or alignment.
+
+The local assistant explains supported project topics and gives general next-step guidance based on the user's words. It does not use webcam measurements to make a referral decision, does not diagnose, and is not a generative large language model. Sudden new double vision, sudden eye misalignment, or sudden vision loss requires urgent medical assessment. A persistent concern about eye alignment or vision should be discussed with an eye-care professional.
+
+Clinical references:
+- AAO/AAPOS, Vision Screening for Infants and Children (2022): https://www.aao.org/education/clinical-statement/vision-screening-infants-children-2022
+- AAO, Strabismus in Children (2026): https://www.aao.org/eye-health/diseases/strabismus-in-children
+- AAO, Pediatric Eye Evaluations Preferred Practice Pattern: https://www.aaojournal.org/article/S0161-6420(22)00866-1/fulltext
+- Royal College of Ophthalmologists, Emergency Eye Care Commissioning Guidance: https://www.rcophth.ac.uk/wp-content/uploads/2020/05/Emergency-Eye-Care-Commissioning-Guidance.pdf
