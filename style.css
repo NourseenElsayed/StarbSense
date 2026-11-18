@@ -897,3 +897,16 @@ body.is-rtl .site-footer { direction: rtl; }
 .assistant-form textarea:focus { outline: 3px solid rgb(85 72 168 / 16%); border-color: #7469c2; }
 .assistant-disclaimer { margin: 12px 0 0; font-size: .82rem; }
 @media (max-width: 760px) { .assistant-message { max-width: 100%; } }
+
+/* Live camera framing and technical-quality guidance */
+.camera-panel { aspect-ratio: 16 / 9; }
+#camera { position: absolute; inset: 0; min-height: 0; height: 100%; object-fit: cover; }
+.face-guide-overlay { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.readiness-panel { padding: 13px 15px; border: 1px solid var(--border); border-radius: 13px; background: #fff9e9; line-height: 1.55; }
+.readiness-panel strong { display: block; margin-bottom: 4px; }
+.readiness-panel p { margin: 0 0 4px; color: var(--text-color); }
+.readiness-panel small { display: block; color: var(--muted); }
+.readiness-panel.is-ready { border-color: #86c9a3; background: #effaf3; }
+.technical-session-result { margin: 12px 0; padding: 14px 16px; border: 1px solid var(--border); border-radius: 12px; background: #f8f9fc; line-height: 1.65; }
+.technical-session-result.is-pass { border-color: #86c9a3; background: #effaf3; }
+.technical-session-result.is-repeat { border-color: #e8c77b; background: #fff9e9; }
