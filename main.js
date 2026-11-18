@@ -1112,11 +1112,13 @@ function showPythonChart(id, src, alt) {
     card.className = "python-chart-card";
 
     const heading = document.createElement("h3");
-    heading.dataset.translationKey = alt;\n    heading.textContent = t(alt);
+    heading.dataset.translationKey = alt;
+    heading.textContent = t(alt);
 
     image = document.createElement("img");
     image.id = id;
-    image.dataset.translationKey = alt;\n    image.alt = t(alt);
+    image.dataset.translationKey = alt;
+    image.alt = t(alt);
     image.loading = "lazy";
     image.style.display = "block";
     image.style.width = "100%";
