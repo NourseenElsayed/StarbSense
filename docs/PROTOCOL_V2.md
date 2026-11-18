@@ -4,7 +4,7 @@
 
 StarbSense v2 uses a predefined sequence of visual fixation targets to make experimental sessions more repeatable than an unspecified or random star movement. It records the requested target position and task phase alongside the timestamped face/iris landmark measurements.
 
-This is a research interaction protocol, not a clinical examination, cover test, calibrated gaze test, or validated strabismus screening protocol.
+This is a research interaction protocol, not a clinical examination, cover test, calibrated gaze test, or validated strabismus screening protocol. The center/horizontal/vertical/diagonal sequence was selected as a simple, repeatable screen-coordinate path. The star shape is a child-friendly engagement choice. The target positions and durations are engineering parameters, not medically prescribed directions, validated stimulus geometry, or evidence of normal ocular motility.
 
 ## Fixed sequence
 
@@ -58,3 +58,16 @@ Before making scientific performance claims, the research team needs:
 - Comparison against an appropriate reference eye-tracking instrument and qualified clinical assessment, under professional supervision.
 - Participant-level train/test separation for any later machine-learning work.
 - Required ethics/school approvals, guardian permission, and participant assent for any research involving minors.
+
+
+## Clinical design boundary
+
+The protocol borrows only the broad concept of presenting a visual target and observing fixation/following, which appears in pediatric eye-assessment guidance. The StarbSense implementation does **not** implement the clinical corneal light-reflex test, cover test, visual-acuity test, or instrument-based screening method. Its webcam landmarks are not equivalent to clinician-observed fixation or calibrated eye tracking. Do not infer alignment, motility, or a referral decision from successful completion of the star path.
+
+The exact target path, star graphic, colors, animation, and dwell times are user-interface and experimental-design choices. They must not be presented as clinically validated. A future clinical protocol requires an ophthalmologist/orthoptist to specify and supervise the examination design and a validation study against an appropriate reference standard.
+
+## Clinical references
+
+- American Academy of Ophthalmology (AAO) and American Association for Pediatric Ophthalmology and Strabismus (AAPOS), *Vision Screening for Infants and Children* (2022): https://www.aao.org/education/clinical-statement/vision-screening-infants-children-2022
+- AAO, *Strabismus in Children* (reviewed 2026): https://www.aao.org/eye-health/diseases/strabismus-in-children
+- AAO, *Pediatric Eye Evaluations Preferred Practice Pattern* (2022): https://www.aaojournal.org/article/S0161-6420(22)00866-1/fulltext
