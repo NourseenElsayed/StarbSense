@@ -5,6 +5,7 @@ StarbSense is an experimental, child-friendly visual-target-following and facial
 ## Current pipeline
 
 - Browser camera capture with participant permission.
+- A fixed 17-step visual-following protocol (center, horizontal, vertical, and diagonal targets) with per-step duration and task metadata; this is an experimental stimulus sequence, not a clinical test.
 - MediaPipe Face Landmarker for facial and iris landmarks.
 - Relative iris-to-eye-corner geometric features (exploratory, not gaze-calibrated).
 - Facial transformation matrix proxies (not validated head-pose angles).
@@ -70,3 +71,5 @@ Obtain the required school/competition approvals, parent/guardian permission, an
 - [Data dictionary](docs/DATA_DICTIONARY.md)
 - [External datasets and research references](docs/RESEARCH_DATASETS.md)
 - [Research validation checklist](docs/VALIDATION_CHECKLIST.md)
+- [Structured visual-following protocol v2](docs/PROTOCOL_V2.md)
+- [Research libraries and dataset registry](docs/RESEARCH_RESOURCES.md)
