@@ -83,16 +83,17 @@ def analyze(csv_file):
     df["face_detected_numeric"] = face_detected.astype(int)
 
     # A valid iris sample requires a detected face and both iris coordinates.
-    left_x = numeric_column(df, "left_iris_x")
-    left_y = numeric_column(df, "left_iris_y")
-    right_x = numeric_column(df, "right_iris_x")
-    right_y = numeric_column(df, "right_iris_y")
+    left_x = numeric_column(df, "left_iris_landmark_x")
+    left_y = numeric_column(df, "left_iris_landmark_y")
+    right_x = numeric_column(df, "right_iris_landmark_x")
+    right_y = numeric_column(df, "right_iris_landmark_y")
 
     left_valid = left_x.notna() & left_y.notna()
     right_valid = right_x.notna() & right_y.notna()
     both_iris_valid = face_detected & left_valid & right_valid
 
     # Quality checks
+    # Check timestamps in their original recording order before sorting.
     original_times = pd.to_numeric(
         pd.read_csv(csv_file)["elapsed_ms"], errors="coerce"
     ).dropna()
@@ -157,15 +158,25 @@ def analyze(csv_file):
 
     summary = {
         "sample_count": total_samples,
+        "total_recorded_frames": total_samples,
         "face_detected_samples": detected_samples,
+        "face_detection_rate_percent": round(
+            detected_samples / total_samples * 100, 2
+        ) if total_samples else 0,
         "face_detection_rate_pct": round(
             detected_samples / total_samples * 100, 2
         ) if total_samples else 0,
         "valid_iris_samples": valid_iris_samples,
+        "frames_with_valid_iris_coordinates": valid_iris_samples,
         "valid_iris_rate_pct": round(
             valid_iris_samples / total_samples * 100, 2
         ) if total_samples else 0,
         "task_count": int(task_index.nunique(dropna=True)),
+        "tasks_with_recorded_frames": int(task_index.nunique(dropna=True)),
+        "negative_timestamp_count": negative_time_steps,
+        "decreasing_timestamp_count": negative_time_steps,
+        "duplicate_timestamp_count": duplicate_time_steps,
+        "median_sample_interval_ms": median_interval_ms,
         "negative_time_steps": negative_time_steps,
         "duplicate_time_steps": duplicate_time_steps,
         "median_sample_interval_ms": median_interval_ms,
@@ -187,8 +198,8 @@ def analyze(csv_file):
         },
         "interpretation": (
             "Experimental landmark and data-quality analysis only. "
-            "These measurements are not validated for diagnosing or "
-            "excluding strabismus or any other eye condition."
+            "These measurements are experimental and are not validated for diagnosing "
+            "or excluding strabismus or any other eye condition."
         ),
     }
 
