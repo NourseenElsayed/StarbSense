@@ -54,6 +54,7 @@
               muted
               aria-label="Camera preview"
             ></video>
+            <canvas id="face-guide-overlay" class="face-guide-overlay" aria-hidden="true"></canvas>
           </div>
 
           <div class="setup-controls">
@@ -74,6 +75,11 @@
             <p id="setup-message" class="message" role="status" aria-live="polite">
               Enable the camera to load the game model.
             </p>
+            <div id="readiness-panel" class="readiness-panel is-warning" role="status" aria-live="polite">
+              <strong id="readiness-title">Camera positioning guide</strong>
+              <p id="readiness-message">Turn on the camera to check that your face and both eyes are visible.</p>
+              <small id="readiness-detail">This checks camera framing and image quality only. It cannot tell whether eyes are healthy.</small>
+            </div>
           </div>
         </div>
       </section>
@@ -241,6 +247,7 @@
 
         <article class="analytics-panel analytics-notice">
           <h3>Interpretation and limitations</h3>
+          <div id="technical-session-result" class="technical-session-result" hidden></div>
           <p id="analytics-summary">
             Complete a session to generate its summary.
           </p>
