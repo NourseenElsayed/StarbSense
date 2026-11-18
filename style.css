@@ -793,3 +793,48 @@ a:focus-visible {
     grid-template-columns: 1fr;
   }
 }
+
+/* Bilingual interface and Arabic RTL support */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.language-toggle {
+  min-height: 40px;
+  padding: 8px 15px;
+  border: 1px solid #dcd8ff;
+  border-radius: 999px;
+  color: #443a9b;
+  background: #f1efff;
+  font-weight: 800;
+  cursor: pointer;
+}
+.language-toggle:hover { background: #e7e3ff; }
+html[dir="rtl"] body {
+  font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+}
+body.is-rtl {
+  text-align: right;
+}
+body.is-rtl .intro {
+  margin-left: auto;
+  margin-right: 0;
+}
+body.is-rtl .prototype-label { text-align: left; }
+body.is-rtl .status-pill { direction: rtl; }
+body.is-rtl .stage-topbar { direction: rtl; }
+body.is-rtl #task-label { text-align: center; }
+body.is-rtl .button-stop { direction: rtl; }
+body.is-rtl .protocol-count { letter-spacing: 0; }
+body.is-rtl .eyebrow { letter-spacing: 0; }
+body.is-rtl .protocol-steps,
+body.is-rtl .guidance-grid { direction: rtl; }
+body.is-rtl .analytics-chart,
+body.is-rtl canvas { direction: ltr; }
+body.is-rtl .game-message { direction: rtl; }
+body.is-rtl .site-footer { direction: rtl; }
+@media (max-width: 760px) {
+  .header-actions { gap: 8px; }
+  body.is-rtl #task-label { text-align: center; }
+}
