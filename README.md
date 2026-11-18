@@ -73,3 +73,4 @@ Obtain the required school/competition approvals, parent/guardian permission, an
 - [Research validation checklist](docs/VALIDATION_CHECKLIST.md)
 - [Structured visual-following protocol v2](docs/PROTOCOL_V2.md)
 - [Research libraries and dataset registry](docs/RESEARCH_RESOURCES.md)
+\n\n## Interface languages\n\nThe interface opens in Arabic (RTL) by default and includes an Arabic/English language switch. The selected language is stored locally in the browser.\n
