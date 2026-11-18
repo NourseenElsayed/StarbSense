@@ -12,7 +12,7 @@ This checklist is a protocol-planning aid, not permission to conduct human-subje
 - [ ] Manual Stop still runs Python analysis on the partial session.
 - [ ] CSV export includes a header and consistent columns.
 - [ ] Python API rejects empty, malformed, and oversized requests.
-- [ ] Browser refresh/page close releases camera tracks.
+- [ ] Browser refresh/page close releases camera tracks.\n- [ ] Stopping the camera during a session safely stops recording and releases all media tracks.\n- [ ] Dashboard counts and Python summary agree for left, right, and paired iris-coordinate validity.
 
 ## B. Measurement and repeatability
 - [ ] Compare recorded task timing with actual display timing.
