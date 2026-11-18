@@ -22,6 +22,9 @@ function applyLanguage(language) {
   currentLanguage = language === "en" ? "en" : "ar";
   localStorage.setItem("starbsense-language", currentLanguage);
   document.documentElement.lang = currentLanguage;
+  document.title = currentLanguage === "ar"
+    ? "StarbSense | نموذج تتبّع بصري تفاعلي"
+    : "StarbSense | Interactive Vision Prototype";
   document.documentElement.dir = currentLanguage === "ar" ? "rtl" : "ltr";
   document.body.classList.toggle("is-rtl", currentLanguage === "ar");
 
@@ -42,6 +45,12 @@ function applyLanguage(language) {
     const translated = currentLanguage === "ar" ? translations[value] : reverseTranslations[value];
     if (translated) element.setAttribute("aria-label", translated);
   });
+
+  if (taskIndex >= 0 && gameRunning) {
+    roundCounter.textContent = currentLanguage === "ar"
+      ? `المهمة ${taskIndex + 1} من ${sequence.length}`
+      : `Task ${taskIndex + 1} of ${sequence.length}`;
+  }
 
   if (languageToggle) {
     languageToggle.textContent = currentLanguage === "ar" ? "English" : "العربية";
