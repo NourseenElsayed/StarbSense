@@ -2,6 +2,7 @@
 import { FaceLandmarker, FilesetResolver } from "@mediapipe/tasks-vision";
 import Chart from "chart.js/auto";
 import cvModule from "@techstark/opencv-js";
+import { startCameraQualityMonitor, inspectFaceGeometry } from "./quality-monitor.js";
 
 const $ = (id) => document.getElementById(id);
 
@@ -83,6 +84,7 @@ function applyLanguage(language) {
   const assistantButton = $("assistant-form")?.querySelector('button[type="submit"]');
   if (assistantButton) assistantButton.textContent = currentLanguage === "ar" ? "اسأل مساعد StarbSense" : "Ask StarbSense Guide";
   updateCareGuidance();
+  if (latestCameraQuality) updateReadiness(latestCameraQuality);
 
   document.querySelectorAll("[aria-label]").forEach((element) => {
     const value = element.getAttribute("aria-label");
@@ -128,6 +130,81 @@ const gameMessage = $("game-message");
 const progressBar = $("progress-bar");
 const taskLabel = $("task-label");
 const roundCounter = $("round-counter");
+const readinessPanel = $("readiness-panel");
+const readinessTitle = $("readiness-title");
+const readinessMessage = $("readiness-message");
+const readinessDetail = $("readiness-detail");
+const faceGuideOverlay = $("face-guide-overlay");
+const technicalSessionResult = $("technical-session-result");
+
+const readinessCopy = {
+  waiting: ["Camera positioning guide", "Turn on the camera to check that your face and both eyes are visible."],
+  no_face: ["Face not found", "Move into the camera view so your whole face is visible."],
+  too_far: ["Move a little closer", "Your face looks small in the camera. Move closer while keeping your full face visible."],
+  too_close: ["Move a little farther away", "Your face is too close to fit comfortably in the guide."],
+  center_face: ["Center your face", "Move your face toward the middle of the frame and keep your eyes visible."],
+  eyes_not_clear: ["Eyes are not clear enough", "Make sure both eyes are visible and face the camera."],
+  head_straight: ["Face the camera", "Keep your head comfortably upright and look toward the screen."],
+  lighting: ["Adjust the lighting", "Use soft, even light from in front of you. Avoid darkness and strong backlighting."],
+  processing_error: ["Camera check paused", "The camera frame could not be analyzed. Check the camera and try again."],
+  ready: ["Camera position looks ready", "Your face is centered and the image is clear enough for this technical session check."]
+};
+
+Object.assign(translations, {
+  "Camera positioning guide": "دليل وضع الكاميرا",
+  "Turn on the camera to check that your face and both eyes are visible.": "شغّل الكاميرا للتأكد من ظهور الوجه والعينين بوضوح.",
+  "This checks camera framing and image quality only. It cannot tell whether eyes are healthy.": "هذا الفحص يراجع وضع الكاميرا وجودة الصورة فقط، ولا يحدد ما إذا كانت العينان سليمتين.",
+  "Face not found": "لم يتم العثور على الوجه",
+  "Move into the camera view so your whole face is visible.": "تحرك إلى مجال الكاميرا حتى يظهر وجهك بالكامل.",
+  "Move a little closer": "اقترب قليلًا",
+  "Your face looks small in the camera. Move closer while keeping your full face visible.": "يبدو وجهك صغيرًا في الصورة. اقترب مع إبقاء الوجه كاملًا ظاهرًا.",
+  "Move a little farther away": "ابتعد قليلًا",
+  "Your face is too close to fit comfortably in the guide.": "وجهك قريب جدًا؛ ابتعد قليلًا ليظهر كاملًا داخل الإطار.",
+  "Center your face": "ضع وجهك في المنتصف",
+  "Move your face toward the middle of the frame and keep your eyes visible.": "حرّك وجهك إلى منتصف الإطار وتأكد من ظهور العينين.",
+  "Eyes are not clear enough": "العينان غير واضحتين بما يكفي",
+  "Make sure both eyes are visible and face the camera.": "تأكد من ظهور العينين بوضوح وأنك تواجه الكاميرا.",
+  "Face the camera": "واجه الكاميرا",
+  "Keep your head comfortably upright and look toward the screen.": "حافظ على وضع رأس مريح ومستقيم وانظر إلى الشاشة.",
+  "Adjust the lighting": "عدّل الإضاءة",
+  "Use soft, even light from in front of you. Avoid darkness and strong backlighting.": "استخدم إضاءة أمامية هادئة ومتساوية، وتجنب الظلام والإضاءة القوية من الخلف.",
+  "Camera check paused": "توقف فحص الكاميرا مؤقتًا",
+  "The camera frame could not be analyzed. Check the camera and try again.": "تعذر تحليل إطار الكاميرا. تحقق من الكاميرا وحاول مرة أخرى.",
+  "Camera position looks ready": "وضع الكاميرا مناسب مبدئيًا",
+  "Your face is centered and the image is clear enough for this technical session check.": "وجهك في المنتصف والصورة واضحة بما يكفي لفحص الجاهزية التقني.",
+  "Technical session status": "حالة الجلسة التقنية",
+  "The camera captured enough usable tracking data for this experimental session.": "سجلت الكاميرا بيانات تتبّع كافية لهذه الجلسة التجريبية.",
+  "Some tracking data may be missing. Adjust your position and repeat the session if you want a cleaner technical recording.": "قد تكون بعض بيانات التتبّع غير مكتملة. عدّل وضعك وأعد الجلسة إذا أردت تسجيلًا تقنيًا أوضح.",
+  "This status describes recording quality only. It is not an eye-health result or a medical recommendation.": "هذه الحالة تصف جودة التسجيل فقط، وليست نتيجة لصحة العين أو توصية طبية.",
+  "Bright spots can be caused by glasses or room lights. This camera setup cannot verify a corneal light reflex.": "قد تنتج البقع الساطعة عن النظارات أو إضاءة الغرفة. لا يستطيع إعداد الكاميرا هذا تأكيد انعكاس الضوء القرني.",
+  "Repeat the session": "يُفضّل إعادة الجلسة",
+  "Technical recording looks usable": "التسجيل التقني قابل للاستخدام مبدئيًا"
+});
+
+function updateReadiness(state) {
+  latestCameraQuality = state;
+  const copy = readinessCopy[state.code] || readinessCopy.waiting;
+  const ready = Boolean(state.ready);
+  readinessTitle.textContent = t(ready ? readinessCopy.ready[0] : copy[0]);
+  readinessMessage.textContent = t(ready ? readinessCopy.ready[1] : copy[1]);
+  readinessDetail.textContent = t("This checks camera framing and image quality only. It cannot tell whether eyes are healthy.");
+  readinessPanel?.classList.toggle("is-ready", ready);
+  readinessPanel?.classList.toggle("is-warning", !ready);
+  startButton.disabled = !cameraReady || !ready || gameRunning;
+}
+
+function startQualityMonitor() {
+  if (!cameraReady || !landmarker || gameRunning || qualityMonitor) return;
+  updateReadiness({ ready: false, code: "waiting", stable_frames: 0 });
+  qualityMonitor = startCameraQualityMonitor({
+    video: camera, landmarker, canvas: faceGuideOverlay, onUpdate: updateReadiness
+  });
+}
+
+function stopQualityMonitor() {
+  qualityMonitor?.stop();
+  qualityMonitor = null;
+}
 
 let stream = null;
 let landmarker = null;
@@ -149,6 +226,8 @@ let sessionStartedAt = "";
 let cameraMetadata = {};
 let irisChart = null;
 let qualityChart = null;
+let qualityMonitor = null;
+let latestCameraQuality = { ready: false, code: "waiting" };
 
 // Temporary canvas used to process a resized camera image.
 const analysisCanvas = document.createElement("canvas");
@@ -403,7 +482,7 @@ async function enableCamera() {
 
     await loadFaceLandmarker();
 
-    startButton.disabled = false;
+    startButton.disabled = true;
     cameraButton.textContent = t("Disable camera");
     cameraButton.onclick = disableCamera;
 
@@ -424,9 +503,11 @@ async function enableCamera() {
         "error"
       );
     }
+    startQualityMonitor();
   } catch (error) {
     console.error("CAMERA OR FACE MODEL ERROR:", error);
 
+    stopQualityMonitor();
     stopCameraTracks();
     cameraReady = false;
     camera.style.display = "none";
@@ -494,6 +575,7 @@ function disableCamera() {
     void runPythonAnalysis();
   }
 
+  stopQualityMonitor();
   stopCameraTracks();
 
   cameraReady = false;
@@ -1000,8 +1082,10 @@ function recordFrame(now) {
 
       Object.assign(
         sample,
-        calculateAdvancedMetrics(landmarks, matrixData)
+        calculateAdvancedMetrics(landmarks, matrixData),
+        inspectFaceGeometry(landmarks, matrixData)
       );
+      sample.camera_quality_ready_at_start = latestCameraQuality.ready ? 1 : 0;
 
       samples.push(sample);
 
@@ -1070,8 +1154,9 @@ function runSequence() {
 }
 
 function startAdventure() {
-  if (!cameraReady || !landmarker || gameRunning) return;
+  if (!cameraReady || !landmarker || gameRunning || !latestCameraQuality.ready) return;
 
+  stopQualityMonitor();
   samples = [];
   processedFrames = 0;
   faceFrames = 0;
@@ -1128,8 +1213,9 @@ function stopAdventure() {
 
   exitGameFullscreen();
 
-  startButton.disabled = !cameraReady;
+  startButton.disabled = true;
   stopButton.disabled = true;
+  if (cameraReady) startQualityMonitor();
 }
 
 function showPythonChart(id, src, alt) {
@@ -1490,6 +1576,25 @@ function renderDashboard() {
   $("analytics-tasks").textContent =
     `${tasksWithFrames} / ${sequence.length}`;
 
+  if (technicalSessionResult) {
+    const usable = stats.total >= 30 && stats.faceRate >= 85 &&
+      stats.validIrisSamples / Math.max(stats.total, 1) >= 0.80 &&
+      tasksWithFrames >= 12;
+    technicalSessionResult.hidden = !stats.total;
+    technicalSessionResult.classList.toggle("is-pass", usable);
+    technicalSessionResult.classList.toggle("is-repeat", !usable);
+    technicalSessionResult.replaceChildren();
+    const heading = document.createElement("strong");
+    heading.textContent = t(usable ? "Technical recording looks usable" : "Repeat the session");
+    const detail = document.createElement("p");
+    detail.textContent = t(usable
+      ? "The camera captured enough usable tracking data for this experimental session."
+      : "Some tracking data may be missing. Adjust your position and repeat the session if you want a cleaner technical recording.");
+    const note = document.createElement("small");
+    note.textContent = t("This status describes recording quality only. It is not an eye-health result or a medical recommendation.");
+    technicalSessionResult.append(heading, detail, note);
+  }
+
   $("analytics-summary").textContent = stats.total
     ? currentLanguage === "ar"
       ? `ظهر وجه في ${stats.detected} من أصل ${stats.total} إطارًا. توفرت إحداثيات صالحة لمعالم القزحيتين في ${stats.validIrisSamples} إطارًا. مؤشرات البكسلات الساطعة: اليسرى ${stats.leftBrightSamples}، واليمنى ${stats.rightBrightSamples}. عالج OpenCV عدد ${stats.imageAnalysisFrames} إطارًا. سُجلت إطارات في ${tasksWithFrames} من أصل ${sequence.length} مهمة. مؤشرات البكسلات الساطعة ليست انعكاسات قرنية مؤكدة، وهذه الإحصاءات لا تحدد اتجاه النظر أو محاذاة العين أو صحة الإبصار.`
@@ -1728,6 +1833,7 @@ exportButton.onclick = exportSession;
 
 window.addEventListener("pagehide", () => {
   stopAdventure();
+  stopQualityMonitor();
   stopCameraTracks();
 
   if (landmarker) {
