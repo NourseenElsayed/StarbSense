@@ -102,3 +102,8 @@ python -m unittest discover -s tests -v
 ```
 
 Copy `data/manifests/dataset_manifest.template.csv` to `data/manifests/dataset_manifest.csv` locally and fill it with verified metadata. The `data/raw`, `data/interim`, `data/processed`, `data/splits`, and `data/reports` folders are local-only and ignored by Git. Never commit identifiable participant data or patient images/videos.
+
+
+### Optional clinical-measurement reference download
+
+`python tools/download_reference_data.py` downloads a small, CC BY 4.0 Figshare spreadsheet after verifying its metadata. It is anonymized tabular clinical measurement data, not image/video training data, and remains local under the ignored `data/raw/` directory.
