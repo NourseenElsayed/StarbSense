@@ -138,3 +138,20 @@ The audit report is a data-integrity report, not a clinical validation report. T
 **Implemented:** local data inventory, manifest schema, deterministic participant-level split generation, integrity/leakage checks, synthetic tests, Git ignore protections, package commands, and CI compilation coverage.
 
 **Not performed:** downloading restricted patient data, uploading identifiable images, training a strabismus model, selecting diagnostic thresholds, or integrating a medical decision into the app. Those steps require a verified lawful dataset, appropriate research oversight, and qualified clinical review.
+
+
+## Approved small reference-data acquisition path
+
+A downloader is available for the Figshare anonymized clinical measurement spreadsheet (article 28001906, file 51086813). It is intentionally separate from the image/video training pipeline.
+
+Run:
+
+```bash
+python tools/download_reference_data.py
+```
+
+The script re-checks the official article title, CC BY 4.0 license, exact file ID, XLSX extension, and a 1 MB maximum before downloading to `data/raw/figshare_reference/`. It writes a local `download_receipt.json` containing the SHA-256 hash. The destination is ignored by Git.
+
+**Interpretation limit:** this spreadsheet contains clinical measurement data, not webcam imagery or temporal eye-movement samples. It can support a separate descriptive analysis of clinical measurements; it cannot train or validate StarbSense's webcam image/video classifier. Do not expose participant-level health data in public commits, even if the source record describes the file as anonymized.
+
+The download endpoint returned HTTP 403 in the hosted execution environment. The script is committed and ready, but the actual spreadsheet bytes have not been retrieved or inspected in this session.
