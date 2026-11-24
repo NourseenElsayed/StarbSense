@@ -97,8 +97,10 @@ def audit_dataset(root: Path, manifest_path: Path) -> dict:
             continue
         if split not in ALLOWED_SPLITS:
             issues.append({"type": "invalid_split", "row": str(row_number), "value": split})
-        if participant_id and split:
-            participant_splits[participant_id].add(split)
+        if participant_id:
+            participant_splits[participant_id]
+            if split:
+                participant_splits[participant_id].add(split)
         if status not in ALLOWED_STATUS:
             issues.append({"type": "invalid_use_status", "row": str(row_number), "value": status})
         status_counts[status] += 1
