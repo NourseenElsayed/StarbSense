@@ -107,3 +107,53 @@ A second pass searched Kaggle-indexed pages for **crossed eyes**, **eye alignmen
 - Kaggle's **Event-based Eye Tracking Challenge** has 13 subjects performing general eye-movement activities (including saccades and smooth pursuit), not strabismus assessment: https://www.kaggle.com/competitions/event-based-eye-tracking-cvpr-2025/data
 
 **Search limitation:** Kaggle's logged-in dataset search may expose results not indexed by public search engines. The project team should add any candidate found in its live Kaggle session by pasting the exact dataset URL; then inspect its Data tab, file tree, labels, uploader, license, and source references. Do not infer clinical relevance from the title alone.
+
+
+## Expanded strabismus-specific audit (2026-11-24)
+
+This section adds studies and data records found in the expanded search. A published cohort is not automatically a downloadable dataset. "Public paper", "public code", and "public data" are separate access states.
+
+| Resource | What the source actually reports | Availability / rights check | Decision for StarbSense |
+|---|---|---|---|
+| **Mendeley Data — Strabismus Detection Module** | 27 webcam facial images: 26 clinically diagnosed strabismus cases and 1 normal control. The page describes a chin-rest-controlled capture workflow and says labels were assigned from clinical diagnosis. | Mendeley page offers "Download All" and displays CC BY 4.0 for the dataset. The severe 26:1 imbalance makes it unsuitable as a training/evaluation cohort. The page describes facial images; treat them as sensitive health-related imagery and do not mirror them in this public repository. | **Downloadable candidate for metadata/pipeline inspection only after adult/supervisor review of privacy and terms. Do not train or report accuracy from it.** |
+| **Pusan National University Yangsan Hospital cohort (Joo et al., 2024)** | 2,249 source face images (996 normal, 1,253 strabismus); after cropping and review by 10 medical professionals, the study retained 900 normal and 896 strabismus images with at least 5/10 agreement. | The article describes hospital-collected data used by the researchers; it does not provide a public download. The public GitHub link is the experimental code, not the patient-image dataset. | **Strongly relevant clinically curated cohort, but author/institution permission is required. Do not assume the images are public.** |
+| **Huang et al. (2021), image-processing screening study** | The article reports results on 60 images (30 normal, 30 strabismus) and provides a supplementary TIF figure/file. | The article says relevant data are in the manuscript and supplementary information. The supplementary item is a figure/result file, not confirmed as a clean, individually labelled image archive. | **Useful for reproducing/understanding the published method; not yet a confirmed trainable dataset. Inspect supplementary material before any reuse.** |
+| **Santos et al. (2025), Cover Test video analysis** | The paper reports CV-I with 13 volunteer videos and CV-II with 57 volunteer videos. Its highlights also say a new dataset was acquired with 123 volunteers; these figures do not reconcile from the accessible abstract. The work uses Alternate Cover Test videos and YOLOv5 for eye/occluder detection. | No public raw-video download or reuse license was confirmed in the accessible article record. Request the authors' data dictionary, participant-level counts, reference labels, consent/ethics details, and reuse terms. | **Top research lead for video-based analysis, but not an accessible dataset yet. Resolve the 123 vs 13+57 count discrepancy before citing a final cohort size.** |
+| **Zheng et al. (2019), Intelligent evaluation of strabismus in videos** | Describes an infrared-camera video database containing both strabismic and normal participants and an automated cover-test analysis pipeline. | The institutional repository provides the paper PDF, not a verified raw-video dataset download. | **Important method reference; raw database access must be requested.** |
+| **AI-assisted strabismus eye-tracking (2026)** | Anonymized coordinate-based eye-tracking records during Alternate Cover Test; the paper reports 50 participants and 335 valid ACT-cycle samples. | The paper links a public GitHub repository. GitHub repository metadata currently reports no license (license field is null); public visibility alone does not grant reuse rights. | **Do not copy, train on, or redistribute until the authors clarify the license.** |
+| **Beijing Tongren wearable eye-tracking study (2025)** | Study of intermittent strabismus using wearable eye tracking; reports screening results and eye-movement features. | The paper's data availability statement says subject eye-image data cannot be shared due to privacy. | **Literature/method reference only; not a dataset source.** |
+| **Strabismus-Net (2026)** | Reports a large gaze-photograph cohort and prospective test cohort. | A public downloadable archive and reuse license remain unconfirmed from the source inspected. | **Author-controlled until an explicit data-access route and license are verified.** |
+
+### Kaggle audit — current conclusion
+
+The expanded public-web search used exact and related terms including `strabismus`, `crossed eyes`, `esotropia`, `exotropia`, `ocular deviation`, `cover test`, and `eye movement`, scoped to Kaggle dataset and competition pages. It did not surface a Kaggle dataset whose files and labels could be verified as clinically diagnosed strabismus data.
+
+This is **not proof that Kaggle contains no such dataset**. Kaggle's authenticated dataset search and account-specific/private/shared results are not visible to this research session. The user reports that a teammate can see a candidate in a logged-in Kaggle session. That exact candidate must be added only after receiving its direct URL or slug and checking:
+- the Data tab and complete file tree (not just the title or notebook text);
+- actual sample images/videos and label files;
+- uploader/source references and whether labels came from an ophthalmologist or a documented clinical test;
+- participant counts, class counts, duplicates, and participant-level splits;
+- dataset license, third-party image rights, and permitted research/training use;
+- whether the data are patient-identifiable or include minors.
+
+Until those checks pass, do not add a Kaggle result as a confirmed strabismus dataset. Kaggle's own documentation explains that dataset owners choose visibility and license, and that users should inspect the dataset page and files: https://www.kaggle.com/docs/datasets.
+
+### Important corrections and access boundaries
+
+- The 2024 Pusan study's 2,249 collected images are **not** a public dataset merely because the paper and its code are public. The curated experimental subset described in the article is 900 normal + 896 strabismus images.
+- The 2025 Cover Test paper contains an unresolved count discrepancy in the accessible record: the highlights mention 123 volunteers, while the described CV-I and CV-II video databases contain 13 and 57 volunteers respectively. Do not repeat "123 videos" or claim a 123-person public dataset.
+- Mendeley's 27-image set is downloadable and lists CC BY 4.0, but its 26:1 class imbalance and face imagery make it inappropriate for meaningful model validation. Dataset availability does not remove privacy or ethics obligations.
+- The 2021 supplementary TIF is not confirmed to be a machine-readable archive of 60 separate images.
+- The 2026 eye-tracking GitHub repository has no license declared in its repository metadata. Obtain permission before reuse.
+- Do not place raw patient photos, eye videos, or identity-bearing metadata in this public GitHub repository.
+
+### New sources
+
+- Mendeley Data, Strabismus Detection Module: https://data.mendeley.com/datasets/4cbdg64773/1
+- Joo et al. (2024), Pusan cohort and expert consensus: https://pmc.ncbi.nlm.nih.gov/articles/PMC11125505/
+- Huang et al. (2021), image-processing study and supplementary data statement: https://pmc.ncbi.nlm.nih.gov/articles/PMC8330949/
+- Santos et al. (2025), cover-test video analysis: https://www.sciencedirect.com/science/article/pii/S0952197625011625
+- Zheng et al. (2019), institutional repository record: https://ira.lib.polyu.edu.hk/handle/10397/80651
+- 2026 eye-tracking study and data statement: https://pmc.ncbi.nlm.nih.gov/articles/PMC13025742/
+- Beijing Tongren wearable eye-tracking study: https://pmc.ncbi.nlm.nih.gov/articles/PMC11852461/
+- Kaggle dataset documentation: https://www.kaggle.com/docs/datasets
