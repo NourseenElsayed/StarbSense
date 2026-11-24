@@ -95,3 +95,15 @@ If a Kaggle result is visible in a logged-in browser but not in public search, r
 - Kaggle Event-based Eye Tracking Challenge: https://www.kaggle.com/competitions/event-based-eye-tracking-cvpr-2025/data
 - Kaggle MPIIGaze: https://www.kaggle.com/c/mp18-eye-gaze-estimation/data
 - Kaggle dataset search guidance: https://www.kaggle.com/docs/datasets
+
+
+### Kaggle follow-up search (additional terms, 2026-11-24)
+
+A second pass searched Kaggle-indexed pages for **crossed eyes**, **eye alignment**, **ocular deviation**, **strabismus notebooks**, and Kaggle's public **Eyes and Vision** notebook category. The visible indexed results were predominantly retinal disease, cataract, drowsiness, open/closed-eye, and generic gaze-direction projects. No result inspected in this pass provided a verified clinical strabismus-labelled dataset.
+
+- Kaggle's public **Eyes and Vision** notebook tag results include retinal-disease and drowsiness notebooks, among other eye-related projects; these are not evidence of strabismus labels: https://www.kaggle.com/code?tagIds=16403-Eyes+and+Vision
+- The Kaggle **APTOS 2019 Blindness Detection** competition is a retinal fundus dataset for diabetic-retinopathy severity (0–4), not eye alignment or strabismus: https://www.kaggle.com/competitions/aptos2019-blindness-detection/data
+- Kaggle's **Eye Movements Verification and Identification Competition** is about identifying people from eye-movement characteristics, not clinical strabismus: https://www.kaggle.com/c/emvic/data
+- Kaggle's **Event-based Eye Tracking Challenge** has 13 subjects performing general eye-movement activities (including saccades and smooth pursuit), not strabismus assessment: https://www.kaggle.com/competitions/event-based-eye-tracking-cvpr-2025/data
+
+**Search limitation:** Kaggle's logged-in dataset search may expose results not indexed by public search engines. The project team should add any candidate found in its live Kaggle session by pasting the exact dataset URL; then inspect its Data tab, file tree, labels, uploader, license, and source references. Do not infer clinical relevance from the title alone.
