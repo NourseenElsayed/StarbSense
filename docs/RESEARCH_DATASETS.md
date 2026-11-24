@@ -52,3 +52,46 @@ This file records what StarbSense can responsibly use today. A dataset being pub
 - Roboflow Strabismus (Strabimus): https://universe.roboflow.com/strabimus/strabismus-d1pgd
 - Roboflow Strabismus Eye Classification: https://universe.roboflow.com/first-training-asi3d/strabismus-eye-classification-rulhf
 - Roboflow eyes-pmves: https://universe.roboflow.com/eyes-pmves/strabismus
+
+
+## Additional strabismus-specific candidates reviewed (2026-11-24)
+
+These are research leads, not datasets already downloaded or integrated. Access status and fit are kept separate.
+
+| Dataset / study | Reported contents | Access status | StarbSense relevance / decision |
+|---|---|---|---|
+| **VD-ACTSE — Video Dataset Based on Automated Cover Tests for Strabismus Evaluation** | 24 videos, about 50 seconds each, 1280×720, 60 fps, recorded during automated cover tests. | Not a direct download. The host asks researchers to email hongfu@chuhai.edu.hk with subject “VD-ACTSE dataset request”. | **High conceptual fit** for cover-test motion analysis. Small sample; request access and documentation before use. |
+| **West China Hospital AI strabismus platform cohort (Wu et al., 2024)** | 6,194 primary-gaze photographs with corneal light reflections: 2,938 exotropia, 1,415 esotropia, 739 vertical deviation, 1,562 orthotropia. | The paper describes the cohort, but the images are not offered as a public download in the paper record inspected. Contact authors for permission and data-sharing conditions. | **High image-label relevance**; not directly available for training at present. |
+| **Strabismus-Net (npj Digital Medicine, 2026)** | 84,897 gaze photographs from 9,433 individuals for cross-validation and 10,458 photographs from 1,162 individuals for prospective testing. | The article reports dataset scale; public downloadable files and reuse license were not confirmed in the inspected source. Treat as author-controlled until verified. | **High research relevance**, but do not assume access or copy images. Contact authors / inspect full data-availability statement. |
+| **AI-assisted Strabismus Recognition eye-tracking dataset** | Anonymized coordinate-based eye-tracking records during Alternate Cover Test; paper reports 50 participants (25 normal / 25 strabismus) and 335 ACT-cycle samples. No original patient videos. | Public GitHub repository is linked by the paper, but a clear repository reuse license was not identified in the inspected metadata. Obtain permission / license clarification before reuse. | **High motion-analysis relevance**, but a different sensor modality from StarbSense's webcam. Useful for method comparison only if terms permit. |
+
+### Additional Kaggle audit
+
+A targeted public-web search of Kaggle pages for the exact term **strabismus** and related eye-movement terms did not surface a Kaggle dataset with verified clinical strabismus labels. This is a bounded search result, not proof that no such dataset exists; Kaggle's logged-in search interface may surface user-specific or less-indexed results.
+
+Kaggle results that are relevant to eye movement but **are not strabismus datasets**:
+
+- **Eye Movements Verification and Identification Competition (EMVIC):** eye-movement biometric/identity task; its data are governed by competition rules, not a clinical strabismus label set. https://www.kaggle.com/c/emvic/data
+- **Event-based Eye Tracking Challenge — CVPR 2025:** 13 subjects performing random viewing, saccades, reading, smooth pursuit and blinks; event-camera recordings, not clinical strabismus labels. https://www.kaggle.com/competitions/event-based-eye-tracking-cvpr-2025/data
+- **MPIIGaze / Eye Gaze Estimation:** eye images with head-pose and gaze-angle information; gaze estimation, not strabismus diagnosis. https://www.kaggle.com/c/mp18-eye-gaze-estimation/data
+
+If a Kaggle result is visible in a logged-in browser but not in public search, record its exact title and URL and inspect its files, labels, uploader, license, and provenance before adding it as a candidate. A Kaggle title or notebook mentioning “eye disease” is not evidence that it contains strabismus cases.
+
+## Updated next steps
+
+1. Request VD-ACTSE access from the listed contact and ask for its label schema, subject count, clinical reference standard, consent/ethics statement, and reuse terms.
+2. Contact the West China and Strabismus-Net authors for data availability and written reuse conditions.
+3. Inspect the eye-tracking repository's license and data dictionary before any copying or training.
+4. Keep the Kaggle eye-movement competitions as **non-strabismus auxiliary references only**. Do not use them as positive/negative strabismus training labels.
+5. Do not add raw patient photos/videos to this GitHub repository. If access is granted, store approved data outside the public repo and document a participant-level split and provenance manifest.
+
+### Sources for this update
+
+- VD-ACTSE dataset page: https://ssitrc.chuhai.edu.hk/index.php/2019/01/31/video-dataset-based-on-automated-cover-tests-for-strabismus-evaluation/
+- Wu et al., *An artificial intelligence platform for the screening and managing of strabismus* (2024): https://pmc.ncbi.nlm.nih.gov/articles/PMC11543679/
+- *Strabismus-Net* (2026): https://www.nature.com/articles/s41746-026-03334-6
+- Eye-tracking paper and repository: https://pmc.ncbi.nlm.nih.gov/articles/PMC13025742/ ; https://github.com/hyunwoongko/strabismus-recognition
+- Kaggle EMVIC: https://www.kaggle.com/c/emvic/data
+- Kaggle Event-based Eye Tracking Challenge: https://www.kaggle.com/competitions/event-based-eye-tracking-cvpr-2025/data
+- Kaggle MPIIGaze: https://www.kaggle.com/c/mp18-eye-gaze-estimation/data
+- Kaggle dataset search guidance: https://www.kaggle.com/docs/datasets
