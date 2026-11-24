@@ -249,3 +249,29 @@ StarbSense should not claim that it has a trainable, clinically representative s
 - Mobile-phone photo screening study (2026): https://www.nature.com/articles/s41598-026-48893-6
 - Automated measurement of horizontal strabismus (2026): https://pubmed.ncbi.nlm.nih.gov/41825684/
 - Cover-test video dataset VD-ACTSE: https://ssitrc.chuhai.edu.hk/index.php/2019/01/31/video-dataset-based-on-automated-cover-tests-for-strabismus-evaluation/
+
+
+## Verified open tabular reference dataset — Figshare (2026-11-24)
+
+**Dataset:** Hughes & Witowska-Jeleń, *Dataset Comparison of strabismus angle performed with synoptophore and prism cover test including the impact of convergence and BSV* (posted 2024-12-10).
+
+- Figshare article ID: `28001906`
+- File ID: `51086813`
+- Reported cohort: 108 participants with six types of horizontal strabismus.
+- File: one anonymized XLSX spreadsheet, 15.63 kB as displayed by Figshare.
+- License displayed on the record: CC BY 4.0.
+- Content: clinical measurement comparisons (synoptophore, prism cover test, convergence, binocular single vision); **not face images, eye crops, or video**.
+- Appropriate use in StarbSense: a separate descriptive/statistical reference for understanding clinical measurement fields and group-level relationships, subject to source citation and responsible handling. It cannot train the webcam image/video classifier.
+- Official record: https://figshare.com/articles/dataset/Dataset_Comparison_of_strabismus_angle_performed_with_synoptophore_and_prism_cover_test_including_the_impact_of_convergence_and_BSV_12_2024_anonymized_xlsx/28001906
+- Official file download: https://figshare.com/ndownloader/files/51086813
+
+A local downloader was added at `tools/download_reference_data.py`. It queries the official Figshare metadata, checks the article title, CC BY 4.0 license, exact file ID and a 1 MB maximum size, then saves the spreadsheet and a SHA-256 receipt under ignored local storage. The download was not committed to GitHub. The hosted file endpoint returned HTTP 403 to this environment during this run, so the actual bytes have **not** been downloaded or inspected here. Run the script locally to complete the download.
+
+## Additional sources rejected for direct acquisition
+
+- **Strabismus Recognizer GitHub repository** (https://github.com/hyunwoongko/strabismus-recognition): describes anonymized eye-tracking coordinates and code, but the repository has no visible LICENSE file. It also describes a commercial strabismus-diagnosis program and its test protocol. Do not copy its code or data until the authors clarify reuse rights and intended research use.
+- **Mendeley Strabismus Detection Module** (https://data.mendeley.com/datasets/4cbdg64773/1): the record says 27 facial images (26 strabismus, 1 normal), CC BY 4.0, with clinically assigned labels. It is severely imbalanced and contains identifiable facial imagery. Do not mirror the images into this public repository or use them as a model-validation cohort. Any local inspection requires supervisor review and privacy safeguards.
+- **CORD ophthalmic dataset** (https://pureportal.strath.ac.uk/en/datasets/comprehensive-ophthalmic-research-database-cord/): CC BY 4.0, but the repository describes ten healthy participants and multiple multi-gigabyte archives. It is not a strabismus-labelled cohort and is not a practical substitute for strabismus training data.
+- **Roboflow user-contributed image sets**: displayed CC BY licenses do not establish clinical label provenance, participant-level separation, or source-image rights. Keep them as unverified exploratory leads, not clinical ground truth.
+
+No patient images or videos were downloaded or committed in this update.
