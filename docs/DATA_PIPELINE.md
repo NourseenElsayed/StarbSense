@@ -109,3 +109,32 @@ A model may be considered for a research-only application integration only after
 ## What this means for the current StarbSense build
 
 Do not add an AI result, diagnostic label, or “go to doctor / no need to go” decision based on the current heuristics. The current app can report technical capture quality and explain that a clinician is the appropriate person to assess concerns. A future research model must remain separate from the existing landmark pipeline until it has passed the integration gate above.
+
+
+## Implemented local tooling (2026-11-24)
+
+The repository now includes executable utilities; these are not merely proposed steps:
+
+- `tools/dataset_tools.py audit`: checks required manifest columns, missing files, unsafe paths outside the approved data root, exact SHA-256 duplicates, unregistered media files, missing labels/licenses, and participant split leakage.
+- `tools/dataset_tools.py split --seed 42`: creates a reproducible participant-level 70/15/15 assignment CSV. It requires at least three distinct pseudonymous participants. The assignment is written to the ignored local `data/splits/` folder.
+- `data/manifests/dataset_manifest.template.csv`: blank manifest header; copy it locally to `dataset_manifest.csv`.
+- `tests/test_dataset_tools.py`: synthetic-only unit tests for duplicate detection, split leakage, deterministic participant assignment, and path traversal protection.
+- `.gitignore`: excludes raw/interim/processed data, local splits, and audit reports.
+- CI compiles the new tools and runs the Python test suite.
+
+Commands from the repository root:
+
+```bash
+python tools/dataset_tools.py audit
+python tools/dataset_tools.py split --seed 42
+python -m unittest discover -s tests -v
+npm run build
+```
+
+The audit report is a data-integrity report, not a clinical validation report. The split generator is intentionally not class-stratified: with small clinical cohorts, participant count and class distribution must be reviewed before selecting a final split strategy. Never interpret a successful audit as permission to train or proof that the labels are clinically correct.
+
+### Completion boundary
+
+**Implemented:** local data inventory, manifest schema, deterministic participant-level split generation, integrity/leakage checks, synthetic tests, Git ignore protections, package commands, and CI compilation coverage.
+
+**Not performed:** downloading restricted patient data, uploading identifiable images, training a strabismus model, selecting diagnostic thresholds, or integrating a medical decision into the app. Those steps require a verified lawful dataset, appropriate research oversight, and qualified clinical review.
