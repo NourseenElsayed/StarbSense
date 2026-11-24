@@ -34,3 +34,8 @@ python -m unittest discover -s tests -v
 ```
 
 The audit checks file presence, manifest schema, path containment, exact SHA-256 duplicates, unregistered media files, missing labels/licenses, and participant split leakage. It does not assess clinical truth, consent, license validity, or model performance. The split generator requires at least three pseudonymous participants and writes assignments to the ignored local `data/splits/` directory.
+
+
+## Small open clinical-measurement reference file
+
+To download the separate anonymized Figshare spreadsheet (not image/video training data), run `python tools/download_reference_data.py`. The script checks the official CC BY 4.0 metadata and saves locally under `data/raw/figshare_reference/`; the destination is ignored by Git. Keep participant-level health measurements local and do not commit the workbook or receipt. This spreadsheet is suitable only for a separate descriptive/statistical reference, not webcam classifier training.
