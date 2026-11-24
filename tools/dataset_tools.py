@@ -112,6 +112,8 @@ def audit_dataset(root: Path, manifest_path: Path) -> dict:
             warnings.append({"type": "missing_label", "row": str(row_number)})
         else:
             label_counts[label] += 1
+        if not (row.get("license") or "").strip():
+            warnings.append({"type": "missing_license", "row": str(row_number)})
 
         path = safe_sample_path(root, relative_path)
         if path is None:
@@ -149,6 +151,8 @@ def audit_dataset(root: Path, manifest_path: Path) -> dict:
         warnings.append({"type": "exact_duplicate_files", "paths": " | ".join(paths)})
 
     discovered_paths = set()
+    if not root.is_dir():
+        issues.append({"type": "data_root_missing", "path": str(root)})
     if root.exists():
         discovered_paths = {
             path.relative_to(root).as_posix()
@@ -202,9 +206,9 @@ def create_participant_split(
 
     shuffled = participants[:]
     random.Random(seed).shuffle(shuffled)
-    train_end = max(1, round(len(shuffled) * train_ratio))
-    validation_end = max(train_end + 1, round(len(shuffled) * (train_ratio + validation_ratio)))
-    validation_end = min(validation_end, len(shuffled) - 1)
+    train_end = max(1, min(len(shuffled) - 2, round(len(shuffled) * train_ratio)))
+    validation_count = max(1, round(len(shuffled) * validation_ratio))
+    validation_end = min(len(shuffled) - 1, train_end + validation_count)
 
     assignments = {}
     for index, participant_id in enumerate(shuffled):
