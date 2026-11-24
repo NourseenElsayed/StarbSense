@@ -213,3 +213,39 @@ For any Kaggle candidate, verify: actual files and sample content; labels and th
 - Roboflow, eyes strabismus classification: https://universe.roboflow.com/eyes-pmves/strabismus
 - Roboflow, STRABISMUS 2025: https://universe.roboflow.com/strabismus-enwec/strabismus-kp1mq
 - Roboflow, strabismus object detection: https://universe.roboflow.com/strabismus/strabismus-gjnif
+
+
+## Final literature sweep — additional sources (2026-11-24)
+
+This final pass adds sources that were not in the earlier inventory. It does not change the acquisition status: no raw clinical dataset has been downloaded or integrated.
+
+| Study / resource | Reported material | Public-data status | Decision |
+|---|---|---|---|
+| **Automated Diagnosis and Measurement of Strabismus in Children (2019)** | The article page exposes two supplementary videos (5 MB and 43 MB), plus figures and a caption document. | The supplementary videos are downloadable from the article page, but the available description does not establish that they form a labelled, multi-participant dataset or provide a reusable dataset license. | **Supplementary research material only.** Do not treat two example videos as a training cohort. Review the article's methods and rights before any reuse. |
+| **Strabismus Detection in Monocular Eye Images for Telemedicine (2024)** | The paper's table identifies 12 stock-video clips: six labelled normal and six strabismus, with short durations. | The clips are identified by Dreamstime video IDs. The paper's table is not a redistribution license; original stock-media licensing and reuse rights remain separate. | **Method reference only.** Do not download/reuse stock footage unless the rights holder's terms explicitly permit this research use. |
+| **Automated strabismus detection and classification using deep learning analysis of facial images (Scientific Reports, 2025)** | Reports 4,257 images for binary classification (1,599 normal; 2,658 strabismus) and a separate multi-class experiment with 480 strabismus and 142 non-strabismus images. Labels are described as based on ophthalmologist measurements using APCT or Modified Krimsky testing. | The paper is accessible, but the inspected source did not confirm a public image archive or an open reuse license for the patient images. | **High-value clinical-method reference; images remain author-controlled unless authors confirm access and rights.** |
+| **Strabismus-Net (npj Digital Medicine, 2026)** | Reports 84,897 gaze photographs from 9,433 people for cross-validation and 10,458 photographs from 1,162 people for prospective testing. | Large cohort described in the paper; a public downloadable archive and reuse license were not verified. | **Author-controlled lead.** Do not assume the photographs can be downloaded or reused. |
+| **Utilizing deep learning from mobile phone photos for early detection of horizontal strabismus (Scientific Reports, 2026)** | Smartphone-acquired facial photographs for binary horizontal-strabismus screening, with exploratory subtype analysis. | The article's data availability statement says the patient-image dataset is not publicly available because of sensitive facial imagery. | **Literature/method reference only.** No image acquisition from the paper. |
+| **Automated measurement of horizontal strabismus in children's primary-gaze photographs (2026)** | Reports 11,018 ocular/ground-truth images for model training and 147 primary-gaze photographs for clinical validation. | The paper reports dataset sizes, but public download and reuse terms were not established from the inspected record. | **Research lead only** pending a verified data-access statement and license. |
+
+### Final dataset classification
+
+- **Publicly downloadable, but limited / unsuitable for meaningful model validation:** Mendeley Strabismus Detection Module (27 images; 26:1 imbalance). Keep its role to format/workflow inspection after privacy and supervision review.
+- **Publicly described but permission-gated or author-controlled:** VD-ACTSE videos, Pusan hospital images, West China Hospital photographs, Santos et al. cover-test videos, Strabismus-Net photographs, and the 2025 facial-image cohort.
+- **Supplementary material, not a confirmed dataset:** the two 2019 supplementary videos and the 2021 supplementary TIF/figures.
+- **Different task or modality:** GazeBase, InvisibleEye, GazeCapture, EYEDIAP, MPIIGaze, generic eye-tracking competitions, and anonymized coordinate-based ACT records. They may inform methods but are not interchangeable with clinically labelled webcam strabismus data.
+- **Rights unclear or source-controlled:** Roboflow user-contributed datasets and stock-footage-based examples. A displayed platform license does not independently prove clinical label quality, image provenance, or third-party rights.
+
+### Final project decision
+
+StarbSense should not claim that it has a trainable, clinically representative strabismus dataset today. The most relevant next acquisition lead is VD-ACTSE for cover-test video research, followed by author contact for the clinically curated photo/video cohorts. The small Mendeley set is not an acceptable substitute for a properly sized, balanced, participant-separated clinical cohort.
+
+### Additional references
+
+- 2019 article and supplementary videos: https://www.sciencedirect.com/science/article/pii/S0002939419306191
+- Monocular eye-image telemedicine study (2024): https://pmc.ncbi.nlm.nih.gov/articles/PMC11595318/
+- Yarkheir et al., *Automated strabismus detection and classification using deep learning analysis of facial images* (2025): https://pmc.ncbi.nlm.nih.gov/articles/PMC11785772/
+- Strabismus-Net (2026): https://www.nature.com/articles/s41746-026-03334-6
+- Mobile-phone photo screening study (2026): https://www.nature.com/articles/s41598-026-48893-6
+- Automated measurement of horizontal strabismus (2026): https://pubmed.ncbi.nlm.nih.gov/41825684/
+- Cover-test video dataset VD-ACTSE: https://ssitrc.chuhai.edu.hk/index.php/2019/01/31/video-dataset-based-on-automated-cover-tests-for-strabismus-evaluation/
