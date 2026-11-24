@@ -157,3 +157,59 @@ Until those checks pass, do not add a Kaggle result as a confirmed strabismus da
 - 2026 eye-tracking study and data statement: https://pmc.ncbi.nlm.nih.gov/articles/PMC13025742/
 - Beijing Tongren wearable eye-tracking study: https://pmc.ncbi.nlm.nih.gov/articles/PMC11852461/
 - Kaggle dataset documentation: https://www.kaggle.com/docs/datasets
+
+
+## Follow-up audit and implementation plan (2026-11-24)
+
+### Additional leads found
+
+| Source | Verified information | Access status | Suitability |
+|---|---|---|---|
+| **Santos et al. (2025), Automated diagnosis using cover-test video analysis** | The article reports a new cover-test video dataset and experiments on two video datasets. Its highlights mention 123 volunteers, while accessible descriptions of CV-I and CV-II report 13 and 57 volunteers; this discrepancy must be resolved with the authors. | Article is public; no verified public raw-video download or dataset license found. | **High scientific relevance; not yet an accessible dataset.** Request participant counts, labels, reference clinical measurements, ethics/consent and data-use terms. |
+| **Joo et al. / Pusan National University Yangsan Hospital (2024)** | 2,249 collected face images (996 normal, 1,253 strabismus); the expert-reviewed experimental subset described in the paper contains 900 normal and 896 strabismus images. | Hospital research cohort; no public image archive confirmed. Public paper/code does not imply public patient-image access. | **High relevance, permission required.** |
+| **Mendeley Data — Strabismus Detection Module** | 27 webcam face images, 26 strabismus and 1 normal; page describes clinical-diagnosis labels and controlled capture. | Dataset page provides downloadable files and lists CC BY 4.0. | **Pipeline/format inspection only.** Severe imbalance prevents meaningful model training or evaluation. Treat face images as sensitive; do not mirror to public GitHub. |
+| **Zheng et al. (2019), Intelligent evaluation of strabismus in videos** | Paper describes infrared video during automated cover testing and a database containing normal and strabismic participants. | Open-access paper/PDF confirmed; raw video database download not confirmed. | **Method reference and author-contact lead, not an acquired dataset.** |
+| **Roboflow — strabismus eye classification (first training)** | Page reports 635 images, two classes (strabismus / strabismus_free); a separate version page shows 1,525 total after preprocessing/augmentation. | CC BY 4.0 shown on page; public dataset page. | **Exploratory only.** No published source/provenance or clinical label protocol; versions and counts differ. Inspect original images and duplicates before any use. |
+| **Roboflow — strabismus classification (eyes)** | Model page shows 59 images, two classes (normal / crossed), while model's linked dataset reports 92 images. | CC BY 4.0 shown. | **Too small and provenance unclear; not for validation.** |
+| **Roboflow — STRABISMUS (2025)** | Dataset page shows a 110-image v1 and a 210-image v2; page lists CC BY 4.0. | Download option shown; license displayed. | **Exploratory only.** Class counts and clinical source/ground truth not established by the page. |
+| **Roboflow — strabismus object detection** | Page exposes versions with 148 and 254 images and downloadable object-detection formats. | CC BY 4.0 shown. | **Potential eye/region annotation resource only.** Object boxes are not equivalent to a clinical strabismus diagnosis. |
+
+### Kaggle: what can and cannot be concluded
+
+Searches were run for Kaggle dataset/competition pages using the terms `strabismus`, `esotropia`, `exotropia`, `crossed eyes`, `ocular deviation`, and `cover test`. No result surfaced whose actual data files and labels could be verified as a clinically diagnosed strabismus dataset.
+
+This is a bounded search result, **not proof that no such Kaggle dataset exists**. Search engines may not index all Kaggle datasets, and logged-in/private/shared results may differ. A teammate-reported Kaggle candidate remains unverified until its direct URL or slug and Data-tab file list are supplied. Do not label any Kaggle result as a strabismus dataset based on its title alone.
+
+For any Kaggle candidate, verify: actual files and sample content; labels and their clinical source; class/participant counts; whether images are duplicated or augmented copies; participant-level splits; license and source rights; and whether identifiable or minor patient data are present. Do not upload raw face/eye imagery to the public project repository.
+
+### Recommended data strategy for StarbSense
+
+1. **Keep modalities separate.** A face-photo classifier, an eye-region detector, eye-tracking coordinates, and cover-test video analysis are different tasks. Do not combine their labels into one training set as if they were interchangeable.
+2. **Primary research direction:** cover-test video / eye movement with clinical reference measurements, because this is closer to a movement-based protocol. The existing star-following webcam task is not itself a clinical cover test.
+3. **Secondary direction:** frontal face/eye photographs with ophthalmologist-confirmed labels, kept as a separate image-classification experiment.
+4. **Create a data manifest before training.** For each sample record only a pseudonymous participant ID, source, modality, label, label provenance, capture conditions, permitted-use status, and split. Keep identifying keys separately under supervisor-controlled storage.
+5. **Use participant-level splits.** All images/video frames from one participant must stay in a single split to prevent leakage. Avoid frame-random splits.
+6. **Do not infer detailed subtype labels.** Use only the classes and clinical definitions explicitly supplied by the source. Record laterality, direction, intermittency, fixation condition, and prism-diopter measurement only when the dataset actually provides them.
+7. **Baseline before deep learning.** First inspect quality and class balance, then establish a simple, transparent baseline. Report sensitivity, specificity, balanced accuracy, confusion matrix, and confidence intervals; do not rely on accuracy alone.
+8. **Independent review.** A qualified ophthalmologist must review the protocol, reference labels, and any intended interpretation. Any prototype output remains research-only and must not claim to diagnose or rule out strabismus.
+9. **No raw patient data in public GitHub.** Store only scripts, schemas, synthetic examples, and non-identifying aggregate results in the repository.
+
+### Current acquisition status
+
+- Public papers and dataset landing pages have been identified.
+- No raw clinical dataset has been downloaded into StarbSense in this audit.
+- No new images/videos have been committed to GitHub.
+- No strabismus classifier has been trained or integrated.
+- Author-controlled sources still require permission and documented terms.
+- Kaggle candidate from the teammate remains pending its exact URL.
+
+### New references
+
+- Santos et al. (2025), cover-test video analysis: https://www.sciencedirect.com/science/article/pii/S0952197625011625
+- Joo et al. (2024), AI-assisted strabismus platform: https://pmc.ncbi.nlm.nih.gov/articles/PMC11543679/
+- Mendeley Data, Strabismus Detection Module: https://data.mendeley.com/datasets/4cbdg64773/1
+- Zheng et al. (2019), automated cover-test video evaluation: https://ira.lib.polyu.edu.hk/handle/10397/80651
+- Roboflow, first-training strabismus eye classification: https://universe.roboflow.com/first-training-asi3d/strabismus-eye-classification-rulhf
+- Roboflow, eyes strabismus classification: https://universe.roboflow.com/eyes-pmves/strabismus
+- Roboflow, STRABISMUS 2025: https://universe.roboflow.com/strabismus-enwec/strabismus-kp1mq
+- Roboflow, strabismus object detection: https://universe.roboflow.com/strabismus/strabismus-gjnif
