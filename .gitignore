@@ -11,3 +11,11 @@ __pycache__/
 analysis/
 .DS_Store
 Thumbs.db
+
+# Research datasets and local experiment outputs (never commit participant data)
+data/raw/
+data/interim/
+data/processed/
+data/splits/
+data/reports/
+!data/manifests/dataset_manifest.template.csv
