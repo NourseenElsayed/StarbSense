@@ -34,7 +34,7 @@ jobs:
         run: python -m pip install -r requirements.txt
 
       - name: Compile Python
-        run: python -m compileall -q server.py analyze_starb_sense.py tests
+        run: python -m compileall -q server.py analyze_starb_sense.py tests tools
 
       - name: Run analysis tests
         run: python -m unittest discover -s tests -v
