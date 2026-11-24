@@ -74,6 +74,8 @@ Obtain the required school/competition approvals, parent/guardian permission, an
 - [Research validation checklist](docs/VALIDATION_CHECKLIST.md)
 - [Structured visual-following protocol v2](docs/PROTOCOL_V2.md)
 - [Research libraries and dataset registry](docs/RESEARCH_RESOURCES.md)
+- [Data pipeline and model-readiness plan](docs/DATA_PIPELINE.md)
+- [Local research data instructions](data/README.md)
 \n\n## Interface languages\n\nThe interface opens in Arabic (RTL) by default and includes an Arabic/English language switch. The selected language is stored locally in the browser.\n
 
 ## Medical evidence and design boundaries
@@ -87,3 +89,16 @@ Clinical references:
 - AAO, Strabismus in Children (2026): https://www.aao.org/eye-health/diseases/strabismus-in-children
 - AAO, Pediatric Eye Evaluations Preferred Practice Pattern: https://www.aaojournal.org/article/S0161-6420(22)00866-1/fulltext
 - Royal College of Ophthalmologists, Emergency Eye Care Commissioning Guidance: https://www.rcophth.ac.uk/wp-content/uploads/2020/05/Emergency-Eye-Care-Commissioning-Guidance.pdf
+
+
+## Local dataset audit utilities
+
+The repository includes local-only tools to check an approved dataset manifest, file presence, exact duplicate files, missing metadata, unsafe paths, and participant-level split leakage. They do not train a model or infer clinical labels.
+
+```bash
+python tools/dataset_tools.py audit
+python tools/dataset_tools.py split --seed 42
+python -m unittest discover -s tests -v
+```
+
+Copy `data/manifests/dataset_manifest.template.csv` to `data/manifests/dataset_manifest.csv` locally and fill it with verified metadata. The `data/raw`, `data/interim`, `data/processed`, `data/splits`, and `data/reports` folders are local-only and ignored by Git. Never commit identifiable participant data or patient images/videos.
