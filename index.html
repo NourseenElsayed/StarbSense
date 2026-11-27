@@ -299,6 +299,35 @@
           <p>These are offline image experiments. They accept pre-cropped eye-pair images; the current browser session records MediaPipe landmarks and experimental image measurements. The image models are not connected to the webcam stream and do not analyze the session CSV.</p>
           <p>Accuracy on these datasets does not establish performance on real-world webcam recordings. These experimental models must not be used to diagnose or rule out an eye condition or decide whether someone needs medical care.</p>
         </div>
+
+        <div class="model-upload-panel" aria-labelledby="model-upload-title">
+          <div class="model-upload-heading">
+            <div>
+              <p class="eyebrow">SEPARATE IMAGE EXPERIMENT</p>
+              <h3 id="model-upload-title">Try a trained image model</h3>
+              <p class="section-description">Upload a pre-cropped image containing both eyes. This experiment does not use your webcam stream or session measurements.</p>
+            </div>
+            <span id="model-api-status" class="status-pill" role="status">Checking local model files…</span>
+          </div>
+          <form id="model-upload-form" class="model-upload-form">
+            <label for="model-task-select">Research experiment</label>
+            <select id="model-task-select" name="task">
+              <option value="binary">Binary labels · strabismus / strabismus-free</option>
+              <option value="five_class">Five image labels · eso / exo / hyper / hypo / normal</option>
+            </select>
+            <label for="model-image-file">Eye-pair image (PNG, JPEG or WebP, up to 8 MB)</label>
+            <input id="model-image-file" name="image" type="file" accept="image/png,image/jpeg,image/webp" required>
+            <p class="model-upload-help">Use a tightly cropped, clear image of both eyes only. Do not upload a full portrait, and only use an image you have permission to use.</p>
+            <img id="model-image-preview" class="model-image-preview" alt="Selected eye-pair image preview" hidden>
+            <button id="model-predict-button" class="button button-primary" type="submit">Run image experiment</button>
+          </form>
+          <div id="model-prediction-result" class="model-prediction-result" role="status" aria-live="polite">
+            <strong>Waiting for an image</strong>
+            <p>Choose an image and run one of the offline experiments.</p>
+          </div>
+          <p class="model-upload-disclaimer">Experimental dataset-label output only — not a diagnosis, not a screening result, and not a reason to delay or avoid an eye-care examination. Uploaded image bytes are processed in memory and are not saved by this endpoint.</p>
+        </div>
+
         <p class="model-report-link"><a href="/research/model-baseline-results.json" target="_blank" rel="noopener">View machine-readable results (JSON)</a></p>
       </section>
 
