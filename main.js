@@ -2302,3 +2302,166 @@ Object.assign(reverseTranslations, Object.fromEntries(
 
 applyLanguage(currentLanguage);
 syncPageFromHash();
+
+
+// Live-camera image-model experiment: freeze one frame, crop around both eye
+// regions using MediaPipe landmarks, preview locally, then submit the crop.
+const cameraCropButton = $("camera-crop-button");
+const cameraCropPreview = $("camera-crop-preview");
+const cameraCropPredictButton = $("camera-crop-predict-button");
+let cameraCropBlob = null;
+let cameraCropPreviewUrl = null;
+
+function setCameraCropMessage(title, detail) {
+  renderModelMessage(
+    currentLanguage === "ar" ? title : title,
+    detail
+  );
+}
+
+cameraCropButton?.addEventListener("click", async () => {
+  if (!cameraReady || !landmarker || camera.readyState < 2) {
+    renderModelMessage(
+      currentLanguage === "ar" ? "شغّلي الكاميرا أولًا" : "Turn on the camera first",
+      currentLanguage === "ar"
+        ? "ارجعي لصفحة الاختبار واضغطي «تشغيل الكاميرا»، وبعدها ارجعي هنا."
+        : "Open the Test page, turn on the camera, then return here."
+    );
+    return;
+  }
+
+  cameraCropButton.disabled = true;
+  cameraCropPredictButton.disabled = true;
+  renderModelMessage(
+    currentLanguage === "ar" ? "جارٍ التقاط إطار" : "Capturing a frame",
+    currentLanguage === "ar"
+      ? "يتم تثبيت لقطة واحدة وفحص نقاط العينين."
+      : "Freezing one frame and checking the eye landmarks."
+  );
+
+  try {
+    const frozenFrame = document.createElement("canvas");
+    frozenFrame.width = camera.videoWidth;
+    frozenFrame.height = camera.videoHeight;
+    const frameContext = frozenFrame.getContext("2d");
+    frameContext.drawImage(camera, 0, 0, frozenFrame.width, frozenFrame.height);
+
+    const detection = landmarker.detectForVideo(camera, performance.now());
+    const landmarks = detection.faceLandmarks?.[0];
+    if (!landmarks || landmarks.length < 478) {
+      throw new Error(currentLanguage === "ar"
+        ? "لم يتم العثور على نقاط العينين بوضوح. واجهي الكاميرا وحاولي مرة أخرى."
+        : "Both eye landmarks were not detected clearly. Face the camera and try again.");
+    }
+
+    const eyeIndices = [33, 133, 160, 158, 144, 153, 362, 263, 385, 387, 373, 380, 468, 473];
+    const points = eyeIndices.map(index => landmarks[index]).filter(Boolean);
+    const xs = points.map(point => point.x * frozenFrame.width);
+    const ys = points.map(point => point.y * frozenFrame.height);
+    const span = Math.max(...xs) - Math.min(...xs);
+    if (!Number.isFinite(span) || span < frozenFrame.width * 0.08) {
+      throw new Error(currentLanguage === "ar"
+        ? "منطقة العينين صغيرة أو غير واضحة بما يكفي. اقتربي قليلًا من الكاميرا."
+        : "The eye region is too small or unclear. Move a little closer to the camera.");
+    }
+
+    const padX = span * 0.10;
+    const padY = span * 0.22;
+    const left = Math.max(0, Math.floor(Math.min(...xs) - padX));
+    const right = Math.min(frozenFrame.width, Math.ceil(Math.max(...xs) + padX));
+    const top = Math.max(0, Math.floor(Math.min(...ys) - padY));
+    const bottom = Math.min(frozenFrame.height, Math.ceil(Math.max(...ys) + padY));
+    const cropWidth = right - left;
+    const cropHeight = bottom - top;
+    if (cropWidth < 32 || cropHeight < 32) {
+      throw new Error(currentLanguage === "ar"
+        ? "القصّة الناتجة صغيرة جدًا. أعيدي التقاط الإطار."
+        : "The resulting crop is too small. Capture another frame.");
+    }
+
+    const cropCanvas = document.createElement("canvas");
+    cropCanvas.width = cropWidth;
+    cropCanvas.height = cropHeight;
+    cropCanvas.getContext("2d").drawImage(
+      frozenFrame, left, top, cropWidth, cropHeight,
+      0, 0, cropWidth, cropHeight
+    );
+
+    cameraCropBlob = await new Promise(resolve =>
+      cropCanvas.toBlob(resolve, "image/jpeg", 0.92)
+    );
+    if (!cameraCropBlob) throw new Error("Could not create the cropped image.");
+    if (cameraCropBlob.size > 8 * 1024 * 1024) {
+      throw new Error("The cropped image is larger than 8 MB.");
+    }
+
+    if (cameraCropPreviewUrl) URL.revokeObjectURL(cameraCropPreviewUrl);
+    cameraCropPreviewUrl = URL.createObjectURL(cameraCropBlob);
+    cameraCropPreview.src = cameraCropPreviewUrl;
+    cameraCropPreview.hidden = false;
+    cameraCropPredictButton.disabled = false;
+    renderModelMessage(
+      currentLanguage === "ar" ? "تم قص منطقة العينين" : "Eye region cropped",
+      currentLanguage === "ar"
+        ? "راجعي الصورة المقصوصة الظاهرة أسفل الزر. لو القصّة واضحة، شغّلي التحليل."
+        : "Review the cropped preview below. If it looks clear, run the experiment."
+    );
+  } catch (error) {
+    cameraCropBlob = null;
+    cameraCropPredictButton.disabled = true;
+    renderModelMessage(
+      currentLanguage === "ar" ? "تعذّر التقاط وقص الإطار" : "Could not capture and crop the frame",
+      error.message
+    );
+  } finally {
+    cameraCropButton.disabled = false;
+  }
+});
+
+cameraCropPredictButton?.addEventListener("click", async () => {
+  if (!cameraCropBlob) return;
+  const payload = new FormData();
+  payload.append("image", cameraCropBlob, "starbsense-camera-eye-crop.jpg");
+  payload.append("task", $("model-task-select").value);
+  cameraCropPredictButton.disabled = true;
+  cameraCropButton.disabled = true;
+  renderModelMessage(
+    currentLanguage === "ar" ? "جارٍ تحليل اللقطة المقصوصة" : "Analyzing the cropped frame",
+    currentLanguage === "ar"
+      ? "يتم إرسال صورة العينين المقصوصة إلى خادم Python المحلي."
+      : "The cropped eye image is being sent to the local Python server."
+  );
+  try {
+    const response = await fetch("/api/model-predict", { method: "POST", body: payload });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || "Camera-frame experiment failed.");
+    latestModelPrediction = result;
+    const title = currentLanguage === "ar"
+      ? `تصنيف اللقطة وفق النموذج: ${displayModelLabel(result.predicted_label)}`
+      : `Model label for camera crop: ${result.predicted_label}`;
+    const detail = currentLanguage === "ar"
+      ? "دي تسمية تجريبية لصورة واحدة مقصوصة من إطار الكاميرا، وليست تشخيصًا أو نتيجة فحص."
+      : "This is an experimental dataset label for one cropped camera frame, not a diagnosis or screening result.";
+    renderModelMessage(title, detail, result.decision_scores);
+  } catch (error) {
+    renderModelMessage(
+      currentLanguage === "ar" ? "تعذّر تحليل لقطة الكاميرا" : "Camera-frame analysis failed",
+      error.message
+    );
+  } finally {
+    cameraCropPredictButton.disabled = !cameraCropBlob;
+    cameraCropButton.disabled = false;
+  }
+});
+
+Object.assign(translations, {
+  "Use a frame from the live camera": "استخدمي لقطة من الكاميرا المباشرة",
+  "Turn on the camera on the Test page. StarbSense will freeze one frame, locate the eye landmarks, crop the eye region, and show the crop before sending it to the local model.": "شغّلي الكاميرا من صفحة الاختبار. سيُثبّت StarbSense لقطة واحدة، ويحدد نقاط العينين، ويقصّ المنطقة حولهما، ثم يعرض القصّة قبل إرسالها للنموذج المحلي.",
+  "Capture and crop from camera": "التقاط وقص من الكاميرا",
+  "Automatically cropped eye region from camera": "منطقة العينين المقصوصة تلقائيًا من الكاميرا",
+  "Analyze cropped camera frame": "تحليل لقطة الكاميرا المقصوصة",
+  "The camera remains on; only the captured frame is frozen. The cropped image is processed in memory and is not saved by the server.": "تظل الكاميرا تعمل؛ الذي يتوقف هو اللقطة الملتقطة فقط. تُعالج الصورة المقصوصة في الذاكرة ولا يحفظها الخادم."
+});
+Object.assign(reverseTranslations, Object.fromEntries(
+  Object.entries(translations).map(([english, arabic]) => [arabic, english])
+));
