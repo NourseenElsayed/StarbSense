@@ -74,6 +74,7 @@ Obtain the required school/competition approvals, parent/guardian permission, an
 
 - [Data dictionary](docs/DATA_DICTIONARY.md)
 - [External datasets and research references](docs/RESEARCH_DATASETS.md)
+- [Mendeley Strabismus Detection Module source review](docs/MENDELEY_STRABISMUS_SOURCE.md)
 - [Research validation checklist](docs/VALIDATION_CHECKLIST.md)
 - [Structured visual-following protocol v2](docs/PROTOCOL_V2.md)
 - [Research libraries and dataset registry](docs/RESEARCH_RESOURCES.md)
