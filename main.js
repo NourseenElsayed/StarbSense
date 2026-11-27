@@ -56,10 +56,6 @@ Object.assign(translations, {
   "Accuracy on these datasets does not establish performance on real-world webcam recordings. These experimental models must not be used to diagnose or rule out an eye condition or decide whether someone needs medical care.": "الدقة على مجموعات البيانات هذه لا تثبت الأداء على تسجيلات كاميرا الويب في الواقع. يجب عدم استخدام هذه النماذج التجريبية لتشخيص حالة بالعين أو استبعادها أو تقرير احتياج شخص إلى رعاية طبية.",
   "View machine-readable results (JSON)": "عرض النتائج بصيغة JSON"
 });
-Object.assign(reverseTranslations, Object.fromEntries(
-  Object.entries(translations).map(([english, arabic]) => [arabic, english])
-));
-
 let latestAnalysis = null;
 let latestModelPrediction = null;
 
