@@ -61,6 +61,7 @@ Object.assign(reverseTranslations, Object.fromEntries(
 ));
 
 let latestAnalysis = null;
+let latestModelPrediction = null;
 
 const reverseTranslations = Object.fromEntries(
   Object.entries(translations).map(([english, arabic]) => [arabic, english])
@@ -1422,50 +1423,129 @@ function updateCareGuidance(level = "general") {
 
 function answerAssistantQuestion(rawQuestion) {
   const q = normalizeAssistantText(rawQuestion);
-  const hasAny = (...terms) => terms.some((term) => q.includes(term));
+  const hasAny = (...terms) => terms.some((term) => q.includes(normalizeAssistantText(term)));
+  const ar = currentLanguage === "ar";
+
   const urgent = hasAny(
-    "sudden", "suddenly", "new double vision", "sudden double vision",
-    "sudden vision loss", "sudden eye turn", "new onset diplopia", "فجأة", "مفاجئ", "ازدواج مفاجئ", "ازدواج جديد", "تغير مفاجئ في اتجاه العين",
-    "فقدان الرؤية المفاجئ", "فقدان مفاجئ للنظر", "انحراف مفاجئ"
+    "sudden double vision", "sudden vision loss", "sudden eye turn",
+    "new onset diplopia", "فجأة", "مفاجئ", "ازدواج جديد", "فقدان الرؤية المفاجئ",
+    "فقدان مفاجئ للنظر", "انحراف مفاجئ", "تغير مفاجئ"
   );
-  const concern = hasAny(
-    "double vision", "diplopia", "crossed eye", "eye turns", "eye turning",
-    "misaligned", "strabismus", "blurred vision", "vision difference",
-    "close one eye", "head tilt", "حول", "حَوَل", "انحراف", "ازدواج",
-    "زغللة", "الرؤية مختلفة", "عينه بتروح", "عين بتتحول"
+  const eyeConcern = hasAny(
+    "double vision", "diplopia", "crossed eye", "eye turns", "misaligned",
+    "strabismus", "blurred vision", "vision difference", "head tilt",
+    "حول", "حَوَل", "انحراف", "ازدواج", "زغللة", "الرؤية مختلفة", "عين بتتحول"
   );
+  const asksDiagnosis = hasAny(
+    "do i have", "does it have", "is it strabismus", "diagnose", "normal or not",
+    "فيه حول", "عندي حول", "عنده حول", "عندها حول", "طبيعي ولا", "حول ولا لا",
+    "التشخيص", "شخصني"
+  );
+  const asksImage = hasAny(
+    "image model", "uploaded image", "model label", "prediction", "تصنيف الصورة",
+    "نتيجة الصورة", "النموذج", "الصورة اللي رفعتها"
+  );
+  const asksSession = hasAny(
+    "session", "result", "results", "report", "analysis", "frames", "iris",
+    "الجلسة", "النتيجة", "النتايج", "النتائج", "التقرير", "التحليل", "العينات", "القزحية"
+  );
+
   if (urgent) {
     updateCareGuidance("urgent");
-    return t("I noticed a possible urgent symptom in your message. Sudden new double vision, sudden eye misalignment, or sudden vision loss needs urgent medical assessment. Tell a parent or guardian now and seek urgent medical care.");
+    return ar
+      ? "الأعراض الجديدة والمفاجئة مثل ازدواج الرؤية أو تغيّر اتجاه العين أو فقدان الرؤية تحتاج تقييمًا طبيًا عاجلًا. أخبر ولي أمرك الآن واطلبوا المساعدة الطبية العاجلة."
+      : "New, sudden symptoms such as double vision, a change in eye alignment, or vision loss need urgent medical assessment. Tell a parent or guardian now and seek urgent medical care.";
   }
-  if (concern) {
+
+  if (eyeConcern && !asksSession && !asksImage) {
     updateCareGuidance("concern");
-    return t("Your message describes an eye or vision concern. Please tell a parent or guardian and arrange a comprehensive assessment with an eye-care professional. StarbSense cannot confirm or exclude strabismus.");
+    return ar
+      ? "ده سؤال متعلق بصحة العين، ومش ممكن أحسمه من اختبار StarbSense. احكي لولي أمرك عن اللي ملاحظُه ورتّبوا فحصًا عند طبيب عيون."
+      : "That is an eye-health concern, and StarbSense cannot settle it. Tell a parent or guardian what you have noticed and arrange an eye-care assessment.";
   }
-  if (hasAny("doctor", "ophthalmologist", "eye doctor", "طبيب", "دكتور", "كشف", "اكشف", "أكشف", "محتاج", "لازم اروح")) {
-    updateCareGuidance("general");
-    return t("If there are no symptoms or concerns and routine eye checks are up to date, this session alone does not create a reason for an extra appointment. Continue routine age-appropriate eye care. This is not a statement that the eyes are healthy; StarbSense cannot assess that.");
+
+  if (asksDiagnosis) {
+    if (latestModelPrediction) {
+      const label = latestModelPrediction.predicted_label;
+      return ar
+        ? `آخر صورة اتعمل لها تحليل: النموذج صنّفها ضمن "${label}". دي الفئة اللي اختارها نموذج الصور من التسميات اللي اتدرّب عليها، مش تشخيص مؤكد للشخص. اختبار الكاميرا نفسه لا يقدر يحدد وجود الحَوَل أو ينفيه.`
+        : `For the last image analyzed, the model selected "${label}". That is a dataset label predicted by the image model, not a confirmed diagnosis for a person. The camera session itself cannot confirm or rule out strabismus.`;
+    }
+    return ar
+      ? "لسه مفيش تصنيف صورة متاح. تقرير جلسة الكاميرا يقيس جودة التسجيل وتوفر نقاط العين فقط، ومش بيصنّف الشخص إلى عنده حَوَل أو لا. لو استخدمت تجربة الصورة، هتظهر تسمية النموذج بوضوح."
+      : "There is no image-model label yet. The camera-session report measures recording quality and landmark availability; it does not classify a person as having or not having strabismus. Run the separate image experiment to see its predicted dataset label.";
   }
-  if (hasAny("result", "results", "session", "frames", "iris", "analysis", "نتيجة", "النتايج", "الجلسة", "الإطارات", "القزحية", "التحليل")) {
+
+  if (asksImage) {
+    if (latestModelPrediction) {
+      const label = latestModelPrediction.predicted_label;
+      const task = latestModelPrediction.task === "binary" ? "binary" : "five-class";
+      const scores = latestModelPrediction.decision_scores || {};
+      const scoreText = Object.entries(scores).map(([name, value]) => `${name}: ${Number(value).toFixed(3)}`).join(" · ");
+      return ar
+        ? `آخر نتيجة للصورة: "${label}" من تجربة ${task === "binary" ? "التصنيف الثنائي" : "التصنيف الخماسي"}. درجات SVM: ${scoreText || "غير متاحة"}. الدرجات دي قيم حسابية وليست نسب ثقة أو احتمالات.`
+        : `Latest image result: "${label}" from the ${task} experiment. SVM decision values: ${scoreText || "not available"}. These values are not confidence percentages or probabilities.`;
+    }
+    return ar
+      ? "مفيش صورة اتحللت لسه. افتح قسم «تجربة الصور»، اختار التصنيف الثنائي أو الخماسي، وارفع صورة واضحة ومقصوصة للعينين معًا."
+      : "No image has been analyzed yet. Open the Image-model experiments section, choose binary or five-class classification, and upload a clear, tightly cropped image of both eyes.";
+  }
+
+  if (asksSession) {
     if (!latestAnalysis) {
-      return currentLanguage === "ar"
-        ? "لم تُحلل جلسة بعد. شغّل التجربة وأكملها أو أوقفها، ثم راجع لوحة التحليل. أرقام الإطارات تصف توفر القياسات فقط ولا تشخّص العين."
-        : "No session has been analyzed yet. Run and complete or stop a session, then review the analytics dashboard. Frame counts describe measurement availability only; they do not diagnose the eyes.";
+      return ar
+        ? "لسه مفيش جلسة مكتملة للتحليل. شغّل الكاميرا، ابدأ الاختبار، وبعد انتهاء الخطوات هتظهر لوحة النتائج هنا."
+        : "There is no analyzed session yet. Turn on the camera, start the test, and the results dashboard will appear here when the steps finish.";
     }
     const total = latestAnalysis.sample_count ?? 0;
     const faceRate = latestAnalysis.face_detection_rate_pct ?? "—";
-    const bilateral = latestAnalysis.valid_iris_rate_pct ?? "—";
-    return currentLanguage === "ar"
-      ? `تحتوي جلستك على ${total} إطارًا مسجلًا. تم اكتشاف معالم الوجه في ${faceRate}% من الإطارات، وتوفرت إحداثيات صالحة للقزحيتين في ${bilateral}% منها. هذه مؤشرات تقنية لتوفر البيانات، وليست دقة لاتجاه النظر أو محاذاة العين أو نتيجة طبية.`
-      : `Your session contains ${total} recorded frames. Face landmarks were detected in ${faceRate}% of frames, and valid coordinates for both iris landmarks were available in ${bilateral}%. These are technical data-availability measures, not gaze accuracy, eye alignment, or a medical result.`;
+    const irisRate = latestAnalysis.valid_iris_rate_pct ?? "—";
+    const tasks = latestAnalysis.task_count ?? 0;
+    const median = latestAnalysis.median_sample_interval_ms ?? "—";
+    return ar
+      ? `ملخص جلستك: ${total} إطارًا مسجلًا؛ اكتشاف الوجه ${faceRate}٪؛ عينات القزحيتين الصالحة ${irisRate}٪؛ إطارات في ${tasks} مهمة؛ ووسيط الفاصل بين العينات ${median} مللي ثانية. الأرقام دي بتشرح جودة وتغطية التسجيل، مش اتجاه النظر أو وجود الحَوَل.`
+      : `Session summary: ${total} recorded frames; face detection ${faceRate}%; valid iris samples ${irisRate}%; frames across ${tasks} tasks; median sampling interval ${median} ms. These describe recording quality and coverage, not gaze direction or whether strabismus is present.`;
   }
-  if (hasAny("star", "movement", "directions", "diagonal", "game", "protocol", "النجمة", "الحركة", "الاتجاهات", "اللعبة", "البروتوكول")) {
-    return t("The star path samples center, left/right, up/down, and diagonal screen positions. These directions make the task repeatable and easy to describe. The exact path, star shape, and durations are experimental design choices, not a clinically validated eye-movement test.");
+
+  if (hasAny("accuracy", "accurate", "performance", "دقة", "الدقة", "نسبة نجاح", "الأداء")) {
+    return ar
+      ? "في تقرير التجارب: دقة التصنيف الثنائي 83.3٪، ودقة التصنيف الخماسي 65.7٪ على مجموعات اختبار منفصلة. دي نتائج داخل مجموعات الصور المستخدمة فقط، ومش مقياسًا لدقة كاميرا الويب أو تشخيص الأشخاص."
+      : "In the baseline report, binary image classification reached 83.3% test accuracy and five-class classification reached 65.7% on separate held-out image sets. These are dataset results, not webcam accuracy or diagnostic performance.";
   }
-  if (hasAny("privacy", "camera", "video", "csv", "data", "خصوصية", "كاميرا", "فيديو", "بيانات", "ملف")) {
-    return t("The browser processes camera frames locally. The Python service receives derived numeric measurements for analysis; it does not receive or store raw video in this project. CSV exports contain facial-landmark coordinates and should be treated as sensitive research data, especially for children.");
+
+  if (hasAny("how does it work", "how it works", "algorithm", "hog", "svm", "بيشتغل ازاي", "بيشتغل إزاي", "الخوارزمية", "الموديل")) {
+    return ar
+      ? "المشروع فيه مسارين منفصلين: جلسة الكاميرا تستخدم MediaPipe لاستخراج نقاط الوجه والقزحية وتراجع جودة الإطارات؛ وتجربة الصور تستخدم خصائص HOG مع مصنف SVM على صورة عينين مقصوصة. نموذج الصور لا يحلل فيديو الجلسة أو ملف CSV."
+      : "The project has two separate paths: the camera session uses MediaPipe to extract face and iris landmarks and checks frame quality; the image experiment uses HOG features and an SVM classifier on a cropped eye-pair image. The image model does not analyze session video or CSV data.";
   }
-  return t("I can explain the session metrics, protocol design, privacy, and general care guidance. I cannot interpret webcam measurements as a diagnosis or answer questions outside this limited project guide. Please rephrase your question or ask an eye-care professional for personal medical advice.");
+
+  if (hasAny("camera", "lighting", "face", "eyes visible", "كاميرا", "الإضاءة", "النور", "الوجه", "العينين")) {
+    return ar
+      ? "علشان التسجيل يبقى أوضح: خلي الوجه في منتصف الإطار، العينين ظاهرين، الإضاءة أمامية وهادية، والرأس في وضع مريح. لو لوحة الجاهزية طلبت تعديل حاجة، اتبع الرسالة اللي جنب معاينة الكاميرا."
+      : "For a cleaner recording, keep your face centered, both eyes visible, use steady front lighting, and keep your head comfortably upright. Follow the readiness message shown beside the camera preview.";
+  }
+
+  if (hasAny("star", "movement", "directions", "diagonal", "game", "protocol", "النجمة", "الحركة", "الاتجاهات", "اللعبة", "الخطوات", "الاختبار")) {
+    return ar
+      ? "الاختبار مكوّن من 17 خطوة: تثبيت في المنتصف، اتجاهات أفقية ورأسية، اتجاهات قطرية، ثم تثبيت نهائي في المنتصف. اتبع النجمة بعينيك وحاول تثبيت الرأس بشكل مريح."
+      : "The test has 17 steps: a center fixation, horizontal and vertical directions, diagonal directions, and a final center fixation. Follow the star with your eyes and keep your head comfortably still.";
+  }
+
+  if (hasAny("privacy", "video", "csv", "data", "خصوصية", "فيديو", "ملف", "بيانات")) {
+    return ar
+      ? "معالجة إطارات الكاميرا بتحصل داخل المتصفح. خدمة Python تستقبل القياسات الرقمية المشتقة لتحليل الجلسة، ومش بتستقبل فيديو خام. ملف CSV يحتوي إحداثيات وقياسات مستخرجة، فاحتفظ به في مكان آمن."
+      : "Camera frames are processed in the browser. The Python service receives derived numeric measurements for session analysis, not raw video. The CSV contains derived coordinates and measurements, so store it carefully.";
+  }
+
+  if (hasAny("help", "what can i ask", "مساعدة", "اسأل ايه", "اسأل إيه", "تقدر تعمل ايه", "تقدر تعمل إيه")) {
+    return ar
+      ? "تقدر تسألني عن: نتيجة الجلسة، جودة الكاميرا، معنى الرسوم، تصنيف صورة العينين، دقة تجارب الصور، خطوات الاختبار، أو طريقة عمل المشروع."
+      : "You can ask about the session result, camera quality, chart meanings, an eye-image label, image-model accuracy, test steps, or how the project works.";
+  }
+
+  return ar
+    ? "أقدر أساعدك في فهم StarbSense وبياناته. جرّب تسألني: «اشرح نتيجة الجلسة»، «ليه جودة التسجيل ضعيفة؟»، «يعني إيه تصنيف الصورة؟»، أو «النموذج بيشتغل إزاي؟»."
+    : "I can help explain StarbSense and its data. Try: “Explain my session result,” “Why is recording quality low?”, “What does the image label mean?”, or “How does the model work?”";
 }
 
 function finishAdventure() {
@@ -1995,8 +2075,9 @@ modelUploadForm?.addEventListener("submit", async (event) => {
     const response = await fetch("/api/model-predict", { method: "POST", body: payload });
     const result = await response.json();
     if (!response.ok) throw new Error(result.error || "Image experiment failed.");
+    latestModelPrediction = result;
     const title = currentLanguage === "ar"
-      ? `تسمية النموذج: ${result.predicted_label}`
+      ? `تصنيف الصورة: ${result.predicted_label}`
       : `Model label: ${result.predicted_label}`;
     const detail = currentLanguage === "ar"
       ? "هذه تسمية تجريبية من النموذج وليست تشخيصًا أو نتيجة فحص. درجات SVM المعروضة قيم حسابية وليست احتمالات."
@@ -2017,3 +2098,50 @@ modelUploadForm?.addEventListener("submit", async (event) => {
 checkImageModelAvailability();
 
 applyLanguage(currentLanguage);
+
+
+Object.assign(translations, {
+  "A simple guided eye-tracking research session.": "جلسة بحثية مبسطة لتتبّع حركة العين.",
+  "Follow the star through 17 guided steps. StarbSense records camera-based measurements and organizes them into an easy-to-read session report.": "اتبع النجمة خلال 17 خطوة واضحة. يسجل StarbSense قياسات الكاميرا وينظمها في تقرير سهل الفهم.",
+  "Session steps": "خطوات الجلسة",
+  "Get ready": "استعد",
+  "Start the test": "ابدأ الاختبار",
+  "View results": "اعرض النتائج",
+  "Ask a question": "اسأل سؤالًا",
+  "Step 1 · Get ready": "الخطوة 1 · الاستعداد",
+  "Camera setup": "إعداد الكاميرا",
+  "Sit comfortably facing the camera. Keep both eyes visible and use steady front lighting.": "اجلس بشكل مريح أمام الكاميرا، واجعل العينين ظاهرتين واستخدم إضاءة أمامية ثابتة.",
+  "What will happen?": "ماذا سيحدث؟",
+  "The star will appear at the center, sides, top, bottom, and diagonal positions. Follow it with your eyes while keeping your head comfortably still.": "ستظهر النجمة في المنتصف والجوانب والأعلى والأسفل والاتجاهات القطرية. اتبعها بعينيك مع إبقاء رأسك ثابتًا بشكل مريح.",
+  "The session takes about 22 seconds and contains 17 steps.": "تستغرق الجلسة نحو 22 ثانية وتتكون من 17 خطوة.",
+  "Step 2 · Follow the star": "الخطوة 2 · اتبع النجمة",
+  "Step 3 · Your session results": "الخطوة 3 · نتائج جلستك",
+  "After the session, your summary and charts will appear here.": "بعد الجلسة، سيظهر هنا الملخص والرسوم البيانية.",
+  "Session summary": "ملخص الجلسة",
+  "A clear summary of the recorded session, followed by optional technical charts.": "ملخص واضح للجلسة المسجلة، وبعده رسوم تقنية اختيارية.",
+  "Technical charts and measurements": "الرسوم والقياسات التقنية",
+  "What this session tells you": "ماذا تخبرك هذه الجلسة؟",
+  "The session report describes how well the camera recorded the task. It does not determine whether a person has strabismus.": "يوضح تقرير الجلسة مدى جودة تسجيل الكاميرا للمهمة، ولا يحدد ما إذا كان الشخص لديه حَوَل.",
+  "Image-model experiments": "تجارب نماذج الصور",
+  "Model accuracy and research details": "دقة النماذج والتفاصيل البحثية",
+  "Optional · Classify an eye-pair image": "اختياري · تصنيف صورة للعينين",
+  "The model returns one label from its training dataset. The image is processed in memory and is not saved by this endpoint.": "يعرض النموذج تسمية واحدة من فئات مجموعة التدريب. تُعالج الصورة في الذاكرة ولا تحفظها هذه الخدمة.",
+  "How to read your result": "كيف تقرأ النتيجة؟",
+  "There are two different outputs: the camera-session report describes recording quality, while the optional image experiment predicts a dataset label for one uploaded image.": "هناك نتيجتان مختلفتان: تقرير جلسة الكاميرا يوضح جودة التسجيل، بينما تتوقع تجربة الصور الاختيارية فئة لصورة واحدة مرفوعة.",
+  "Camera-session result": "نتيجة جلسة الكاميرا",
+  "This shows whether enough usable frames and eye landmarks were recorded. It is not a strabismus classification.": "توضح ما إذا كان قد تم تسجيل عدد كافٍ من الإطارات ومعالم العين. وهي ليست تصنيفًا للحَوَل.",
+  "Image-model result": "نتيجة نموذج الصور",
+  "This shows the model’s predicted label for the uploaded image: “strabismus” or “strabismus-free”, or one of the five image classes.": "تعرض الفئة التي توقعها النموذج للصورة: «حَوَل» أو «دون حَوَل»، أو إحدى فئات الصور الخمس.",
+  "If you have a concern about your vision or eye alignment, discuss it with a parent or guardian and an eye-care professional.": "إذا كان لديك قلق بشأن الرؤية أو اتجاه العين، فتحدث مع ولي أمرك ومع مختص عيون.",
+  "Step 4 · Ask StarbSense": "الخطوة 4 · اسأل StarbSense",
+  "Ask about your session, charts, image-model labels, camera quality, or how StarbSense works. The assistant uses the project data available in this browser.": "اسأل عن جلستك أو الرسوم أو تصنيفات نموذج الصور أو جودة الكاميرا أو طريقة عمل StarbSense. يستخدم المساعد بيانات المشروع المتاحة في هذا المتصفح.",
+  "For questions outside the project, the assistant may not have enough information.": "قد لا تتوفر لدى المساعد معلومات كافية للأسئلة خارج نطاق المشروع.",
+  "Explain my session results in simple words.": "اشرح نتيجة جلستي بكلمات بسيطة.",
+  "Image label:": "تصنيف الصورة:",
+  "Image model label:": "تصنيف نموذج الصور:",
+  "This is a dataset label predicted by the image model, not a confirmed diagnosis for a person.": "هذه تسمية من مجموعة البيانات توقعها نموذج الصور، وليست تشخيصًا مؤكدًا لشخص.",
+  "The camera-session report measures recording quality and landmark availability; it does not classify a person as having or not having strabismus.": "يقيس تقرير جلسة الكاميرا جودة التسجيل وتوفر معالم العين، ولا يصنف الشخص على أنه لديه حَوَل أو لا."
+});
+Object.assign(reverseTranslations, Object.fromEntries(
+  Object.entries(translations).map(([english, arabic]) => [arabic, english])
+));
