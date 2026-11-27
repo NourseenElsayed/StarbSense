@@ -22,3 +22,18 @@ data/reports/
 
 # Model artifacts are installed locally from the supplied archive.
 models/*.joblib
+
+# Large local Mendeley inference models (do not commit)
+models/mendeley/*.tflite
+
+
+# Local environments and generated files
+.venv/
+venv/
+__pycache__/
+node_modules/
+dist/
+data/raw/
+data/interim/
+data/processed/
+data/external/
