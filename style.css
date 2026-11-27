@@ -1178,3 +1178,6 @@ body.is-rtl .site-footer { direction: rtl; }
 @media (max-width: 760px) {
   #python-charts { grid-template-columns: 1fr; }
 }
+
+/* Keep internal readiness checks active without showing alert-style panels */
+.readiness-panel { display: none !important; }
