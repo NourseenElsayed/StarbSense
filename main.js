@@ -2228,7 +2228,7 @@ Object.assign(translations, {
   "Image label:": "تصنيف الصورة:",
   "Image model label:": "تصنيف نموذج الصور:",
   "This is a dataset label predicted by the image model, not a confirmed diagnosis for a person.": "هذه تسمية من مجموعة البيانات توقعها نموذج الصور، وليست تشخيصًا مؤكدًا لشخص.",
-  "The camera-session report measures recording quality and landmark availability; it does not classify a person as having or not having strabismus.": "يقيس تقرير جلسة الكاميرا جودة التسجيل وتوفر معالم العين، ولا يصنف الشخص على أنه لديه حَوَل أو لا."
+  "The camera-session report measures recording quality and landmark availability; it does not classify a person as having or not having strabismus.": "يقيس تقرير جلسة الكاميرا جودة التسجيل وتوفر معالم العين، ولا يصنف الشخص على أنه لديه حَوَل أو لا.",
 
   "chart-description:Face detection by task": "يوضح عدد الإطارات التي ظهر فيها الوجه أو لم يظهر في كل خطوة. يساعد على معرفة الخطوات التي كانت فيها بيانات الوجه أقل.",
   "chart-description:Raw iris coordinates over time": "يعرض تغيّر إحداثيات القزحية التي التقطتها MediaPipe أثناء الجلسة. هذه إحداثيات داخل الصورة وليست قياسًا مُعايرًا لاتجاه النظر.",
