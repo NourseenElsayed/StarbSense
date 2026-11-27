@@ -1,0 +1,27 @@
+{
+  "generated_from": "reports/baseline_results.json",
+  "status": "offline_experimental_baselines",
+  "webcam_connected": false,
+  "clinical_validation": false,
+  "experiments": {
+    "binary": {
+      "dataset_images": 1525,
+      "test_images": 305,
+      "accuracy": 0.8327868852,
+      "balanced_accuracy": 0.8325378397,
+      "macro_f1": 0.8317450703,
+      "model": "HOG grayscale 96x96 + RBF SVM C=1",
+      "split": "grouped stratified approx 64/16/20"
+    },
+    "five_class": {
+      "dataset_images": 509,
+      "test_images": 102,
+      "accuracy": 0.6568627451,
+      "balanced_accuracy": 0.6579676464,
+      "macro_f1": 0.6545649839,
+      "model": "HOG grayscale 96x96 + RBF SVM C=10",
+      "split": "stratified random image 70/10/20; participant independence unknown"
+    }
+  },
+  "note": "Pre-cropped eye-pair image experiments only; not connected to webcam/MediaPipe session data and not for diagnosis."
+}
