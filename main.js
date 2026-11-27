@@ -34,6 +34,32 @@ Object.assign(translations, {
   "The browser processes camera frames locally. The Python service receives derived numeric measurements for analysis; it does not receive or store raw video in this project. CSV exports contain facial-landmark coordinates and should be treated as sensitive research data, especially for children.": "يعالج المتصفح إطارات الكاميرا محليًا. تستقبل خدمة Python قياسات رقمية مشتقة للتحليل؛ ولا تستقبل أو تخزن فيديو خامًا في هذا المشروع. تحتوي ملفات CSV على إحداثيات معالم الوجه ويجب التعامل معها كبيانات بحثية حساسة، خاصةً للأطفال.",
   "I can explain the session metrics, protocol design, privacy, and general care guidance. I cannot interpret webcam measurements as a diagnosis or answer questions outside this limited project guide. Please rephrase your question or ask an eye-care professional for personal medical advice.": "يمكنني شرح مؤشرات الجلسة وتصميم البروتوكول والخصوصية والإرشادات العامة للرعاية. لا يمكنني تفسير قياسات كاميرا الويب على أنها تشخيص أو الإجابة عن أسئلة خارج نطاق دليل المشروع المحدود. أعد صياغة سؤالك أو اسأل مختص عيون للحصول على نصيحة طبية شخصية."
 });
+
+Object.assign(translations, {
+  "OFFLINE IMAGE-MODEL EXPERIMENTS": "تجارب نماذج الصور غير المتصلة",
+  "Research model baselines": "النتائج الأساسية للنماذج البحثية",
+  "Results from two separate image-classification experiments using the uploaded research datasets. These are not results from your live camera session.": "نتائج تجربتين منفصلتين لتصنيف الصور باستخدام مجموعات البيانات البحثية المرفوعة. هذه النتائج ليست ناتجة عن جلسة الكاميرا المباشرة.",
+  "Offline evaluation": "تقييم غير متصل",
+  "BINARY CLASSIFICATION": "تصنيف ثنائي",
+  "Strabismus / strabismus-free": "حَوَل / دون حَوَل وفق تسميات مجموعة الصور",
+  "Held-out test accuracy": "دقة مجموعة الاختبار المحجوبة",
+  "Macro-F1": "مقياس Macro-F1",
+  "Balanced accuracy": "الدقة المتوازنة",
+  "Test images": "صور الاختبار",
+  "Dataset images": "صور مجموعة البيانات",
+  "HOG features (grayscale 96×96) with an RBF support-vector machine. Source-image variants were grouped for splitting using the available class and numeric image ID.": "استخدمت التجربة خصائص HOG لصور رمادية بحجم 96×96 مع مصنف SVM بنواة RBF. جُمعت نسخ الصور المرتبطة عند التقسيم باستخدام الفئة ورقم الصورة المتاح.",
+  "FIVE-CLASS CLASSIFICATION": "تصنيف بخمس فئات",
+  "Five supplied image labels": "الفئات الخمس الموجودة في الصور",
+  "HOG features (grayscale 96×96) with an RBF support-vector machine. The available dataset had no participant/source IDs, so participant-level separation could not be verified.": "استخدمت التجربة خصائص HOG لصور رمادية بحجم 96×96 مع مصنف SVM بنواة RBF. لا تحتوي مجموعة البيانات على معرفات للمشاركين أو مصادر الصور، لذلك لم يمكن التحقق من الفصل على مستوى المشاركين.",
+  "How these models relate to StarbSense": "علاقة هذه النماذج بمشروع StarbSense",
+  "These are offline image experiments. They accept pre-cropped eye-pair images; the current browser session records MediaPipe landmarks and experimental image measurements. The image models are not connected to the webcam stream and do not analyze the session CSV.": "هذه تجارب صور غير متصلة. تستقبل صورًا لزوج العينين بعد قصّها مسبقًا؛ أما جلسة المتصفح الحالية فتسجل معالم MediaPipe وقياسات صور تجريبية. نماذج الصور غير متصلة ببث الكاميرا ولا تحلل ملف CSV الخاص بالجلسة.",
+  "Accuracy on these datasets does not establish performance on real-world webcam recordings. These experimental models must not be used to diagnose or rule out an eye condition or decide whether someone needs medical care.": "الدقة على مجموعات البيانات هذه لا تثبت الأداء على تسجيلات كاميرا الويب في الواقع. يجب عدم استخدام هذه النماذج التجريبية لتشخيص حالة بالعين أو استبعادها أو تقرير احتياج شخص إلى رعاية طبية.",
+  "View machine-readable results (JSON)": "عرض النتائج بصيغة JSON"
+});
+Object.assign(reverseTranslations, Object.fromEntries(
+  Object.entries(translations).map(([english, arabic]) => [arabic, english])
+));
+
 let latestAnalysis = null;
 
 const reverseTranslations = Object.fromEntries(
