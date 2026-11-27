@@ -15,6 +15,12 @@ This checklist is a protocol-planning aid, not permission to conduct human-subje
 - [ ] Browser refresh/page close releases camera tracks.
 - [ ] Stopping the camera during a session safely stops recording and releases all media tracks.
 - [ ] Dashboard counts and Python summary agree for left, right, and paired iris-coordinate validity.
+- [ ] Automatic eye-pair crops are captured only from the current live session and at least three valid crops are required for a model summary.
+- [ ] The app analyzes no more than five evenly distributed session crops and displays the actual number analyzed.
+- [ ] Binary and five-class vote counts match the per-frame API predictions; ties are reported as inconclusive.
+- [ ] Starting a new session clears all prior model predictions and chart outputs.
+- [ ] A missing model, failed request, or insufficient crop count never displays a fabricated or stale prediction.
+- [ ] Privacy text accurately states that selected eye-pair crops and derived numeric measurements are sent to the local Flask service, while raw video/audio are not sent or stored.
 - [ ] Task-group summary reports sample counts and separate left/right/bilateral coordinate availability.
 - [ ] Assistant answers only supported topics, clearly identifies its rule-based limitations, and never diagnoses.
 - [ ] Medical next-step guidance is based on user-reported symptoms and established referral guidance, never on webcam measurements.
