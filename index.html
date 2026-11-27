@@ -19,10 +19,11 @@
         <span class="brand-icon">✦</span>
         <span>StarbSense</span>
       </a>
-      <div class="header-actions"><span class="prototype-label">RESEARCH PROTOTYPE</span><button id="language-toggle" class="language-toggle" type="button" aria-label="Switch language">English</button></div>
+      <nav class="main-nav" aria-label="Main navigation"><a href="#test" data-page-link="test">الاختبار</a><a href="#analysis" data-page-link="analysis">التحليلات</a><a href="#assistant" data-page-link="assistant">المساعد الذكي</a></nav><div class="header-actions"><button id="language-toggle" class="language-toggle" type="button" aria-label="Switch language">English</button></div>
     </header>
 
     <main class="page-content">
+      <section class="app-page" id="page-test" data-page="test">
       <section class="intro">
         <p class="eyebrow">TRACK · MEASURE · UNDERSTAND</p>
         <h1>A simple guided eye-tracking research session.</h1>
@@ -31,12 +32,6 @@
         </p>
       </section>
 
-      <nav class="quick-nav" aria-label="Session steps">
-        <a href="#setup-title"><span>1</span> Get ready</a>
-        <a href="#game-title"><span>2</span> Start the test</a>
-        <a href="#report-title"><span>3</span> View results</a>
-        <a href="#assistant-title"><span>4</span> Ask a question</a>
-      </nav>
 
       <section class="setup-panel" aria-labelledby="setup-title">
         <div class="section-heading">
@@ -81,11 +76,7 @@
             <p id="setup-message" class="message" role="status" aria-live="polite">
               Enable the camera to load the game model.
             </p>
-            <div id="readiness-panel" class="readiness-panel is-warning" role="status" aria-live="polite">
-              <strong id="readiness-title">Camera positioning guide</strong>
-              <p id="readiness-message">Turn on the camera to check that your face and both eyes are visible.</p>
-              <small id="readiness-detail">We check that your face and both eyes are clearly visible.</small>
-              </div>
+            
           </div>
         </div>
       </section>
@@ -169,7 +160,7 @@
         </div>
 
         <p id="report-message" class="message" role="status" aria-live="polite">Complete the 17 steps to see your session summary.</p>
-        <button id="analytics-toggle" class="button button-secondary" type="button" aria-expanded="false">Show all data and charts</button>
+        <a id="analytics-toggle" class="button button-secondary" href="#analysis" data-translation-key="Open full analysis">Open full analysis</a>
         <article id="final-result-card" class="final-result-card" hidden aria-live="polite">
           <span class="final-result-kicker">YOUR RESULT</span>
           <h3 id="final-result-title">Your session result will appear here</h3>
@@ -181,8 +172,10 @@
           Export CSV
         </button>
       </section>
+      </section>
 
-      <section id="analytics-dashboard" class="analytics-dashboard technical-appendix" hidden>
+      <section class="app-page" id="page-analysis" data-page="analysis" hidden>
+      <section id="analytics-dashboard" class="analytics-dashboard technical-appendix">
         <div class="analytics-heading">
           <p class="eyebrow">SESSION ANALYTICS</p>
           <h2 id="analytics-title">All session data and charts</h2>
@@ -330,7 +323,9 @@
 
         <p class="model-report-link"><a href="/research/model-baseline-results.json" target="_blank" rel="noopener">View machine-readable results (JSON)</a></p>
       </details>
+      </section>
 
+      <section class="app-page" id="page-assistant" data-page="assistant" hidden>
       <section class="assistant-panel" aria-labelledby="assistant-title">
         <p class="eyebrow">STARBSENSE GUIDE · LOCAL ASSISTANT</p>
         <h2 id="assistant-title">Step 4 · Ask StarbSense</h2>
@@ -346,15 +341,9 @@
         </form>
         
       </section>
-
-      <section class="privacy-note">
-        <strong>Privacy and responsible use</strong>
-        <p>
-          Camera processing is performed in the browser. Session CSV files
-          contain derived facial landmark coordinates; handle them carefully,
-          especially when working with children.
-        </p>
       </section>
+
+      
     </main>
 
     <footer class="site-footer">
