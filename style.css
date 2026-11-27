@@ -1273,3 +1273,11 @@ body.is-rtl .site-footer { direction: rtl; }
   color: var(--muted);
   line-height: 1.65;
 }
+
+
+/* Neutral state for a live-session model result without a majority vote. */
+.automatic-diagnosis-card.is-inconclusive {
+  border-color: #b7791f;
+  background: rgba(245, 158, 11, 0.10);
+  color: inherit;
+}
