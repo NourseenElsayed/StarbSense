@@ -1233,6 +1233,14 @@ function startAdventure() {
 
   stopQualityMonitor();
   samples = [];
+  latestAnalysis = null;
+  const previousFinalCard = $("final-result-card");
+  if (previousFinalCard) previousFinalCard.hidden = true;
+  setMessage(
+    $("report-message"),
+    currentLanguage === "ar" ? "الجلسة الجديدة قيد التسجيل؛ ستظهر نتائجها بعد الانتهاء." : "A new session is being recorded. Its results will appear when it finishes.",
+    "info"
+  );
   automaticEyeCrops = new Map();
   automaticEyeCropCount = 0;
   processedFrames = 0;
