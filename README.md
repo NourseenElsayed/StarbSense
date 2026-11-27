@@ -13,10 +13,10 @@ StarbSense is an experimental, child-friendly visual-target-following and facial
 - Per-frame technical metadata: timestamps, camera resolution/frame rate where exposed, task metadata, page visibility, and non-identifying lighting summaries.
 - CSV export and local Flask/Python analysis.
 - Data-quality summaries and seven charts, including task-level and task-group coverage and heuristic lighting trends.
-- A separate offline image-model experiment: a user-selected, pre-cropped eye-pair image can be processed by one of two local HOG + SVM baselines. This does not consume webcam frames or session CSV data.
+- A separate image-model inference stage that automatically crops eye-pair images from the live camera session. It analyzes up to five evenly distributed valid crops with two local HOG + SVM baselines and summarizes their per-frame votes. It does not use the session CSV as model input.
 - A local, rule-based evidence guide for project FAQs and general eye-care next steps; it is not a generative AI model and never diagnoses.
 
-The live camera/session pipeline does not send raw camera frames, camera device identifiers, or audio to the Python service; it sends derived numeric session fields only. The separate image-model feature sends a user-selected eye-pair image to the local Flask process for in-memory inference and does not write that upload to disk.
+The browser processes the live camera stream and sends derived numeric session measurements to the local Flask service for chart analysis. For image-model inference, up to five selected eye-pair crops from the current session are also sent to the local Flask process for in-memory inference; the prediction endpoint does not write those crops to disk. Raw video, audio, and camera device identifiers are not sent.
 
 ## Run locally
 
@@ -62,13 +62,13 @@ GitHub Actions runs the Python checks and Vite build on pushes and pull requests
 - Bright-pixel candidates can arise from reflections, glasses, skin, sclera, and lighting. They are not proof of corneal reflections.
 - Lighting flags use heuristic thresholds only; they are not validated participant-exclusion criteria.
 - The current star-following sequence is an experimental task, not a clinical cover test or validated examination protocol.
-- The two offline image classifiers are exploratory dataset baselines only. They are not trained on the live webcam stream, are not validated on real-world webcam images, and must not be used to diagnose, screen for, or rule out an eye condition.
+- The two image classifiers are exploratory dataset-trained baselines applied to selected live-session eye crops. They have not been validated on real-world webcam images or against an independent clinical reference standard, and must not be used to diagnose, screen for, or rule out an eye condition.
 
 Do not claim diagnostic accuracy, sensitivity, specificity, or screening performance without an appropriately designed, independently supervised validation study and a suitable clinical reference standard.
 
 ## Participant privacy and research governance
 
-Obtain the required school/competition approvals, parent/guardian permission, and participant assent before collecting data from minors. Minimize collected metadata, use coded participant IDs, store exports securely, and do not publish identifiable data. This prototype does not upload recordings to a remote service; the Flask endpoint is local-only by default.
+Obtain the required school/competition approvals, parent/guardian permission, and participant assent before collecting data from minors. Minimize collected metadata, use coded participant IDs, store exports securely, and do not publish identifiable data. The app sends derived numeric session measurements and selected cropped eye-pair images to the local Flask service; it does not send raw video/audio to a remote service. The prediction endpoint processes crops in memory and does not save them to disk.
 
 ## Project documentation
 
