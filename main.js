@@ -1411,6 +1411,7 @@ function updateCareGuidance(level = "general") {
       ? "لا يمكن لنتيجة StarbSense تحديد الحاجة إلى الطبيب. إذا لم توجد أعراض وكانت الفحوصات الدورية محدثة، فلا تستلزم هذه الجلسة وحدها موعدًا إضافيًا؛ استمر في الفحوصات الدورية المناسبة للعمر. أي قلق جديد يستحق تقييمًا مهنيًا."
       : "StarbSense cannot decide whether a clinician is needed. If there are no symptoms and routine checks are up to date, this session alone does not require an extra appointment; continue age-appropriate routine eye care. Any new concern deserves professional assessment.";
   }
+  panel.hidden = level === "general";
   panel.replaceChildren();
   const strong = document.createElement("strong");
   strong.textContent = title;
