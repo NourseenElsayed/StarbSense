@@ -326,6 +326,14 @@
             <strong>Waiting for an image</strong>
             <p>Choose an image and run one of the offline experiments.</p>
           </div>
+          <div class="camera-frame-experiment">
+            <h4>Use a frame from the live camera</h4>
+            <p class="model-upload-help">Turn on the camera on the Test page. StarbSense will freeze one frame, locate the eye landmarks, crop the eye region, and show the crop before sending it to the local model.</p>
+            <button id="camera-crop-button" class="button button-secondary" type="button">Capture and crop from camera</button>
+            <img id="camera-crop-preview" class="model-image-preview" alt="Automatically cropped eye region from camera" hidden>
+            <button id="camera-crop-predict-button" class="button button-primary" type="button" disabled>Analyze cropped camera frame</button>
+            <p class="model-upload-help">The camera remains on; only the captured frame is frozen. The cropped image is processed in memory and is not saved by the server.</p>
+          </div>
           <p class="model-upload-disclaimer">The model returns one label from its training dataset. The image is processed in memory and is not saved by this endpoint.</p>
         </div>
 
