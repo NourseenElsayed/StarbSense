@@ -1584,7 +1584,9 @@ function finishAdventure() {
 
   setMessage(
     $("report-message"),
-    "Session recorded. Bright-pixel candidates are experimental image features, not verified corneal reflections or a medical diagnosis.",
+    currentLanguage === "ar"
+      ? "تم تسجيل الجلسة. جاري تجهيز النتيجة النهائية…"
+      : "Session recorded. Preparing your result…",
     "success"
   );
 
