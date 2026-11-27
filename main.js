@@ -2116,7 +2116,7 @@ checkImageModelAvailability();
 
 
 Object.assign(translations, {
-  "A simple guided eye-tracking research session".: "جلسة بحثية مبسطة لتتبّع حركة العين.",
+  "A simple guided eye-tracking research session.": "جلسة بحثية مبسطة لتتبّع حركة العين.",
   "Follow the star through 17 guided steps. StarbSense records camera-based measurements and organizes them into an easy-to-read session report.": "اتبع النجمة خلال 17 خطوة واضحة. يسجل StarbSense قياسات الكاميرا وينظمها في تقرير سهل الفهم.",
   "Session steps": "خطوات الجلسة",
   "Get ready": "استعد",
