@@ -10,7 +10,7 @@ This registry records external tools and datasets that may support research plan
 | OpenCV.js | Experimental image-feature processing | Bright-pixel candidates are not verified corneal reflections. |
 | Chart.js | Session plots | Visualizes recorded values; it does not validate their meaning. |
 | NumPy, pandas, Matplotlib | Local Python analysis | Used for tabular summaries, descriptive statistics, and charts. |
-| Flask | Local analysis API | Receives the session's derived numeric fields from the local browser app. |
+| Flask | Local analysis API | Receives derived numeric session fields for analysis and selected cropped eye-pair images for in-memory model inference. |
 
 Do not add libraries only to make the dependency list longer. A new dependency should solve a documented research or engineering need, have a compatible license, and be covered by tests.
 
