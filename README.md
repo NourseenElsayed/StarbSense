@@ -25,8 +25,8 @@ Use two terminals from the project folder.
 Terminal 1:
 ```bash
 python -m pip install -r requirements.txt
-# Optional: install the separately supplied trained model archive for image experiments
-python tools/install_trained_models.py "$env:USERPROFILE\Downloads\starbsense_trained_baselines.zip"
+# Optional: install the separately supplied archive for image-model experiments
+python tools/install_trained_models.py "PATH_TO/starbsense_trained_baselines.zip"
 python server.py
 ```
 
