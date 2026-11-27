@@ -180,7 +180,8 @@ const readinessCopy = {
 Object.assign(translations, {
   "Camera positioning guide": "دليل وضع الكاميرا",
   "Turn on the camera to check that your face and both eyes are visible.": "شغّل الكاميرا للتأكد من ظهور الوجه والعينين بوضوح.",
-  "This checks camera framing and image quality only. It cannot tell whether eyes are healthy.": "هذا الفحص يراجع وضع الكاميرا وجودة الصورة فقط، ولا يحدد ما إذا كانت العينان سليمتين.",
+  "This checks camera framing and image quality only. It cannot tell whether eyes are healthy.": "نتأكد من ظهور الوجه والعينين بوضوح.",
+  "We check that your face and both eyes are clearly visible.": "نتأكد من ظهور الوجه والعينين بوضوح.",
   "Face not found": "لم يتم العثور على الوجه",
   "Move into the camera view so your whole face is visible.": "تحرك إلى مجال الكاميرا حتى يظهر وجهك بالكامل.",
   "Move a little closer": "اقترب قليلًا",
@@ -202,7 +203,8 @@ Object.assign(translations, {
   "Technical session status": "حالة الجلسة التقنية",
   "The camera captured enough usable tracking data for this experimental session.": "سجلت الكاميرا بيانات تتبّع كافية لهذه الجلسة التجريبية.",
   "Some tracking data may be missing. Adjust your position and repeat the session if you want a cleaner technical recording.": "قد تكون بعض بيانات التتبّع غير مكتملة. عدّل وضعك وأعد الجلسة إذا أردت تسجيلًا تقنيًا أوضح.",
-  "This status describes recording quality only. It is not an eye-health result or a medical recommendation.": "هذه الحالة تصف جودة التسجيل فقط، وليست نتيجة لصحة العين أو توصية طبية.",
+  "This status describes recording quality only. It is not an eye-health result or a medical recommendation.": "هذه النتيجة تصف جودة التسجيل.",
+  "This result describes recording quality.": "هذه النتيجة تصف جودة التسجيل.",
   "Bright spots can be caused by glasses or room lights. This camera setup cannot verify a corneal light reflex.": "قد تنتج البقع الساطعة عن النظارات أو إضاءة الغرفة. لا يستطيع إعداد الكاميرا هذا تأكيد انعكاس الضوء القرني.",
   "Repeat the session": "يُفضّل إعادة الجلسة",
   "Technical recording looks usable": "التسجيل التقني قابل للاستخدام مبدئيًا"
@@ -217,7 +219,7 @@ function updateReadiness(state) {
   const ready = Boolean(state.ready);
   readinessTitle.textContent = t(ready ? readinessCopy.ready[0] : copy[0]);
   readinessMessage.textContent = t(ready ? readinessCopy.ready[1] : copy[1]);
-  readinessDetail.textContent = t("This checks camera framing and image quality only. It cannot tell whether eyes are healthy.");
+  readinessDetail.textContent = t("We check that your face and both eyes are clearly visible.");
   readinessPanel?.classList.toggle("is-ready", ready);
   readinessPanel?.classList.toggle("is-warning", !ready);
   startButton.disabled = !cameraReady || !ready || gameRunning;
@@ -1466,7 +1468,7 @@ function answerAssistantQuestion(rawQuestion) {
 
   if (asksDiagnosis) {
     if (latestModelPrediction) {
-      const label = latestModelPrediction.predicted_label;
+      const label = displayModelLabel(latestModelPrediction.predicted_label);
       return ar
         ? `آخر صورة اتعمل لها تحليل: النموذج صنّفها ضمن "${label}". دي الفئة اللي اختارها نموذج الصور من التسميات اللي اتدرّب عليها، مش تشخيص مؤكد للشخص. اختبار الكاميرا نفسه لا يقدر يحدد وجود الحَوَل أو ينفيه.`
         : `For the last image analyzed, the model selected "${label}". That is a dataset label predicted by the image model, not a confirmed diagnosis for a person. The camera session itself cannot confirm or rule out strabismus.`;
@@ -1701,7 +1703,7 @@ function renderDashboard() {
       ? "The camera captured enough usable tracking data for this experimental session."
       : "Some tracking data may be missing. Adjust your position and repeat the session if you want a cleaner technical recording.");
     const note = document.createElement("small");
-    note.textContent = t("This status describes recording quality only. It is not an eye-health result or a medical recommendation.");
+    note.textContent = t("This result describes recording quality.");
     technicalSessionResult.append(heading, detail, note);
   }
 
@@ -1981,6 +1983,21 @@ const modelPredictionResult = $("model-prediction-result");
 const modelPredictButton = $("model-predict-button");
 let modelPreviewUrl = null;
 
+
+function displayModelLabel(label) {
+  if (currentLanguage !== "ar") return label;
+  const labels = {
+    strabismus: "فئة الحَوَل",
+    strabismus_free: "فئة دون حَوَل",
+    esotropia: "حَوَل إنسي",
+    exotropia: "حَوَل وحشي",
+    hypertropia: "حَوَل رأسي لأعلى",
+    hypotropia: "حَوَل رأسي لأسفل",
+    normal: "الفئة الطبيعية"
+  };
+  return labels[label] || label;
+}
+
 function renderModelMessage(title, detail, scores = null) {
   if (!modelPredictionResult) return;
   modelPredictionResult.replaceChildren();
@@ -2077,7 +2094,7 @@ modelUploadForm?.addEventListener("submit", async (event) => {
     if (!response.ok) throw new Error(result.error || "Image experiment failed.");
     latestModelPrediction = result;
     const title = currentLanguage === "ar"
-      ? `تصنيف الصورة: ${result.predicted_label}`
+      ? `تصنيف الصورة وفق النموذج: ${displayModelLabel(result.predicted_label)}`
       : `Model label: ${result.predicted_label}`;
     const detail = currentLanguage === "ar"
       ? "هذه تسمية تجريبية من النموذج وليست تشخيصًا أو نتيجة فحص. درجات SVM المعروضة قيم حسابية وليست احتمالات."
@@ -2097,11 +2114,9 @@ modelUploadForm?.addEventListener("submit", async (event) => {
 
 checkImageModelAvailability();
 
-applyLanguage(currentLanguage);
-
 
 Object.assign(translations, {
-  "A simple guided eye-tracking research session.": "جلسة بحثية مبسطة لتتبّع حركة العين.",
+  "A simple guided eye-tracking research session".: "جلسة بحثية مبسطة لتتبّع حركة العين.",
   "Follow the star through 17 guided steps. StarbSense records camera-based measurements and organizes them into an easy-to-read session report.": "اتبع النجمة خلال 17 خطوة واضحة. يسجل StarbSense قياسات الكاميرا وينظمها في تقرير سهل الفهم.",
   "Session steps": "خطوات الجلسة",
   "Get ready": "استعد",
@@ -2145,3 +2160,5 @@ Object.assign(translations, {
 Object.assign(reverseTranslations, Object.fromEntries(
   Object.entries(translations).map(([english, arabic]) => [arabic, english])
 ));
+
+applyLanguage(currentLanguage);
