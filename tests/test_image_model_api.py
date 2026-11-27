@@ -41,7 +41,7 @@ class ImageModelApiTests(unittest.TestCase):
         )
         self.assertEqual(response.status_code, 400)
 
-    def test_returns_model_label_and_raw_decision_score(self):
+    def test_returns_model_label_and_signed_raw_decision_scores(self):
         artifact = {"model": FakeSvm()}
         with patch("server.load_image_models", return_value={"binary": artifact}), \
              patch("server.extract_eye_pair_features", return_value=np.zeros((1, 4356))):
@@ -56,8 +56,9 @@ class ImageModelApiTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         result = response.get_json()
         self.assertEqual(result["predicted_label"], "strabismus")
-        self.assertEqual(result["decision_scores"]["strabismus"], 0.73)
-        self.assertEqual(result["image_stored"], False)
+        self.assertEqual(result["decision_scores"]["strabismus"], -0.73)
+        self.assertEqual(result["decision_scores"]["strabismus_free"], 0.73)
+        self.assertFalse(result["image_stored"])
         self.assertIn("not a probability", result["score_type"])
 
     def test_reports_models_not_installed_without_loading(self):
