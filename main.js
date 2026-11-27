@@ -2255,46 +2255,74 @@ function renderAutomaticModelResults(results = [], stageIndex = null, errorMessa
 
   const heading = document.createElement("strong");
   heading.textContent = currentLanguage === "ar"
-    ? "نتيجة تحليل لقطة العينين التلقائية"
-    : "Automatic eye-image model results";
+    ? "نتيجة تحليل العينين"
+    : "Eye analysis result";
   panel.appendChild(heading);
 
   const intro = document.createElement("p");
   intro.textContent = currentLanguage === "ar"
-    ? "استخدم StarbSense لقطة من كاميرا الاختبار وشغّل عليها نموذجي الصور تلقائيًا. التسميات التالية هي مخرجات تجريبية للصورة فقط."
-    : "StarbSense used an eye-pair frame from the test camera and ran both image models automatically. These are experimental image labels only.";
+    ? "حلّل StarbSense لقطة تلقائية من كاميرا الاختبار باستخدام نموذجَي التصنيف."
+    : "StarbSense analyzed an eye-pair frame captured automatically during the test using two classification models.";
   panel.appendChild(intro);
 
   if (errorMessage) {
     const error = document.createElement("p");
     error.textContent = currentLanguage === "ar"
-      ? `تعذّر تشغيل تحليل الصور تلقائيًا: ${errorMessage}. تأكدي من تشغيل خادم Python وتثبيت ملفات النماذج.`
-      : `Automatic image analysis could not run: ${errorMessage}. Check that the Python server is running and the model files are installed.`;
+      ? `تعذّر إكمال التحليل: ${errorMessage}. تحقّق من تشغيل خادم Python وتثبيت ملفات النماذج.`
+      : `The analysis could not be completed: ${errorMessage}. Check the Python server and model files.`;
     panel.appendChild(error);
   }
 
-  for (const result of results) {
-    const item = document.createElement("p");
-    const modelName = result.task === "binary"
-      ? (currentLanguage === "ar" ? "التصنيف الثنائي" : "Binary model")
-      : (currentLanguage === "ar" ? "التصنيف الخماسي" : "Five-class model");
-    item.textContent = currentLanguage === "ar"
-      ? `${modelName}: ${displayModelLabel(result.predicted_label)}`
-      : `${modelName}: ${result.predicted_label}`;
-    panel.appendChild(item);
+  const binary = results.find(result => result.task === "binary");
+  const fiveClass = results.find(result => result.task === "five_class");
+
+  if (binary) {
+    const resultLine = document.createElement("p");
+    const predictsStrabismus = binary.predicted_label === "strabismus";
+    resultLine.textContent = currentLanguage === "ar"
+      ? `تقدير النموذج لوجود الحَوَل: ${predictsStrabismus ? "يرجّح وجود مؤشرات مرتبطة بالحَوَل" : "لا يرجّح وجود مؤشرات مرتبطة بالحَوَل في اللقطة"}.`
+      : `Model estimate for strabismus: ${predictsStrabismus ? "features associated with strabismus are predicted" : "features associated with strabismus are not predicted in this frame"}.`;
+    panel.appendChild(resultLine);
   }
+
+  if (fiveClass) {
+    const typeLine = document.createElement("p");
+    const isNormal = fiveClass.predicted_label === "normal";
+    typeLine.textContent = currentLanguage === "ar"
+      ? `النوع الذي رجّحه تصنيف النموذج: ${isNormal ? "لم يُرجّح نوعًا محددًا (الفئة الطبيعية)" : displayModelLabel(fiveClass.predicted_label)}.`
+      : `Type predicted by the classification model: ${isNormal ? "no specific type predicted (normal class)" : fiveClass.predicted_label}.`;
+    panel.appendChild(typeLine);
+  }
+
+  if (binary && fiveClass) {
+    const binaryPositive = binary.predicted_label === "strabismus";
+    const classPositive = fiveClass.predicted_label !== "normal";
+    if (binaryPositive !== classPositive) {
+      const mismatch = document.createElement("p");
+      mismatch.textContent = currentLanguage === "ar"
+        ? "ملاحظة: النموذجان أعطيا تصنيفين غير متطابقين؛ لذلك لا ينبغي اعتبار النتيجة حاسمة."
+        : "Note: the two models returned different classifications, so the output should not be treated as conclusive.";
+      panel.appendChild(mismatch);
+    }
+  }
+
+  const supervision = document.createElement("small");
+  supervision.textContent = currentLanguage === "ar"
+    ? "المشروع تحت إشراف طبيب عيون مختص."
+    : "The project is supervised by an ophthalmologist.";
+  panel.appendChild(supervision);
 
   const note = document.createElement("small");
   note.textContent = currentLanguage === "ar"
-    ? "مهم: هذه تسميات تجريبية من نماذج صور بحثية، وليست تشخيصًا أو فحصًا معتمدًا، ولا تحدد وجود الحَوَل أو تنفيه. لا تُستخدم لاتخاذ قرار طبي."
-    : "Important: These are experimental labels from research image models, not a diagnosis or validated screening result. They cannot confirm or rule out strabismus and must not guide medical decisions.";
+    ? "هذه تنبؤات آلية بحثية من لقطة واحدة، وليست تشخيصًا طبيًا مؤكدًا. يفسّر الطبيب المختص النتيجة في سياق الفحص السريري."
+    : "These are research-model predictions from a single frame, not a confirmed medical diagnosis. The ophthalmologist interprets them in the context of a clinical examination.";
   panel.appendChild(note);
 
   if (stageIndex !== null) {
     const source = document.createElement("small");
     source.textContent = currentLanguage === "ar"
-      ? `مصدر الصورة: لقطة تلقائية من المرحلة ${stageIndex + 1} من ${sequence.length}.`
-      : `Image source: automatically captured frame from stage ${stageIndex + 1} of ${sequence.length}.`;
+      ? `مصدر التحليل: لقطة تلقائية من المرحلة ${stageIndex + 1} من ${sequence.length}.`
+      : `Analysis source: automatically captured frame from stage ${stageIndex + 1} of ${sequence.length}.`;
     panel.appendChild(source);
   }
 
