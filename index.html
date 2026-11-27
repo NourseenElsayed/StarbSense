@@ -108,7 +108,7 @@
           <span>04 · Diagonals</span>
           <span>05 · Center</span>
         </div>
-        <p class="protocol-caution">The session takes about 22 seconds and contains 17 steps.</p>
+        
       </section>
 
       <section class="game-section" aria-labelledby="game-title">
@@ -168,7 +168,8 @@
           </div>
         </div>
 
-        <p id="report-message" class="message" role="status" aria-live="polite">Complete the 17 steps to see your result.</p>
+        <p id="report-message" class="message" role="status" aria-live="polite">Complete the 17 steps to see your session summary.</p>
+        <button id="analytics-toggle" class="button button-secondary" type="button" aria-expanded="false">Show all data and charts</button>
         <article id="final-result-card" class="final-result-card" hidden aria-live="polite">
           <span class="final-result-kicker">YOUR RESULT</span>
           <h3 id="final-result-title">Your session result will appear here</h3>
@@ -181,12 +182,12 @@
         </button>
       </section>
 
-      <details
-        id="analytics-dashboard"
-        class="analytics-dashboard advanced-details technical-appendix"
-        hidden
-      >
-        <summary>Technical details for researchers</summary>
+      <section id="analytics-dashboard" class="analytics-dashboard technical-appendix" hidden>
+        <div class="analytics-heading">
+          <p class="eyebrow">SESSION ANALYTICS</p>
+          <h2 id="analytics-title">All session data and charts</h2>
+          <p class="section-description">Explore the recorded measurements, with a short explanation under every chart.</p>
+        </div>
       
 <div id="python-charts" class="python-charts"></div>
 
@@ -220,7 +221,6 @@
           </article>
         </div>
 
-        <details class="advanced-details"><summary>Technical charts and measurements</summary>
         <div class="analytics-grid">
           <article class="analytics-panel">
             <h3>Iris landmark coordinates over time</h3>
@@ -243,10 +243,9 @@
             </div>
           </article>
         </div>
-        </details>
 
         <article class="analytics-panel analytics-notice">
-          <h3>What this session tells you</h3>
+          <h3>Session data summary</h3>
           <div id="technical-session-result" class="technical-session-result" hidden></div>
           <p id="analytics-summary">
             Complete a session to generate its summary.
@@ -255,7 +254,7 @@
             Your session report summarizes recording quality and how much of the test was captured.
           </p>
         </article>
-      </details>
+      </section>
 
       
       <details class="model-research-panel advanced-details">
@@ -346,7 +345,7 @@
           <textarea id="assistant-input" rows="2" maxlength="500" required placeholder="For example: Explain my session results in simple words."></textarea>
           <button class="button button-primary" type="submit">Ask StarbSense Guide</button>
         </form>
-        <p class="assistant-disclaimer">For questions outside the project, the assistant may not have enough information.</p>
+        
       </section>
 
       <section class="privacy-note">
