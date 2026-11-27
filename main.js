@@ -17,7 +17,10 @@ function showPage(pageName = "test") {
     if (active) link.setAttribute("aria-current", "page");
     else link.removeAttribute("aria-current");
   });
-  if (page === "analysis" && samples.length) renderDashboard();
+  if (page === "analysis" && samples.length) {
+    renderDashboard();
+    if (!$("python-charts")?.children.length) void runPythonAnalysis();
+  }
   window.scrollTo(0, 0);
 }
 function syncPageFromHash() {
@@ -1772,6 +1775,7 @@ function renderSimpleFinalResult(result = null) {
 function renderDashboard() {
   const dashboard = $("analytics-dashboard");
   if (!dashboard) return;
+  dashboard.hidden = false;
 
   const stats = analyzeSession();
 
@@ -2091,14 +2095,6 @@ Object.assign(reverseTranslations, Object.fromEntries(
 ));
 
 
-const modelUploadForm = $("model-upload-form");
-const modelImageInput = $("model-image-file");
-const modelImagePreview = $("model-image-preview");
-const modelPredictionResult = $("model-prediction-result");
-const modelPredictButton = $("model-predict-button");
-let modelPreviewUrl = null;
-
-
 function displayModelLabel(label) {
   if (currentLanguage !== "ar") return label;
   const labels = {
@@ -2112,123 +2108,6 @@ function displayModelLabel(label) {
   };
   return labels[label] || label;
 }
-
-function renderModelMessage(title, detail, scores = null) {
-  if (!modelPredictionResult) return;
-  modelPredictionResult.replaceChildren();
-  const heading = document.createElement("strong");
-  heading.textContent = title;
-  const paragraph = document.createElement("p");
-  paragraph.textContent = detail;
-  modelPredictionResult.append(heading, paragraph);
-  if (scores && Object.keys(scores).length) {
-    const list = document.createElement("ul");
-    for (const [label, score] of Object.entries(scores)) {
-      const item = document.createElement("li");
-      item.textContent = `${label}: ${Number(score).toFixed(4)}`;
-      list.append(item);
-    }
-    modelPredictionResult.append(list);
-  }
-}
-
-async function checkImageModelAvailability() {
-  const status = $("model-api-status");
-  if (!status) return;
-  try {
-    const response = await fetch("/api/model-health", { cache: "no-store" });
-    const result = await response.json();
-    if (!response.ok) throw new Error(result.error || "Model service unavailable.");
-    if (result.available) {
-      status.textContent = currentLanguage === "ar" ? "النماذج المحلية جاهزة" : "Local models ready";
-      status.classList.add("is-model-ready");
-    } else {
-      status.textContent = currentLanguage === "ar" ? "ملفات النماذج غير مثبتة" : "Model files not installed";
-      status.classList.remove("is-model-ready");
-      renderModelMessage(
-        currentLanguage === "ar" ? "ثبّت ملفات النماذج أولًا" : "Install the model files first",
-        currentLanguage === "ar"
-          ? "نزّل ملف النماذج ثم شغّل tools/install_trained_models.py من مجلد المشروع. راجع docs/USING_IMAGE_MODELS.md."
-          : "Download the trained-models ZIP, then run tools/install_trained_models.py from the project folder. See docs/USING_IMAGE_MODELS.md."
-      );
-    }
-  } catch (error) {
-    status.textContent = currentLanguage === "ar" ? "خادم Python غير متصل" : "Python server offline";
-    renderModelMessage(
-      currentLanguage === "ar" ? "شغّل خادم Python" : "Start the Python server",
-      currentLanguage === "ar"
-        ? "شغّل python server.py في نافذة PowerShell منفصلة، ثم أعد تحميل الصفحة."
-        : "Run python server.py in a separate PowerShell window, then reload this page."
-    );
-  }
-}
-
-modelImageInput?.addEventListener("change", () => {
-  const file = modelImageInput.files?.[0];
-  if (modelPreviewUrl) URL.revokeObjectURL(modelPreviewUrl);
-  modelPreviewUrl = null;
-  if (!file) {
-    modelImagePreview.hidden = true;
-    modelImagePreview.removeAttribute("src");
-    return;
-  }
-  if (!["image/jpeg", "image/png", "image/webp"].includes(file.type) || file.size > 8 * 1024 * 1024) {
-    renderModelMessage(
-      currentLanguage === "ar" ? "صورة غير مدعومة" : "Unsupported image",
-      currentLanguage === "ar" ? "اختر PNG أو JPEG أو WebP بحجم لا يتجاوز 8 ميجابايت." : "Choose PNG, JPEG, or WebP up to 8 MB."
-    );
-    modelImageInput.value = "";
-    modelImagePreview.hidden = true;
-    return;
-  }
-  modelPreviewUrl = URL.createObjectURL(file);
-  modelImagePreview.src = modelPreviewUrl;
-  modelImagePreview.hidden = false;
-  renderModelMessage(
-    currentLanguage === "ar" ? "الصورة جاهزة" : "Image ready",
-    currentLanguage === "ar" ? "تأكد أن الصورة تحتوي على العينين معًا ومقصوصة بإحكام، ثم شغّل التجربة." : "Check that the image contains both eyes and is tightly cropped, then run the experiment."
-  );
-});
-
-modelUploadForm?.addEventListener("submit", async (event) => {
-  event.preventDefault();
-  const file = modelImageInput?.files?.[0];
-  if (!file) return;
-  const payload = new FormData();
-  payload.append("image", file);
-  payload.append("task", $("model-task-select").value);
-  modelPredictButton.disabled = true;
-  modelPredictButton.textContent = currentLanguage === "ar" ? "جارٍ تشغيل التجربة…" : "Running experiment…";
-  renderModelMessage(
-    currentLanguage === "ar" ? "جارٍ تشغيل النموذج" : "Running the model",
-    currentLanguage === "ar" ? "تُعالج الصورة مؤقتًا في خادم Python المحلي." : "The image is being processed temporarily by the local Python server."
-  );
-  try {
-    const response = await fetch("/api/model-predict", { method: "POST", body: payload });
-    const result = await response.json();
-    if (!response.ok) throw new Error(result.error || "Image experiment failed.");
-    latestModelPrediction = result;
-    const title = currentLanguage === "ar"
-      ? `تصنيف الصورة وفق النموذج: ${displayModelLabel(result.predicted_label)}`
-      : `Model label: ${result.predicted_label}`;
-    const detail = currentLanguage === "ar"
-      ? "التصنيف مأخوذ من فئات الصور التي تدرب عليها النموذج. درجات SVM قيم حسابية وليست احتمالات."
-      : "The label comes from the model training classes. SVM scores are raw decision values, not probabilities.";
-    renderModelMessage(title, detail, result.decision_scores);
-  } catch (error) {
-    renderModelMessage(
-      currentLanguage === "ar" ? "تعذّر تشغيل التجربة" : "Experiment unavailable",
-      error.message || (currentLanguage === "ar" ? "تحقق من تشغيل خادم Python وتثبيت ملفات النماذج." : "Check that the Python server is running and the model files are installed.")
-    );
-  } finally {
-    modelPredictButton.disabled = false;
-    modelPredictButton.textContent = currentLanguage === "ar" ? "تشغيل تجربة الصور" : "Run image experiment";
-  }
-});
-
-
-checkImageModelAvailability();
-
 
 Object.assign(translations, {
   "Show all data and charts": "عرض كل البيانات والجرافات",
