@@ -19,3 +19,6 @@ data/processed/
 data/splits/
 data/reports/
 !data/manifests/dataset_manifest.template.csv
+
+# Model artifacts are installed locally from the supplied archive.
+models/*.joblib
