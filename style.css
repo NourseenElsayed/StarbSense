@@ -910,3 +910,69 @@ body.is-rtl .site-footer { direction: rtl; }
 .technical-session-result { margin: 12px 0; padding: 14px 16px; border: 1px solid var(--border); border-radius: 12px; background: #f8f9fc; line-height: 1.65; }
 .technical-session-result.is-pass { border-color: #86c9a3; background: #effaf3; }
 .technical-session-result.is-repeat { border-color: #e8c77b; background: #fff9e9; }
+
+
+/* Offline image-model baseline results */
+.model-research-panel {
+  margin: 0 0 26px;
+  padding: clamp(20px, 3vw, 30px);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  background: var(--card-background, #fff);
+  box-shadow: 0 10px 30px rgb(32 37 43 / 4%);
+}
+.model-results-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.model-result-card {
+  min-width: 0;
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: #fbfcff;
+}
+.model-result-card h3 { margin: 5px 0 14px; }
+.model-task-label {
+  margin: 0;
+  color: var(--accent);
+  font-size: .72rem;
+  font-weight: 850;
+  letter-spacing: .08em;
+}
+.model-primary-metric {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+.model-primary-metric strong { font-size: clamp(2rem, 5vw, 2.8rem); color: var(--accent-dark); }
+.model-primary-metric span { color: var(--muted); font-size: .9rem; }
+.model-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 16px 0;
+}
+.model-metrics div { min-width: 0; }
+.model-metrics dt { color: var(--muted); font-size: .8rem; }
+.model-metrics dd { margin: 3px 0 0; font-size: 1.1rem; font-weight: 800; }
+.model-result-card > p:last-child,
+.model-connection-note p { color: var(--muted); font-size: .9rem; line-height: 1.7; }
+.model-connection-note {
+  margin-top: 16px;
+  padding: 16px 18px;
+  border: 1px solid #d9e7f2;
+  border-radius: 14px;
+  background: #f2f8fc;
+}
+.model-connection-note strong { color: #26384a; }
+.model-connection-note p:last-child { margin-bottom: 0; }
+.model-report-link { margin: 14px 0 0; font-size: .9rem; }
+.model-report-link a { color: var(--accent-dark); font-weight: 750; }
+@media (max-width: 760px) {
+  .model-results-grid { grid-template-columns: 1fr; }
+}
