@@ -1706,13 +1706,13 @@ function renderDashboard() {
 
   $("analytics-summary").textContent = stats.total
     ? currentLanguage === "ar"
-      ? `ظهر وجه في ${stats.detected} من أصل ${stats.total} إطارًا. توفرت إحداثيات صالحة لمعالم القزحيتين في ${stats.validIrisSamples} إطارًا. مؤشرات البكسلات الساطعة: اليسرى ${stats.leftBrightSamples}، واليمنى ${stats.rightBrightSamples}. عالج OpenCV عدد ${stats.imageAnalysisFrames} إطارًا. سُجلت إطارات في ${tasksWithFrames} من أصل ${sequence.length} مهمة. مؤشرات البكسلات الساطعة ليست انعكاسات قرنية مؤكدة، وهذه الإحصاءات لا تحدد اتجاه النظر أو محاذاة العين أو صحة الإبصار.`
+      ? `ظهر وجه في ${stats.detected} من أصل ${stats.total} إطارًا. توفرت إحداثيات صالحة لمعالم القزحيتين في ${stats.validIrisSamples} إطارًا. مؤشرات البكسلات الساطعة: اليسرى ${stats.leftBrightSamples}، واليمنى ${stats.rightBrightSamples}. عالج OpenCV عدد ${stats.imageAnalysisFrames} إطارًا. سُجلت إطارات في ${tasksWithFrames} من أصل ${sequence.length} مهمة.`
       : `${stats.detected} of ${stats.total} frames contained a detected face. ` +
         `${stats.validIrisSamples} frames had valid coordinates for both iris landmarks. ` +
         `Bright-pixel candidates: left ${stats.leftBrightSamples}, right ${stats.rightBrightSamples}. ` +
         `OpenCV image analysis processed ${stats.imageAnalysisFrames} frames. ` +
         `${tasksWithFrames} of ${sequence.length} tasks had recorded frames. ` +
-        "Bright-pixel candidates are not verified corneal reflections. These statistics do not determine gaze direction, eye alignment, or visual health."
+        "Session statistics summarize the recorded camera data and task coverage."
     : t("No frames were recorded. Start a session and try again.");
 
   if (irisChart) {
@@ -2094,8 +2094,8 @@ modelUploadForm?.addEventListener("submit", async (event) => {
       ? `تصنيف الصورة وفق النموذج: ${displayModelLabel(result.predicted_label)}`
       : `Model label: ${result.predicted_label}`;
     const detail = currentLanguage === "ar"
-      ? "هذه تسمية تجريبية من النموذج وليست تشخيصًا أو نتيجة فحص. درجات SVM المعروضة قيم حسابية وليست احتمالات."
-      : "This is an experimental model label, not a diagnosis or screening result. SVM scores are raw decision values, not probabilities.";
+      ? "التصنيف مأخوذ من فئات الصور التي تدرب عليها النموذج. درجات SVM قيم حسابية وليست احتمالات."
+      : "The label comes from the model training classes. SVM scores are raw decision values, not probabilities.";
     renderModelMessage(title, detail, result.decision_scores);
   } catch (error) {
     renderModelMessage(
