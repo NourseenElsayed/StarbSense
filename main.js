@@ -1312,6 +1312,7 @@ async function runPythonAnalysis() {
 
     status.textContent = t("Python analysis complete");
     latestAnalysis = result;
+    renderSimpleFinalResult(result);
 
     const lines = [
       `Python analyzed ${result.sample_count ?? 0} recorded frames.`,
@@ -1328,8 +1329,8 @@ async function runPythonAnalysis() {
     ];
 
     summary.textContent = currentLanguage === "ar"
-      ? `حلّل Python عدد ${result.sample_count ?? 0} إطارًا مسجلًا. معدل اكتشاف الوجه: ${result.face_detection_rate_pct ?? "غير متاح"}٪. عينات إحداثيات القزحية الصالحة: ${result.valid_iris_samples ?? 0}. المهام ذات الإطارات المسجلة: ${result.task_count ?? 0}. خطوات الطوابع الزمنية غير المرتبة: ${result.negative_time_steps ?? 0}. الخطوات ذات الطوابع الزمنية المكررة: ${result.duplicate_time_steps ?? 0}. وسيط الفاصل بين العينات: ${result.median_sample_interval_ms ?? "غير متاح"} مللي ثانية. العين اليسرى: ${result.left_iris_valid_samples ?? 0} عينة صالحة؛ العين اليمنى: ${result.right_iris_valid_samples ?? 0}. إحداثيات القزحية خارج النطاق: ${result.iris_coordinate_out_of_bounds_count ?? 0}. عينات الإضاءة: ${result.lighting_sample_count ?? 0}. ${result.interpretation || ""}`
-      : lines.filter(Boolean).join(" ");
+      ? `عدد الإطارات: ${result.sample_count ?? 0} · ظهور الوجه: ${result.face_detection_rate_pct ?? "غير متاح"}٪ · عينات العين الصالحة: ${result.valid_iris_samples ?? 0} · المهام المسجلة: ${result.task_count ?? 0} من 17 · وسيط زمن العينة: ${result.median_sample_interval_ms ?? "غير متاح"} مللي ثانية.`
+      : `Frames: ${result.sample_count ?? 0} · Face visible: ${result.face_detection_rate_pct ?? "N/A"}% · Valid eye samples: ${result.valid_iris_samples ?? 0} · Tasks recorded: ${result.task_count ?? 0} of 17 · Median sample interval: ${result.median_sample_interval_ms ?? "N/A"} ms.`;
 
     showPythonChart(
       "python-face-chart",
@@ -1656,6 +1657,52 @@ function analyzeSession() {
   };
 }
 
+
+function renderSimpleFinalResult(result = null) {
+  const card = $("final-result-card");
+  const title = $("final-result-title");
+  const detail = $("final-result-detail");
+  const meaning = $("final-result-meaning");
+  if (!card || !title || !detail || !meaning) return;
+
+  const total = Number(result?.sample_count ?? samples.length ?? 0);
+  const faceRate = Number(result?.face_detection_rate_pct ??
+    (samples.length ? (samples.filter((s) => s.face_landmarks_detected === 1).length / samples.length) * 100 : 0));
+  const validIris = Number(result?.valid_iris_samples ??
+    samples.filter((s) =>
+      isValidCoordinate(s.left_iris_landmark_x) &&
+      isValidCoordinate(s.left_iris_landmark_y) &&
+      isValidCoordinate(s.right_iris_landmark_x) &&
+      isValidCoordinate(s.right_iris_landmark_y)
+    ).length);
+  const taskCount = Number(result?.task_count ??
+    new Set(samples.map((s) => s.task_index).filter((v) => Number(v) > 0)).size);
+  const irisRate = total ? (validIris / total) * 100 : 0;
+  const recordingReady = total >= 30 && faceRate >= 85 && irisRate >= 80 && taskCount >= 12;
+
+  card.hidden = false;
+  card.classList.toggle("is-good", recordingReady);
+  card.classList.toggle("is-retry", !recordingReady);
+
+  if (currentLanguage === "ar") {
+    title.textContent = recordingReady
+      ? "اكتمل الاختبار — التسجيل جيد"
+      : "التسجيل غير مكتمل — يُفضّل إعادة الاختبار";
+    detail.textContent = recordingReady
+      ? "الكاميرا سجلت عددًا كافيًا من الإطارات، وظهر الوجه والعينان بوضوح في معظمها. يمكنك حفظ ملف النتائج."
+      : "بعض أجزاء التسجيل أو بيانات العين لم تكن كافية. ثبّت الكاميرا، واجعل الإضاءة أمامية، وحافظ على ظهور العينين ثم أعد الخطوات.";
+    meaning.textContent = "المهم: نتيجة الجلسة دي بتقيّم جودة التسجيل فقط. الاختبار الحالي لا يملك قياسًا طبيًا معتمدًا لمحاذاة العينين، لذلك لا يستطيع تأكيد الحَوَل أو نفيه.";
+  } else {
+    title.textContent = recordingReady
+      ? "Session complete — recording quality is good"
+      : "Recording incomplete — repeat the session";
+    detail.textContent = recordingReady
+      ? "The camera captured enough frames, with the face and eyes visible in most of them. You can save the session data."
+      : "Some recording sections or eye measurements were insufficient. Stabilize the camera, use front lighting, keep both eyes visible, and repeat the steps.";
+    meaning.textContent = "This result evaluates recording quality only. The current session does not include a clinically validated eye-alignment measurement, so it cannot confirm or rule out strabismus.";
+  }
+}
+
 function renderDashboard() {
   const dashboard = $("analytics-dashboard");
   if (!dashboard) return;
@@ -1663,6 +1710,7 @@ function renderDashboard() {
   const stats = analyzeSession();
 
   dashboard.hidden = false;
+  renderSimpleFinalResult(latestAnalysis);
 
   $("analytics-status").textContent = samples.length
     ? "Session analyzed"
