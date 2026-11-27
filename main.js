@@ -126,6 +126,10 @@ function applyLanguage(language) {
     image.alt = currentLanguage === "ar" ? (translations[key] || key) : key;
   });
 
+  if ($("final-result-card") && !$("final-result-card").hidden && typeof renderSimpleFinalResult === "function") {
+    renderSimpleFinalResult(latestAnalysis);
+  }
+
   if (languageToggle) {
     languageToggle.textContent = currentLanguage === "ar" ? "English" : "العربية";
     languageToggle.setAttribute("aria-label", currentLanguage === "ar" ? "Switch to English" : "التبديل إلى العربية");
