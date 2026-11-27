@@ -1656,6 +1656,14 @@ function analyzeSession() {
     (sample) => sample.face_landmarks_detected === 1
   ).length;
 
+  const leftIrisSamples = samples.filter((sample) =>
+    isValidCoordinate(sample.left_iris_landmark_x) &&
+    isValidCoordinate(sample.left_iris_landmark_y)
+  ).length;
+  const rightIrisSamples = samples.filter((sample) =>
+    isValidCoordinate(sample.right_iris_landmark_x) &&
+    isValidCoordinate(sample.right_iris_landmark_y)
+  ).length;
   const validIrisSamples = samples.filter((sample) =>
     isValidCoordinate(sample.left_iris_landmark_x) &&
     isValidCoordinate(sample.left_iris_landmark_y) &&
@@ -1697,6 +1705,8 @@ function analyzeSession() {
     detected,
     faceRate: total ? (detected / total) * 100 : 0,
     validIrisSamples,
+    leftIrisSamples,
+    rightIrisSamples,
     leftBrightSamples,
     rightBrightSamples,
     imageAnalysisFrames,
@@ -1761,6 +1771,10 @@ function renderDashboard() {
     ? `${stats.faceRate.toFixed(1)}%`
     : "—";
 
+  $("analytics-left-iris-valid").textContent =
+    `${stats.leftIrisSamples} / ${stats.total}`;
+  $("analytics-right-iris-valid").textContent =
+    `${stats.rightIrisSamples} / ${stats.total}`;
   $("analytics-iris-valid").textContent =
     `${stats.validIrisSamples} / ${stats.total}`;
 
