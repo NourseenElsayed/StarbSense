@@ -1645,8 +1645,9 @@ function finishAdventure() {
   );
 
   updateStats();
-renderDashboard();
-void runPythonAnalysis();
+  renderDashboard();
+  void finalizeAutomaticEyeCrops();
+  void runPythonAnalysis();
 }
 
 function updateStats() {
@@ -2051,6 +2052,7 @@ stopButton.onclick = () => {
 
   updateStats();
   renderDashboard();
+  void finalizeAutomaticEyeCrops();
   void runPythonAnalysis();
 };
 
@@ -2354,15 +2356,114 @@ function queueAutomaticEyeCrop(landmarks, stageIndex) {
   automaticEyeCrops.set(stageIndex, blobPromise);
 }
 
+async function requestAutomaticModelPrediction(blob, task) {
+  const payload = new FormData();
+  payload.append("image", blob, `starbsense-session-eye-pair-${task}.jpg`);
+  payload.append("task", task);
+  const response = await fetch("/api/model-predict", {
+    method: "POST",
+    body: payload
+  });
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.error || "Automatic image-model analysis failed.");
+  return result;
+}
+
+function renderAutomaticModelResults(results = [], stageIndex = null, errorMessage = "") {
+  const panel = $("automatic-model-result");
+  if (!panel) return;
+  panel.replaceChildren();
+
+  const heading = document.createElement("strong");
+  heading.textContent = currentLanguage === "ar"
+    ? "نتيجة تحليل لقطة العينين التلقائية"
+    : "Automatic eye-image model results";
+  panel.appendChild(heading);
+
+  const intro = document.createElement("p");
+  intro.textContent = currentLanguage === "ar"
+    ? "استخدم StarbSense لقطة من كاميرا الاختبار وشغّل عليها نموذجي الصور تلقائيًا. التسميات التالية هي مخرجات تجريبية للصورة فقط."
+    : "StarbSense used an eye-pair frame from the test camera and ran both image models automatically. These are experimental image labels only.";
+  panel.appendChild(intro);
+
+  if (errorMessage) {
+    const error = document.createElement("p");
+    error.textContent = currentLanguage === "ar"
+      ? `تعذّر تشغيل تحليل الصور تلقائيًا: ${errorMessage}. تأكدي من تشغيل خادم Python وتثبيت ملفات النماذج.`
+      : `Automatic image analysis could not run: ${errorMessage}. Check that the Python server is running and the model files are installed.`;
+    panel.appendChild(error);
+  }
+
+  for (const result of results) {
+    const item = document.createElement("p");
+    const modelName = result.task === "binary"
+      ? (currentLanguage === "ar" ? "التصنيف الثنائي" : "Binary model")
+      : (currentLanguage === "ar" ? "التصنيف الخماسي" : "Five-class model");
+    item.textContent = currentLanguage === "ar"
+      ? `${modelName}: ${displayModelLabel(result.predicted_label)}`
+      : `${modelName}: ${result.predicted_label}`;
+    panel.appendChild(item);
+  }
+
+  const note = document.createElement("small");
+  note.textContent = currentLanguage === "ar"
+    ? "مهم: هذه تسميات تجريبية من نماذج صور بحثية، وليست تشخيصًا أو فحصًا معتمدًا، ولا تحدد وجود الحَوَل أو تنفيه. لا تُستخدم لاتخاذ قرار طبي."
+    : "Important: These are experimental labels from research image models, not a diagnosis or validated screening result. They cannot confirm or rule out strabismus and must not guide medical decisions.";
+  panel.appendChild(note);
+
+  if (stageIndex !== null) {
+    const source = document.createElement("small");
+    source.textContent = currentLanguage === "ar"
+      ? `مصدر الصورة: لقطة تلقائية من المرحلة ${stageIndex + 1} من ${sequence.length}.`
+      : `Image source: automatically captured frame from stage ${stageIndex + 1} of ${sequence.length}.`;
+    panel.appendChild(source);
+  }
+
+  panel.hidden = false;
+}
+
 async function finalizeAutomaticEyeCrops() {
-  const blobs = await Promise.all([...automaticEyeCrops.values()]);
-  automaticEyeCropCount = blobs.filter(Boolean).length;
+  const entries = await Promise.all(
+    [...automaticEyeCrops.entries()].map(async ([stageIndex, promise]) => ({
+      stageIndex,
+      blob: await promise
+    }))
+  );
+  const validEntries = entries.filter(entry => entry.blob instanceof Blob);
+  automaticEyeCropCount = validEntries.length;
   renderSimpleFinalResult(latestAnalysis);
+
+  if (!validEntries.length) {
+    renderAutomaticModelResults([], null,
+      currentLanguage === "ar"
+        ? "لم تتوفر لقطة واضحة تحتوي على معالم العينين المطلوبة"
+        : "No usable eye-pair frame was captured");
+    return;
+  }
+
+  // Prefer the final center-fixation frame; otherwise use the latest valid stage.
+  const selected = validEntries.find(entry => entry.stageIndex === sequence.length - 1)
+    || validEntries[validEntries.length - 1];
+
+  const results = [];
+  let failure = "";
+  for (const task of ["binary", "five_class"]) {
+    try {
+      results.push(await requestAutomaticModelPrediction(selected.blob, task));
+    } catch (error) {
+      failure = error.message || String(error);
+      break;
+    }
+  }
+
+  latestModelPrediction = results.find(result => result.task === "binary") || results[0] || null;
+  renderAutomaticModelResults(results, selected.stageIndex, failure);
+
   const report = $("report-message");
   if (report && samples.length) {
     report.textContent = currentLanguage === "ar"
-      ? `اكتمل الاختبار. تم تجهيز ${automaticEyeCropCount} لقطة مقصوصة تلقائيًا من أصل ${sequence.length} مرحلة. الصور تظل داخل المتصفح ولا تُرسل إلى الخادم.`
-      : `Test complete. ${automaticEyeCropCount} automatically cropped frames were prepared across ${sequence.length} stages. Images remain in the browser and are not sent to the server.`;
+      ? `اكتمل الاختبار. تم التقاط ${automaticEyeCropCount} لقطة عينين تلقائيًا، وتشغيل نماذج الصور على لقطة واحدة دون رفع يدوي.`
+      : `Test complete. ${automaticEyeCropCount} eye-pair frames were captured automatically; both image models were run on one frame without manual upload.`;
   }
 }
 
