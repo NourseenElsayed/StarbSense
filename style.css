@@ -1195,3 +1195,81 @@ body.is-rtl .site-footer { direction: rtl; }
   .main-nav { order:3; width:100%; justify-content:center; gap:10px; padding:8px 0 2px; }
   .main-nav a { padding:10px 14px; margin:2px 0; font-size:.9rem; }
 }
+
+
+/* Prominent live result card: colors and content are set from each session's prediction. */
+.automatic-model-result {
+  margin: 22px 0;
+  padding: clamp(18px, 2.5vw, 26px);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--card-background, #fff);
+}
+.automatic-model-result .automatic-result-heading {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 1.2rem;
+  font-weight: 850;
+}
+.automatic-model-result > p {
+  margin: 8px 0 14px;
+  color: var(--muted);
+  line-height: 1.7;
+}
+.automatic-diagnosis-card {
+  display: grid;
+  gap: 9px;
+  margin: 16px 0;
+  padding: clamp(18px, 3vw, 26px);
+  border: 2px solid;
+  border-radius: 16px;
+}
+.automatic-diagnosis-card.is-negative {
+  color: #176b43;
+  border-color: #55ad7b;
+  background: #effaf3;
+}
+.automatic-diagnosis-card.is-positive {
+  color: #963c48;
+  border-color: #d77a86;
+  background: #fff1f2;
+}
+.automatic-diagnosis-kicker {
+  font-size: .92rem;
+  font-weight: 800;
+}
+.automatic-diagnosis-value {
+  display: block;
+  font-size: clamp(1.2rem, 3vw, 1.75rem);
+  line-height: 1.45;
+  font-weight: 900;
+}
+.automatic-diagnosis-card small {
+  font-size: .88rem;
+  opacity: .9;
+}
+.automatic-type-card {
+  margin: 12px 0;
+  padding: 16px 18px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--card-background, #fff);
+}
+.automatic-type-card strong { display: block; margin-bottom: 6px; }
+.automatic-type-value { margin: 0; font-size: 1.08rem; font-weight: 800; }
+.automatic-result-mismatch,
+.automatic-result-error {
+  padding: 12px 14px;
+  border: 1px solid #d6a24a;
+  border-radius: 12px;
+  background: #fff8e9;
+  color: #765016 !important;
+}
+.automatic-result-supervision,
+.automatic-result-note,
+.automatic-result-source {
+  display: block;
+  margin-top: 9px;
+  color: var(--muted);
+  line-height: 1.65;
+}
