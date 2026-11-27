@@ -2418,14 +2418,10 @@ async function finalizeAutomaticEyeCrops() {
     return;
   }
 
-  // Analyze up to five evenly distributed frames captured during this session.
-  const maxFrames = 5;
-  const selectedEntries = validEntries.length <= maxFrames
-    ? validEntries
-    : Array.from({ length: maxFrames }, (_, index) => {
-        const position = Math.round(index * (validEntries.length - 1) / (maxFrames - 1));
-        return validEntries[position];
-      });
+  // Analyze up to all 17 protocol-stage frames captured during this session.
+  // The protocol has 17 stages, so use every valid stage capture rather than sampling only five.
+  const maxFrames = 17;
+  const selectedEntries = validEntries.slice(0, maxFrames);
 
   const frameResults = [];
   let failure = "";
