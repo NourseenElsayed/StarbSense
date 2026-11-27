@@ -13,9 +13,10 @@ StarbSense is an experimental, child-friendly visual-target-following and facial
 - Per-frame technical metadata: timestamps, camera resolution/frame rate where exposed, task metadata, page visibility, and non-identifying lighting summaries.
 - CSV export and local Flask/Python analysis.
 - Data-quality summaries and seven charts, including task-level and task-group coverage and heuristic lighting trends.
+- A separate offline image-model experiment: a user-selected, pre-cropped eye-pair image can be processed by one of two local HOG + SVM baselines. This does not consume webcam frames or session CSV data.
 - A local, rule-based evidence guide for project FAQs and general eye-care next steps; it is not a generative AI model and never diagnoses.
 
-No raw camera frames, camera device identifiers, or audio are saved or sent to the Python service. The local service processes only the numeric/session fields submitted by the browser.
+The live camera/session pipeline does not send raw camera frames, camera device identifiers, or audio to the Python service; it sends derived numeric session fields only. The separate image-model feature sends a user-selected eye-pair image to the local Flask process for in-memory inference and does not write that upload to disk.
 
 ## Run locally
 
@@ -24,6 +25,8 @@ Use two terminals from the project folder.
 Terminal 1:
 ```bash
 python -m pip install -r requirements.txt
+# Optional: install the separately supplied trained model archive for image experiments
+python tools/install_trained_models.py "$env:USERPROFILE\Downloads\starbsense_trained_baselines.zip"
 python server.py
 ```
 
@@ -59,7 +62,7 @@ GitHub Actions runs the Python checks and Vite build on pushes and pull requests
 - Bright-pixel candidates can arise from reflections, glasses, skin, sclera, and lighting. They are not proof of corneal reflections.
 - Lighting flags use heuristic thresholds only; they are not validated participant-exclusion criteria.
 - The current star-following sequence is an experimental task, not a clinical cover test or validated examination protocol.
-- No diagnostic classifier or clinical threshold is implemented.
+- The two offline image classifiers are exploratory dataset baselines only. They are not trained on the live webcam stream, are not validated on real-world webcam images, and must not be used to diagnose, screen for, or rule out an eye condition.
 
 Do not claim diagnostic accuracy, sensitivity, specificity, or screening performance without an appropriately designed, independently supervised validation study and a suitable clinical reference standard.
 
@@ -75,8 +78,9 @@ Obtain the required school/competition approvals, parent/guardian permission, an
 - [Structured visual-following protocol v2](docs/PROTOCOL_V2.md)
 - [Research libraries and dataset registry](docs/RESEARCH_RESOURCES.md)
 - [Data pipeline and model-readiness plan](docs/DATA_PIPELINE.md)
-- [Exploratory dataset baseline training report](docs/TRAINING_REPORT.md)
-- [Baseline metrics (JSON)](reports/baseline_results.json)
+- [Exploratory dataset baseline training report](docs/MODEL_BASELINE_REPORT.md)
+- [How to run the separate image-model experiment](docs/USING_IMAGE_MODELS.md)
+- [Baseline metrics (JSON)](public/research/model-baseline-results.json)
 - [Local research data instructions](data/README.md)
 
 ## Interface languages
