@@ -154,6 +154,12 @@
         </p>
       </section>
 
+      <section class="stats-strip" hidden aria-hidden="true">
+        <span id="tasks-completed">0</span>
+        <span id="frames-count">0</span>
+        <span id="face-count">0</span>
+      </section>
+
       <section class="report-section" aria-labelledby="report-title">
         <div class="section-heading">
           <div>
@@ -331,6 +337,7 @@
         <p class="eyebrow">STARBSENSE GUIDE · LOCAL ASSISTANT</p>
         <h2 id="assistant-title">Step 4 · Ask StarbSense</h2>
         <p class="assistant-intro">Ask about your session, charts, image-model labels, camera quality, or how StarbSense works. The assistant uses the project data available in this browser.</p>
+        <div id="care-guidance" class="care-guidance" hidden role="status" aria-live="polite"></div>
         <div id="assistant-messages" class="assistant-messages" aria-live="polite">
           <p class="assistant-message assistant-message-system">Ask about your session summary, camera quality, charts, model labels, or the test steps.</p>
         </div>
