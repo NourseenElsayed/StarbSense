@@ -37,3 +37,14 @@ data/raw/
 data/interim/
 data/processed/
 data/external/
+
+# Local environments and generated files
+.venv/
+venv/
+__pycache__/
+node_modules/
+dist/
+data/raw/
+data/interim/
+data/processed/
+data/external/
