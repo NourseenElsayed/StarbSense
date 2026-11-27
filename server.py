@@ -154,10 +154,19 @@ def predict_eye_pair_image():
         predicted_label = str(model.predict(features)[0])
         raw_scores = np.asarray(model.decision_function(features)).reshape(-1).tolist()
         labels = list(map(str, model.classes_))
-        score_by_label = {
-            label: round(float(score), 5)
-            for label, score in zip(labels, raw_scores)
-        }
+        if len(labels) == 2 and len(raw_scores) == 1:
+            margin = float(raw_scores[0])
+            score_by_label = {
+                labels[0]: round(-margin, 5),
+                labels[1]: round(margin, 5),
+            }
+        elif len(labels) == len(raw_scores):
+            score_by_label = {
+                label: round(float(score), 5)
+                for label, score in zip(labels, raw_scores)
+            }
+        else:
+            raise ValueError("The model returned an unexpected decision-score shape.")
 
         return jsonify({
             "task": task,
