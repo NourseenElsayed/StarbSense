@@ -2256,6 +2256,24 @@ async function requestAutomaticModelPrediction(blob, task) {
   return result;
 }
 
+function aggregateSessionPredictions(frameResults, task, capturedFrameCount) {
+  const predictions = frameResults.map(frame => frame[task])
+    .filter(result => result && typeof result.predicted_label === "string");
+  const voteCounts = {};
+  for (const result of predictions) {
+    voteCounts[result.predicted_label] = (voteCounts[result.predicted_label] || 0) + 1;
+  }
+  const ranked = Object.entries(voteCounts).sort((a, b) => b[1] - a[1]);
+  const hasMajority = ranked.length > 0 && (ranked.length === 1 || ranked[0][1] > ranked[1][1]);
+  return {
+    task,
+    predicted_label: hasMajority ? ranked[0][0] : "inconclusive",
+    vote_counts: voteCounts,
+    evaluated_frames: predictions.length,
+    captured_frames: capturedFrameCount
+  };
+}
+
 function renderAutomaticModelResults(results = [], stageIndex = null, errorMessage = "") {
   const panel = $("automatic-model-result");
   if (!panel) return;
@@ -2263,21 +2281,21 @@ function renderAutomaticModelResults(results = [], stageIndex = null, errorMessa
 
   const heading = document.createElement("strong");
   heading.className = "automatic-result-heading";
-  heading.textContent = currentLanguage === "ar" ? "نتيجة تحليل العينين" : "Eye analysis result";
+  heading.textContent = currentLanguage === "ar" ? "نتيجة تحليل جلسة الكاميرا" : "Live camera session analysis";
   panel.appendChild(heading);
 
   const intro = document.createElement("p");
   intro.textContent = currentLanguage === "ar"
-    ? "النتيجة التالية محسوبة تلقائيًا من لقطة كاميرا هذه الجلسة."
-    : "The following result was generated automatically from this session's camera frame.";
+    ? "تم حساب النتيجة من لقطات متعددة التُقطت تلقائيًا أثناء جلسة الكاميرا الحالية."
+    : "Results were calculated from multiple frames automatically captured during this live camera session.";
   panel.appendChild(intro);
 
   if (errorMessage) {
     const error = document.createElement("p");
     error.className = "automatic-result-error";
     error.textContent = currentLanguage === "ar"
-      ? `تعذّر إكمال التحليل: ${errorMessage}. تحقّق من تشغيل خادم Python ووجود ملفات النماذج.`
-      : `Analysis could not be completed: ${errorMessage}. Check the Python server and model files.`;
+      ? "تعذّر إكمال التحليل: " + errorMessage + ". تحقّق من تشغيل خادم Python ووجود ملفات النماذج."
+      : "Analysis could not be completed: " + errorMessage + ". Check the Python server and model files.";
     panel.appendChild(error);
   }
 
@@ -2286,26 +2304,28 @@ function renderAutomaticModelResults(results = [], stageIndex = null, errorMessa
 
   if (binary) {
     const predictsStrabismus = binary.predicted_label === "strabismus";
+    const hasBinaryVote = ["strabismus", "strabismus_free"].includes(binary.predicted_label);
     const resultCard = document.createElement("section");
-    resultCard.className = `automatic-diagnosis-card ${predictsStrabismus ? "is-positive" : "is-negative"}`;
+    resultCard.className = "automatic-diagnosis-card " + (!hasBinaryVote ? "is-inconclusive" : predictsStrabismus ? "is-positive" : "is-negative");
 
     const resultLabel = document.createElement("span");
     resultLabel.className = "automatic-diagnosis-kicker";
-    resultLabel.textContent = currentLanguage === "ar" ? "هل يرجّح النموذج وجود حول؟" : "Does the model predict strabismus?";
+    resultLabel.textContent = currentLanguage === "ar" ? "ملخص تصويت النموذج عبر لقطات الجلسة" : "Model vote across session frames";
     resultCard.appendChild(resultLabel);
 
     const resultValue = document.createElement("strong");
     resultValue.className = "automatic-diagnosis-value";
     resultValue.textContent = currentLanguage === "ar"
-      ? (predictsStrabismus ? "يرجّح وجود مؤشرات مرتبطة بالحَوَل" : "لا يرجّح وجود مؤشرات مرتبطة بالحَوَل")
-      : (predictsStrabismus ? "Features associated with strabismus predicted" : "No strabismus-associated features predicted");
+      ? (!hasBinaryVote ? "النتيجة غير حاسمة؛ لا يوجد تصويت أغلبية" : predictsStrabismus ? "النموذج رجّح مؤشرات مرتبطة بالحَوَل" : "النموذج لم يرجّح مؤشرات مرتبطة بالحَوَل")
+      : (!hasBinaryVote ? "Inconclusive — no majority vote" : predictsStrabismus ? "Model predicted features associated with strabismus" : "Model did not predict strabismus-associated features");
     resultCard.appendChild(resultValue);
 
-    const resultHint = document.createElement("small");
-    resultHint.textContent = currentLanguage === "ar"
-      ? (predictsStrabismus ? "تصنيف النموذج لهذه الجلسة: حَوَل" : "تصنيف النموذج لهذه الجلسة: دون حَوَل")
-      : (predictsStrabismus ? "This session's model class: strabismus" : "This session's model class: strabismus-free");
-    resultCard.appendChild(resultHint);
+    const counts = binary.vote_counts || {};
+    const voteSummary = document.createElement("small");
+    voteSummary.textContent = currentLanguage === "ar"
+      ? "اللقطات التي حللها النموذج: " + (binary.evaluated_frames || 0) + " من " + (binary.captured_frames || 0) + ". التصويت: حول " + (counts.strabismus || 0) + "، دون حول " + (counts.strabismus_free || 0) + "."
+      : "Frames analyzed: " + (binary.evaluated_frames || 0) + " of " + (binary.captured_frames || 0) + ". Votes: strabismus " + (counts.strabismus || 0) + ", strabismus-free " + (counts.strabismus_free || 0) + ".";
+    resultCard.appendChild(voteSummary);
     panel.appendChild(resultCard);
   }
 
@@ -2313,51 +2333,58 @@ function renderAutomaticModelResults(results = [], stageIndex = null, errorMessa
     const typeCard = document.createElement("section");
     typeCard.className = "automatic-type-card";
     const typeHeading = document.createElement("strong");
-    typeHeading.textContent = currentLanguage === "ar" ? "النوع الذي رجّحه تصنيف النموذج" : "Type predicted by the model";
+    typeHeading.textContent = currentLanguage === "ar" ? "تصنيف النوع عبر لقطات الجلسة" : "Type classification across session frames";
     typeCard.appendChild(typeHeading);
     const typeValue = document.createElement("p");
     typeValue.className = "automatic-type-value";
     const isNormal = fiveClass.predicted_label === "normal";
     typeValue.textContent = currentLanguage === "ar"
-      ? (isNormal ? "لم يُرجّح نوعًا محددًا (الفئة الطبيعية)" : displayModelLabel(fiveClass.predicted_label))
-      : (isNormal ? "No specific type predicted (normal class)" : fiveClass.predicted_label);
+      ? (fiveClass.predicted_label === "inconclusive" ? "التصويت غير حاسم بين الفئات" : isNormal ? "الفئة الأكثر تصويتًا: طبيعية" : "الفئة الأكثر تصويتًا: " + displayModelLabel(fiveClass.predicted_label))
+      : (fiveClass.predicted_label === "inconclusive" ? "No majority across classes" : "Most-voted class: " + fiveClass.predicted_label);
     typeCard.appendChild(typeValue);
+    const counts = fiveClass.vote_counts || {};
+    const votes = Object.entries(counts).map(([label, count]) => displayModelLabel(label) + ": " + count).join(" · ");
+    const voteSummary = document.createElement("small");
+    voteSummary.textContent = currentLanguage === "ar"
+      ? "اللقطات المحللة: " + (fiveClass.evaluated_frames || 0) + " من " + (fiveClass.captured_frames || 0) + ". " + votes
+      : "Frames analyzed: " + (fiveClass.evaluated_frames || 0) + " of " + (fiveClass.captured_frames || 0) + ". " + votes;
+    typeCard.appendChild(voteSummary);
     panel.appendChild(typeCard);
   }
 
-  if (binary && fiveClass) {
+  if (binary && fiveClass && binary.predicted_label !== "inconclusive" && fiveClass.predicted_label !== "inconclusive") {
     const binaryPositive = binary.predicted_label === "strabismus";
     const classPositive = fiveClass.predicted_label !== "normal";
     if (binaryPositive !== classPositive) {
       const mismatch = document.createElement("p");
       mismatch.className = "automatic-result-mismatch";
       mismatch.textContent = currentLanguage === "ar"
-        ? "النموذجان اختلفا في التصنيف لهذه الجلسة؛ لذلك تُعرض النتيجة كتقدير بحثي غير حاسم."
-        : "The models disagreed in this session, so this is shown as an inconclusive research estimate.";
+        ? "ملخصا النموذجين اختلفا؛ لذلك تُعرض النتيجة كتقدير بحثي غير حاسم."
+        : "The two model summaries disagree, so the result is an inconclusive research estimate.";
       panel.appendChild(mismatch);
     }
   }
 
-  const supervision = document.createElement("small");
-  supervision.className = "automatic-result-supervision";
-  supervision.textContent = currentLanguage === "ar"
-    ? "المشروع تحت إشراف طبيب عيون مختص."
-    : "The project is supervised by an ophthalmologist.";
-  panel.appendChild(supervision);
-
   const note = document.createElement("small");
   note.className = "automatic-result-note";
   note.textContent = currentLanguage === "ar"
-    ? "هذه نتيجة نموذج بحثي تتغير مع كل جلسة، وليست تشخيصًا طبيًا مؤكدًا. يراجع الطبيب المختص النتيجة ضمن الفحص السريري."
-    : "This research-model result is recalculated for every session and is not a confirmed medical diagnosis. The ophthalmologist reviews it as part of a clinical examination.";
+    ? "هذه مخرجات تصنيف بحثي تجريبي وليست تشخيصًا طبيًا أو اختبارًا معتمدًا للكشف عن الحَوَل أو استبعاده."
+    : "These are experimental research-classification outputs, not a medical diagnosis or a validated test to detect or rule out strabismus.";
   panel.appendChild(note);
 
   if (stageIndex !== null) {
     const source = document.createElement("small");
     source.className = "automatic-result-source";
     source.textContent = currentLanguage === "ar"
-      ? `مصدر التحليل: لقطة تلقائية من المرحلة ${stageIndex + 1} من ${sequence.length}.`
-      : `Analysis source: automatically captured frame from stage ${stageIndex + 1} of ${sequence.length}.`;
+      ? "مصدر التحليل: لقطة تلقائية من المرحلة " + (stageIndex + 1) + " من " + sequence.length + "."
+      : "Analysis source: automatically captured frame from stage " + (stageIndex + 1) + " of " + sequence.length + ".";
+    panel.appendChild(source);
+  } else if (binary || fiveClass) {
+    const source = document.createElement("small");
+    source.className = "automatic-result-source";
+    source.textContent = currentLanguage === "ar"
+      ? "مصدر البيانات: لقطات العينين الملتقطة من بث الكاميرا أثناء الجلسة الحالية فقط."
+      : "Data source: eye-pair frames captured from the camera stream during this session only.";
     panel.appendChild(source);
   }
 
@@ -2378,34 +2405,53 @@ async function finalizeAutomaticEyeCrops() {
   if (!validEntries.length) {
     renderAutomaticModelResults([], null,
       currentLanguage === "ar"
-        ? "لم تتوفر لقطة واضحة تحتوي على معالم العينين المطلوبة"
-        : "No usable eye-pair frame was captured");
+        ? "لم تتوفر لقطات واضحة تحتوي على معالم العينين المطلوبة"
+        : "No usable eye-pair frames were captured");
     return;
   }
 
-  // Prefer the final center-fixation frame; otherwise use the latest valid stage.
-  const selected = validEntries.find(entry => entry.stageIndex === sequence.length - 1)
-    || validEntries[validEntries.length - 1];
+  // Analyze up to five evenly distributed frames captured during this session.
+  const maxFrames = 5;
+  const selectedEntries = validEntries.length <= maxFrames
+    ? validEntries
+    : Array.from({ length: maxFrames }, (_, index) => {
+        const position = Math.round(index * (validEntries.length - 1) / (maxFrames - 1));
+        return validEntries[position];
+      });
 
-  const results = [];
+  const frameResults = [];
   let failure = "";
-  for (const task of ["binary", "five_class"]) {
+  for (const entry of selectedEntries) {
     try {
-      results.push(await requestAutomaticModelPrediction(selected.blob, task));
+      const pair = await Promise.all([
+        requestAutomaticModelPrediction(entry.blob, "binary"),
+        requestAutomaticModelPrediction(entry.blob, "five_class")
+      ]);
+      frameResults.push({ stageIndex: entry.stageIndex, binary: pair[0], five_class: pair[1] });
     } catch (error) {
       failure = error.message || String(error);
       break;
     }
   }
 
-  latestModelPrediction = results.find(result => result.task === "binary") || results[0] || null;
-  renderAutomaticModelResults(results, selected.stageIndex, failure);
+  if (!frameResults.length) {
+    latestModelPrediction = null;
+    renderAutomaticModelResults([], null, failure || (currentLanguage === "ar" ? "لم تكتمل معالجة لقطات الجلسة" : "Session frame processing did not complete"));
+    return;
+  }
+
+  const results = [
+    aggregateSessionPredictions(frameResults, "binary", validEntries.length),
+    aggregateSessionPredictions(frameResults, "five_class", validEntries.length)
+  ];
+  latestModelPrediction = results[0];
+  renderAutomaticModelResults(results, null, failure);
 
   const report = $("report-message");
   if (report && samples.length) {
     report.textContent = currentLanguage === "ar"
-      ? `اكتمل الاختبار. تم التقاط ${automaticEyeCropCount} لقطة عينين تلقائيًا، وتشغيل نماذج الصور على لقطة واحدة دون رفع يدوي.`
-      : `Test complete. ${automaticEyeCropCount} eye-pair frames were captured automatically; both image models were run on one frame without manual upload.`;
+      ? "اكتمل الاختبار. تم التقاط " + automaticEyeCropCount + " لقطة عينين، وتحليل " + frameResults.length + " لقطات موزعة من الجلسة الحالية تلقائيًا."
+      : "Test complete. " + automaticEyeCropCount + " eye-pair frames were captured; " + frameResults.length + " distributed frames from this session were analyzed automatically.";
   }
 }
 
