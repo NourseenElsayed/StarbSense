@@ -76,7 +76,7 @@ Object.assign(translations, {
   "Five supplied image labels": "الفئات الخمس الموجودة في الصور",
   "HOG features (grayscale 96×96) with an RBF support-vector machine. The available dataset had no participant/source IDs, so participant-level separation could not be verified.": "استخدمت التجربة خصائص HOG لصور رمادية بحجم 96×96 مع مصنف SVM بنواة RBF. لا تحتوي مجموعة البيانات على معرفات للمشاركين أو مصادر الصور، لذلك لم يمكن التحقق من الفصل على مستوى المشاركين.",
   "How these models relate to StarbSense": "علاقة هذه النماذج بمشروع StarbSense",
-  "These are offline image experiments. They accept pre-cropped eye-pair images; the current browser session records MediaPipe landmarks and experimental image measurements. The image models are not connected to the webcam stream and do not analyze the session CSV.": "هذه تجارب صور غير متصلة. تستقبل صورًا لزوج العينين بعد قصّها مسبقًا؛ أما جلسة المتصفح الحالية فتسجل معالم MediaPipe وقياسات صور تجريبية. نماذج الصور غير متصلة ببث الكاميرا ولا تحلل ملف CSV الخاص بالجلسة.",
+  "These are offline dataset experiments. After a live session, StarbSense automatically sends one eye-pair crop from the camera session to both local image models. Their labels are experimental and are not clinically validated.": "هذه نتائج تجارب على مجموعات بيانات. بعد جلسة الكاميرا، يرسل StarbSense تلقائيًا لقطة مقصوصة للعينين إلى نموذجي الصور المحليين. تسميات النماذج تجريبية وغير معتمدة سريريًا.",
   "Accuracy on these datasets does not establish performance on real-world webcam recordings. These experimental models must not be used to diagnose or rule out an eye condition or decide whether someone needs medical care.": "الدقة على مجموعات البيانات هذه لا تثبت الأداء على تسجيلات كاميرا الويب في الواقع. يجب عدم استخدام هذه النماذج التجريبية لتشخيص حالة بالعين أو استبعادها أو تقرير احتياج شخص إلى رعاية طبية.",
   "View machine-readable results (JSON)": "عرض النتائج بصيغة JSON"
 });
@@ -2140,11 +2140,11 @@ Object.assign(translations, {
   "Optional · Classify an eye-pair image": "اختياري · تصنيف صورة للعينين",
   "The model returns one label from its training dataset. The image is processed in memory and is not saved by this endpoint.": "يعرض النموذج تسمية واحدة من فئات مجموعة التدريب. تُعالج الصورة في الذاكرة ولا تحفظها هذه الخدمة.",
   "How to read your result": "كيف تقرأ النتيجة؟",
-  "There are two different outputs: the camera-session report describes recording quality, while the optional image experiment predicts a dataset label for one uploaded image.": "هناك نتيجتان مختلفتان: تقرير جلسة الكاميرا يوضح جودة التسجيل، بينما تتوقع تجربة الصور الاختيارية فئة لصورة واحدة مرفوعة.",
+  "There are two outputs: the camera-session report describes recording quality, while the image models automatically return experimental dataset labels for an eye-pair frame captured during the test.": "هناك نتيجتان: تقرير جلسة الكاميرا يوضح جودة التسجيل، بينما يعرض نموذجا الصور تلقائيًا تسميات بحثية تجريبية للعينين من لقطة ملتقطة أثناء الاختبار.",
   "Camera-session result": "نتيجة جلسة الكاميرا",
   "This shows whether enough usable frames and eye landmarks were recorded. It is not a strabismus classification.": "توضح ما إذا كان قد تم تسجيل عدد كافٍ من الإطارات ومعالم العين. وهي ليست تصنيفًا للحَوَل.",
   "Image-model result": "نتيجة نموذج الصور",
-  "This shows the model’s predicted label for the uploaded image: “strabismus” or “strabismus-free”, or one of the five image classes.": "تعرض الفئة التي توقعها النموذج للصورة: «حَوَل» أو «دون حَوَل»، أو إحدى فئات الصور الخمس.",
+  "This shows the experimental dataset label predicted for an eye-pair frame captured automatically during the session. It is not a diagnosis or validated screening result.": "تعرض التسمية البحثية التجريبية التي توقعها النموذج للعينين من لقطة التُقطت تلقائيًا أثناء الجلسة. وهي ليست تشخيصًا أو نتيجة فحص معتمدة.",
   "If you have a concern about your vision or eye alignment, discuss it with a parent or guardian and an eye-care professional.": "إذا كان لديك قلق بشأن الرؤية أو اتجاه العين، فتحدث مع ولي أمرك ومع مختص عيون.",
   "Step 4 · Ask StarbSense": "الخطوة 4 · اسأل StarbSense",
   "Ask about your session, charts, image-model labels, camera quality, or how StarbSense works. The assistant uses the project data available in this browser.": "اسأل عن جلستك أو الرسوم أو تصنيفات نموذج الصور أو جودة الكاميرا أو طريقة عمل StarbSense. يستخدم المساعد بيانات المشروع المتاحة في هذا المتصفح.",
