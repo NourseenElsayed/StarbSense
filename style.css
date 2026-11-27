@@ -1097,3 +1097,43 @@ body.is-rtl .site-footer { direction: rtl; }
 @media (max-width: 420px) {
   .quick-nav a { padding: 10px 8px; font-size: .85rem; }
 }
+
+
+/* Clear final user-facing session result */
+.final-result-card {
+  margin: 18px 0 20px;
+  padding: clamp(20px, 3vw, 30px);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: #f7f9fc;
+}
+.final-result-card[hidden] { display: none !important; }
+.final-result-kicker {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--muted);
+  font-size: .76rem;
+  font-weight: 850;
+  letter-spacing: .08em;
+}
+.final-result-card h3 {
+  margin: 0 0 10px;
+  font-size: clamp(1.25rem, 3vw, 1.7rem);
+}
+.final-result-card p { margin: 8px 0 0; line-height: 1.75; }
+.final-result-meaning {
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: .9rem;
+}
+.final-result-card.is-good { border-color: #9acdaf; background: #f1faf4; }
+.final-result-card.is-retry { border-color: #e7c77c; background: #fff9ec; }
+.technical-appendix { margin: 20px 0; }
+.technical-appendix > summary,
+.model-research-panel > summary { font-size: 1rem; }
+.model-research-panel { display: block; }
+.model-research-panel[open] { display: block; }
+.model-research-panel > summary { margin-bottom: 8px; }
+.report-section { scroll-margin-top: 18px; }
+.stats-strip { display: none !important; }
