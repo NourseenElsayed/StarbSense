@@ -166,10 +166,6 @@
           <p id="final-result-detail"></p>
           <p id="final-result-meaning" class="final-result-meaning"></p>
         </article>
-        <article id="automatic-model-result" class="model-prediction-result automatic-model-result" hidden aria-live="polite">
-          <strong>Automatic eye-image model results</strong>
-          <p>After the test, StarbSense will analyze an eye-pair frame captured from the camera automatically.</p>
-        </article>
         <a id="analytics-toggle" class="button button-secondary" href="#analysis" data-translation-key="Open full analysis">Open full analysis</a>
 
         <button id="export-btn" class="button button-secondary" type="button" disabled>
@@ -185,6 +181,10 @@
           <h2 id="analytics-title">All session data and charts</h2>
           <p class="section-description">Explore the recorded measurements, with a short explanation under every chart.</p>
         </div>
+        <article id="automatic-model-result" class="model-prediction-result automatic-model-result" hidden aria-live="polite">
+          <strong>Automatic eye-image model results</strong>
+          <p>After the test, StarbSense analyzes an eye-pair frame captured automatically from the test camera.</p>
+        </article>
       
 <div id="python-charts" class="python-charts"></div>
 
@@ -300,38 +300,10 @@
         </div>
         <div class="model-connection-note">
           <strong>How these models relate to StarbSense</strong>
-          <p>These are offline image experiments. They accept pre-cropped eye-pair images; the current browser session records MediaPipe landmarks and experimental image measurements. The image models are not connected to the webcam stream and do not analyze the session CSV.</p>
+          <p>The offline dataset metrics above describe model development only. After a live session, StarbSense now automatically sends one eye-pair crop captured from that session to both local image models. The live outputs are experimental image labels only and are not clinically validated.</p>
           <p>Accuracy on these datasets does not establish performance on real-world webcam recordings. These experimental models must not be used to diagnose or rule out an eye condition or decide whether someone needs medical care.</p>
         </div>
         </details>
-
-        <div class="model-upload-panel" aria-labelledby="model-upload-title">
-          <div class="model-upload-heading">
-            <div>
-              <p class="eyebrow">SEPARATE IMAGE EXPERIMENT</p>
-              <h3 id="model-upload-title">Optional · Classify an eye-pair image</h3>
-              <p class="section-description">Upload a pre-cropped image containing both eyes. This experiment does not use your webcam stream or session measurements.</p>
-            </div>
-            <span id="model-api-status" class="status-pill" role="status">Checking local model files…</span>
-          </div>
-          <form id="model-upload-form" class="model-upload-form">
-            <label for="model-task-select">Research experiment</label>
-            <select id="model-task-select" name="task">
-              <option value="binary">Binary labels · strabismus / strabismus-free</option>
-              <option value="five_class">Five image labels · eso / exo / hyper / hypo / normal</option>
-            </select>
-            <label for="model-image-file">Eye-pair image (PNG, JPEG or WebP, up to 8 MB)</label>
-            <input id="model-image-file" name="image" type="file" accept="image/png,image/jpeg,image/webp" required>
-            <p class="model-upload-help">Use a tightly cropped, clear image of both eyes only. Do not upload a full portrait, and only use an image you have permission to use.</p>
-            <img id="model-image-preview" class="model-image-preview" alt="Selected eye-pair image preview" hidden>
-            <button id="model-predict-button" class="button button-primary" type="submit">Run image experiment</button>
-          </form>
-          <div id="model-prediction-result" class="model-prediction-result" role="status" aria-live="polite">
-            <strong>Waiting for an image</strong>
-            <p>Choose an image and run one of the offline experiments.</p>
-          </div>
-          <p class="model-upload-disclaimer">The model returns one label from its training dataset. The image is processed in memory and is not saved by this endpoint.</p>
-        </div>
 
         <p class="model-report-link"><a href="/research/model-baseline-results.json" target="_blank" rel="noopener">View machine-readable results (JSON)</a></p>
       </details>
