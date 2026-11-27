@@ -275,3 +275,12 @@ A local downloader was added at `tools/download_reference_data.py`. It queries t
 - **Roboflow user-contributed image sets**: displayed CC BY licenses do not establish clinical label provenance, participant-level separation, or source-image rights. Keep them as unverified exploratory leads, not clinical ground truth.
 
 No patient images or videos were downloaded or committed in this update.
+
+
+## Mendeley source and associated paper — clarification (2026-11-27)
+
+The [Mendeley Data v1 record](https://data.mendeley.com/datasets/4cbdg64773/1) describes a 27-image set (26 strabismus, 1 normal). This is described as a functional-validation set, not the larger training cohort. The associated [2025 paper](https://pmc.ncbi.nlm.nih.gov/articles/PMC12478477/) separately reports a balanced 1,000-image cohort (500 strabismus, 500 normal) used for stratified 10-fold cross-validation, with mean accuracy 95.61%. The Mendeley project archive inspected for StarbSense contains application code and model/hardware assets, but no identifiable 1,000-image training folder. Public availability of the paper and model archive does not establish access to those 1,000 images or their reuse conditions.
+
+**Decision:** Do not train on the 27-image 26:1 set or treat it as the paper's 1,000-image cohort. Do not import the supplied NASNet/DenseNet weights into the current HOG-SVM endpoint: the published app's NASNet input preprocessing (331×331) differs from StarbSense's 96×96 grayscale HOG contract, and the DenseNet model is not invoked by the inspected source code. Keep the Mendeley project as a separately documented software/literature reference until the authors confirm availability, labels, grouping keys, license, and consent/reuse conditions for the 1,000-image cohort.
+
+See [MENDELEY_STRABISMUS_SOURCE.md](MENDELEY_STRABISMUS_SOURCE.md) for the detailed source review.
