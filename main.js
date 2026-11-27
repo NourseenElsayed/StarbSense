@@ -1712,24 +1712,29 @@ function renderSimpleFinalResult(result = null) {
   const detail = $("final-result-detail");
   const meaning = $("final-result-meaning");
   if (!card || !title || !detail || !meaning) return;
+
   const total = Number(result?.sample_count ?? samples.length ?? 0);
   const faceRate = Number(result?.face_detection_rate_pct ?? 0);
-  const irisValid = Number(result?.valid_iris_samples ?? 0);
-  const tasks = Number(result?.task_count ?? new Set(samples.map((sample) => sample.task_index)).size ?? 0);
-  const completed = total >= 30 && tasks >= 12 && faceRate >= 85 && irisValid >= 20;
+  const validIris = Number(result?.valid_iris_samples ?? 0);
+  const taskCount = Number(result?.task_count ?? new Set(samples.map((sample) => sample.task_index)).size);
+  const irisRate = total > 0 ? (validIris / total) * 100 : 0;
+  const complete = total >= 30 && faceRate >= 85 && irisRate >= 80 && taskCount >= 12;
+
   card.hidden = false;
   card.classList.remove("is-good", "is-retry", "is-next-step");
-  card.classList.add(completed ? "is-good" : "is-retry");
+  card.classList.add(complete ? "is-good" : "is-retry");
+
   if (!total) {
     title.textContent = currentLanguage === "ar" ? "لم تُسجّل جلسة بعد" : "No session recorded yet";
     detail.textContent = currentLanguage === "ar" ? "ابدئي الاختبار لإظهار النتيجة." : "Complete the test to display a result.";
     meaning.textContent = "";
     return;
   }
-  title.textContent = completed
+
+  title.textContent = complete
     ? (currentLanguage === "ar" ? "اكتمل تسجيل الجلسة" : "Session recording completed")
     : (currentLanguage === "ar" ? "التسجيل غير مكتمل" : "Recording incomplete");
-  detail.textContent = completed
+  detail.textContent = complete
     ? (currentLanguage === "ar" ? "تم تسجيل قدر كافٍ من بيانات الجلسة وفق معايير جودة التسجيل الحالية." : "Enough session data was recorded according to the current recording-quality checks.")
     : (currentLanguage === "ar" ? "البيانات المسجلة لا تحقق معايير اكتمال الجلسة الحالية. راجعي جودة التسجيل أو أعيدي الجلسة." : "The recorded data did not meet the current session-completeness checks. Review recording quality or repeat the session.");
   meaning.textContent = currentLanguage === "ar"
