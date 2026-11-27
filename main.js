@@ -7,6 +7,19 @@ import { startCameraQualityMonitor, inspectFaceGeometry } from "./quality-monito
 const $ = (id) => document.getElementById(id);
 
 const languageToggle = $("language-toggle");
+const analyticsToggle = $("analytics-toggle");
+if (analyticsToggle) {
+  analyticsToggle.addEventListener("click", () => {
+    const panel = $("analytics-dashboard");
+    const opening = panel.hidden;
+    panel.hidden = !opening;
+    analyticsToggle.setAttribute("aria-expanded", String(opening));
+    analyticsToggle.textContent = opening
+      ? (currentLanguage === "ar" ? "إخفاء البيانات والجرافات" : "Hide data and charts")
+      : (currentLanguage === "ar" ? "عرض كل البيانات والجرافات" : "Show all data and charts");
+    if (opening && samples.length) renderDashboard();
+  });
+}
 const translations = {"RESEARCH PROTOTYPE":"نموذج أولي بحثي","TRACK · MEASURE · UNDERSTAND":"تابع · قِس · افهم","A playful visual-tracking experience for research.":"تجربة تفاعلية ممتعة لتتبّع حركة العين لأغراض البحث.","Follow the moving star while StarbSense records experimental facial-landmark and eye-region measurements for research analysis.":"اتبِع النجمة المتحركة بينما يسجّل StarbSense قياسات تجريبية لمعالم الوجه ومنطقة العين لتحليلها بحثيًا.","GETTING READY":"الاستعداد","Prepare your adventure":"جهّز نفسك للتجربة","Camera off":"الكاميرا متوقفة","Your camera preview":"معاينة الكاميرا","Enable your camera to get started.":"فعّل الكاميرا للبدء.","Ready when you are":"جاهزون عندما تكون مستعدًا","Place your face comfortably in front of the camera and try to keep the lighting steady.":"ضع وجهك أمام الكاميرا بشكل مريح وحاول الحفاظ على إضاءة ثابتة.","Enable camera":"تشغيل الكاميرا","Disable camera":"إيقاف الكاميرا","Start adventure":"ابدأ التجربة","Enable the camera to load the game model.":"فعّل الكاميرا لتحميل نموذج اللعبة.","STRUCTURED RESEARCH SESSION · V2":"جلسة بحثية منظّمة · الإصدار الثاني","A planned path, not random movement":"مسار محدد، وليس حركة عشوائية","The star follows a fixed sequence of center, horizontal, vertical, and diagonal fixation targets. Each target has a defined position and duration so sessions can be compared consistently.":"تتحرك النجمة وفق تسلسل ثابت من نقاط التثبيت: المركز، والاتجاهات الأفقية والرأسية والقطرية. لكل نقطة موضع ومدة محددان لضمان إمكانية مقارنة الجلسات.","17 FIXATION STEPS":"١٧ خطوة تثبيت","Protocol stages":"مراحل البروتوكول","01 · Center":"٠١ · المركز","02 · Left ↔ Right":"٠٢ · اليسار ↔ اليمين","03 · Up ↕ Down":"٠٣ · أعلى ↕ أسفل","04 · Diagonals":"٠٤ · الاتجاهات القطرية","05 · Center":"٠٥ · المركز","This sequence is an experimental visual-following task. It is not a cover test, a calibrated gaze test, or a validated strabismus screening protocol.":"هذا التسلسل مهمة تجريبية لتتبّع هدف بصري، وليس اختبار تغطية للعين أو اختبار نظر مُعايرًا أو بروتوكولًا معتمدًا للكشف عن الحَوَل.","THE ADVENTURE":"التجربة","Follow the star":"اتبع النجمة","Waiting to start":"في انتظار البدء","Your star is waiting":"النجمة في انتظارك","Stop":"إيقاف","Follow the star at your own comfortable pace":"اتبع النجمة بالسرعة المريحة لك","Star target":"الهدف النجمي","Your adventure starts here":"تبدأ تجربتك من هنا","Enable the camera, then select Start adventure.":"فعّل الكاميرا، ثم اختر «ابدأ التجربة».","Adventure progress":"تقدّم التجربة","During play, the game enters distraction-reduced full-screen mode when supported by your browser. Press Esc to exit full screen.":"أثناء اللعب، تنتقل اللعبة إلى وضع ملء الشاشة لتقليل المشتتات إذا كان المتصفح يدعم ذلك. اضغط Esc للخروج من وضع ملء الشاشة.","Live session counters":"مؤشرات الجلسة المباشرة","Tasks completed":"المهام المكتملة","Frames processed":"الإطارات التي تمت معالجتها","Frames with a face":"الإطارات التي ظهر فيها وجه","YOUR SESSION":"جلستك","Session data":"بيانات الجلسة","Complete or stop a session to review and export recorded data.":"أكمل الجلسة أو أوقفها لمراجعة البيانات المسجلة وتصديرها.","Export CSV":"تصدير CSV","SESSION ANALYTICS":"تحليلات الجلسة","Session dashboard":"لوحة بيانات الجلسة","Experimental data-quality statistics and landmark visualizations.":"إحصاءات تجريبية لجودة البيانات ورسوم توضيحية لمعالم الوجه.","Waiting for a session":"في انتظار جلسة","Processed frames":"الإطارات المعالجة","Face detection rate":"معدل اكتشاف الوجه","Valid iris samples":"عينات القزحية الصالحة","Tasks with recorded frames":"المهام التي سُجلت لها إطارات","Iris landmark coordinates over time":"إحداثيات معالم القزحية بمرور الوقت","Normalized image x-coordinates recorded by MediaPipe. These are not validated gaze measurements.":"إحداثيات X الموحّدة للصورة والمسجلة بواسطة MediaPipe. هذه ليست قياسات معتمدة لاتجاه النظر.","Face detection by task":"اكتشاف الوجه حسب المهمة","Recorded frames with and without a detected face for each task.":"عدد الإطارات التي ظهر فيها وجه أو لم يظهر لكل مهمة.","Interpretation and limitations":"التفسير والقيود","Complete a session to generate its summary.":"أكمل جلسة لإنشاء ملخصها.","StarbSense is an experimental prototype. These experimental measurements are not clinically validated and cannot diagnose or rule out strabismus or any other eye condition.":"StarbSense نموذج تجريبي. هذه القياسات غير معتمدة سريريًا ولا يمكنها تشخيص الحَوَل أو استبعاده، أو تشخيص أي حالة أخرى بالعين.","UNDERSTANDING YOUR SESSION":"فهم نتائج جلستك","What should I do with this result?":"ماذا أفعل بهذه النتيجة؟","StarbSense reports experimental tracking and data-quality measurements only. It cannot decide whether someone's eyes are healthy, diagnose or rule out strabismus, or determine that an eye examination is unnecessary.":"يعرض StarbSense قياسات تجريبية للتتبّع وجودة البيانات فقط. لا يمكنه تحديد ما إذا كانت العين سليمة، أو تشخيص الحَوَل أو استبعاده، أو تقرير أن فحص العين غير ضروري.","If there is an eye-related concern":"إذا كان هناك قلق متعلق بالعين","Ask a parent or guardian to arrange a comprehensive examination with an eye-care professional, especially if an eye appears to turn, vision seems different between the eyes, or double vision occurs.":"اطلب من أحد الوالدين أو ولي الأمر ترتيب فحص شامل لدى مختص عيون، خاصةً إذا بدت إحدى العينين منحرفة، أو اختلفت الرؤية بين العينين، أو حدث ازدواج في الرؤية.","If symptoms begin suddenly":"إذا ظهرت الأعراض فجأة","Sudden new double vision, a sudden change in eye alignment, or sudden vision loss needs urgent medical assessment.":"ظهور ازدواج جديد في الرؤية فجأة، أو تغيّر مفاجئ في اتجاه العين، أو فقدان مفاجئ للرؤية يستلزم تقييمًا طبيًا عاجلًا.","A reassuring-looking StarbSense session does not replace routine eye care or a professional examination.":"حتى إذا بدت نتائج StarbSense مطمئنة، فهي لا تغني عن رعاية العين المعتادة أو الفحص لدى مختص.","Privacy and responsible use":"الخصوصية والاستخدام المسؤول","Camera processing is performed in the browser. Session CSV files contain derived facial landmark coordinates; handle them carefully, especially when working with children.":"تتم معالجة الكاميرا داخل المتصفح. تحتوي ملفات CSV الخاصة بالجلسة على إحداثيات مستخرجة لمعالم الوجه؛ لذا يجب التعامل معها بحذر، خاصةً عند العمل مع الأطفال.","StarbSense · ISEF research prototype · Not a medical device":"StarbSense · نموذج بحثي لمعرض ISEF · ليس جهازًا طبيًا","Camera preview":"معاينة الكاميرا","Camera on":"الكاميرا تعمل","Loading the face model…":"جارٍ تحميل نموذج الوجه…","Camera access requires HTTPS or localhost in a supported browser.":"يتطلب الوصول إلى الكاميرا اتصال HTTPS أو localhost باستخدام متصفح مدعوم.","Requesting camera permission…":"جارٍ طلب إذن استخدام الكاميرا…","Face landmarks and experimental image processing are ready.":"أصبحت معالم الوجه والمعالجة التجريبية للصور جاهزة.","Face tracking is ready, but bright-pixel analysis is unavailable. The game can still run.":"أصبح تتبّع الوجه جاهزًا، لكن تحليل البكسلات الساطعة غير متاح. لا يزال بإمكانك تشغيل اللعبة.","Camera permission denied. Allow camera access in your browser settings.":"تم رفض إذن الكاميرا. اسمح باستخدام الكاميرا من إعدادات المتصفح.","No camera found. Check that a camera is connected.":"لم يتم العثور على كاميرا. تحقق من توصيل الكاميرا.","The camera may be in use by another app. Close other apps using it.":"قد يكون تطبيق آخر يستخدم الكاميرا. أغلق التطبيقات الأخرى التي تستخدمها.","Camera turned off.":"تم إيقاف الكاميرا.","Frame processing failed. Check the browser Console.":"فشلت معالجة الإطار. تحقق من وحدة التحكم (Console) في المتصفح.","Adventure in progress":"التجربة قيد التنفيذ","Adventure started! Follow the star.":"بدأت التجربة! اتبع النجمة.","No session data":"لا توجد بيانات للجلسة","No frames were recorded, so Python analysis was skipped.":"لم يتم تسجيل أي إطارات، لذلك تم تخطي تحليل Python.","Running Python analysis…":"جارٍ تشغيل تحليل Python…","Sending recorded session data to the local Python service.":"جارٍ إرسال بيانات الجلسة المسجلة إلى خدمة Python المحلية.","Python analysis complete":"اكتمل تحليل Python","Python analysis unavailable":"تحليل Python غير متاح","Adventure complete!":"اكتملت التجربة!","You did it! ✨":"أحسنت! ✨","Your session data is ready to review and export.":"بيانات جلستك جاهزة للمراجعة والتصدير.","Session recorded. Bright-pixel candidates are experimental image features, not verified corneal reflections or a medical diagnosis.":"تم تسجيل الجلسة. مؤشرات البكسلات الساطعة خصائص تجريبية للصورة، وليست انعكاسات قرنية مؤكدة أو تشخيصًا طبيًا.","No frame data is available to export.":"لا توجد بيانات إطارات لتصديرها.","CSV exported. It contains experimental facial landmarks and bright-pixel candidates, not a medical diagnosis.":"تم تصدير CSV. يحتوي الملف على معالم وجه تجريبية ومؤشرات بكسلات ساطعة، وليس تشخيصًا طبيًا.","Adventure stopped":"تم إيقاف التجربة","You can start a new adventure when ready.":"يمكنك بدء تجربة جديدة عندما تكون مستعدًا.","Your recorded session data is ready to review.":"بيانات جلستك المسجلة جاهزة للمراجعة.","Session stopped early. You can export the recorded frames.":"تم إيقاف الجلسة مبكرًا. يمكنك تصدير الإطارات المسجلة.","Look at the center":"انظر إلى المركز","Follow left":"اتبع النقطة إلى اليسار","Return to center":"عُد إلى المركز","Follow right":"اتبع النقطة إلى اليمين","Follow upward":"اتبع النقطة إلى أعلى","Follow downward":"اتبع النقطة إلى أسفل","Follow upper-left":"اتبع النقطة إلى أعلى اليسار","Follow upper-right":"اتبع النقطة إلى أعلى اليمين","Follow lower-left":"اتبع النقطة إلى أسفل اليسار","Follow lower-right":"اتبع النقطة إلى أسفل اليمين","Final center fixation":"التثبيت النهائي في المركز","Baseline fixation":"تثبيت أساسي","Horizontal":"أفقي","Vertical":"رأسي","Diagonal":"قطري","Final fixation":"تثبيت نهائي","Left iris landmark x":"إحداثي X لمعْلم القزحية اليسرى","Right iris landmark x":"إحداثي X لمعْلم القزحية اليمنى","Elapsed time (seconds)":"الوقت المنقضي (بالثواني)","Normalized image x-coordinate":"إحداثي X الموحّد للصورة","Face detected":"تم اكتشاف الوجه","Face not detected":"لم يتم اكتشاف الوجه","Recorded frames":"الإطارات المسجلة","Raw iris coordinates over time":"إحداثيات القزحية الخام بمرور الوقت","Relative iris position":"الموضع النسبي للقزحية","Experimental head-rotation proxies":"مؤشرات تجريبية لدوران الرأس","Relative iris comparison by task":"مقارنة موضع القزحية النسبي حسب المهمة","Frame lighting quality over time":"جودة إضاءة الإطارات بمرور الوقت","Technical data availability by task group":"توفر البيانات التقنية حسب مجموعة المهمة"};
 Object.assign(translations, {
   "Session analyzed": "تم تحليل الجلسة",
@@ -138,6 +151,7 @@ function applyLanguage(language) {
 
 languageToggle?.addEventListener("click", () => {
   applyLanguage(currentLanguage === "ar" ? "en" : "ar");
+  if (analyticsToggle && !$("analytics-dashboard").hidden) { analyticsToggle.textContent = currentLanguage === "ar" ? "إخفاء البيانات والجرافات" : "Hide data and charts"; }
   if (samples.length && !$("analytics-dashboard").hidden) renderDashboard();
 });
 
@@ -1251,6 +1265,15 @@ function stopAdventure() {
 }
 
 function showPythonChart(id, src, alt) {
+  const descriptions = {
+    "Face detection by task": currentLanguage === "ar" ? "يوضح عدد الإطارات التي ظهر فيها الوجه أو لم يظهر في كل خطوة. يساعد على معرفة الخطوات التي كانت فيها بيانات الوجه أقل." : "Shows how many frames contained a detected face in each task. It helps identify steps with fewer usable face frames.",
+    "Raw iris coordinates over time": currentLanguage === "ar" ? "يعرض تغيّر إحداثيات القزحية التي التقطتها MediaPipe أثناء الجلسة. هذه إحداثيات داخل الصورة وليست قياسًا مُعايرًا لاتجاه النظر." : "Plots iris landmark coordinates detected by MediaPipe during the session. These are image coordinates, not calibrated gaze measurements.",
+    "Relative iris position": currentLanguage === "ar" ? "يعرض موضع القزحية نسبةً إلى نقاط العين المسجلة. يتأثر بجودة الصورة ووضع الرأس، ولا يثبت وجود مشكلة في محاذاة العين." : "Shows iris position relative to recorded eye landmarks. It can be affected by image quality and head pose and does not establish an alignment problem.",
+    "Experimental head-rotation proxies": currentLanguage === "ar" ? "يعرض تقديرات تجريبية لوضع الرأس المستخرجة من معالم الوجه. هي مؤشرات تقريبية وليست قياسات طبية لحركة الرأس." : "Shows experimental estimates of head pose derived from face landmarks. They are approximate proxies, not clinical head-movement measurements.",
+    "Relative iris comparison by task": currentLanguage === "ar" ? "يقارن متوسطات أو توزيعات موضع القزحية بين مجموعات خطوات الاختبار لتسهيل مراجعة البيانات." : "Compares relative iris-position values across task groups to make the recorded data easier to review.",
+    "Frame lighting quality over time": currentLanguage === "ar" ? "يتابع مستوى الإضاءة الذي رُصد في الإطارات. التغيّر الكبير قد يؤثر في وضوح معالم الوجه والعين." : "Tracks the lighting level detected in frames. Large changes may affect how clearly face and eye landmarks are detected.",
+    "Technical data availability by task group": currentLanguage === "ar" ? "يلخص مدى توفر القياسات التقنية في كل مجموعة من خطوات الاختبار، ويساعد في تحديد الأجزاء التي تحتوي على بيانات ناقصة." : "Summarizes how much technical measurement data is available in each task group and helps locate sections with missing data."
+  };
   const container = document.getElementById("python-charts");
   if (!container || !src) return;
 
@@ -1263,6 +1286,9 @@ function showPythonChart(id, src, alt) {
     const heading = document.createElement("h3");
     heading.dataset.translationKey = alt;
     heading.textContent = t(alt);
+    const explanation = document.createElement("p");
+    explanation.className = "chart-explanation";
+    explanation.textContent = descriptions[alt] || "";
 
     image = document.createElement("img");
     image.id = id;
@@ -1273,7 +1299,7 @@ function showPythonChart(id, src, alt) {
     image.style.width = "100%";
     image.style.height = "auto";
 
-    card.append(heading, image);
+    card.append(heading, explanation, image);
     container.appendChild(card);
   }
 
@@ -1455,14 +1481,12 @@ function answerAssistantQuestion(rawQuestion) {
   );
 
   if (urgent) {
-    updateCareGuidance("urgent");
     return ar
       ? "الأعراض الجديدة والمفاجئة مثل ازدواج الرؤية أو تغيّر اتجاه العين أو فقدان الرؤية تحتاج تقييمًا طبيًا عاجلًا. أخبر ولي أمرك الآن واطلبوا المساعدة الطبية العاجلة."
       : "New, sudden symptoms such as double vision, a change in eye alignment, or vision loss need urgent medical assessment. Tell a parent or guardian now and seek urgent medical care.";
   }
 
   if (eyeConcern && !asksSession && !asksImage) {
-    updateCareGuidance("concern");
     return ar
       ? "ده سؤال متعلق بصحة العين، ومش ممكن أحسمه من اختبار StarbSense. احكي لولي أمرك عن اللي ملاحظُه ورتّبوا فحصًا عند طبيب عيون."
       : "That is an eye-health concern, and StarbSense cannot settle it. Tell a parent or guardian what you have noticed and arrange an eye-care assessment.";
@@ -1672,41 +1696,26 @@ function renderSimpleFinalResult(result = null) {
   if (!card || !title || !detail || !meaning) return;
 
   const total = Number(result?.sample_count ?? samples.length ?? 0);
-  const faceRate = Number(result?.face_detection_rate_pct ??
-    (samples.length ? (samples.filter((s) => s.face_landmarks_detected === 1).length / samples.length) * 100 : 0));
-  const validIris = Number(result?.valid_iris_samples ??
-    samples.filter((s) =>
-      isValidCoordinate(s.left_iris_landmark_x) &&
-      isValidCoordinate(s.left_iris_landmark_y) &&
-      isValidCoordinate(s.right_iris_landmark_x) &&
-      isValidCoordinate(s.right_iris_landmark_y)
-    ).length);
-  const taskCount = Number(result?.task_count ??
-    new Set(samples.map((s) => s.task_index).filter((v) => Number(v) > 0)).size);
-  const irisRate = total ? (validIris / total) * 100 : 0;
-  const recordingReady = total >= 30 && faceRate >= 85 && irisRate >= 80 && taskCount >= 12;
-
   card.hidden = false;
-  card.classList.toggle("is-good", recordingReady);
-  card.classList.toggle("is-retry", !recordingReady);
+  card.classList.remove("is-good", "is-retry");
+  card.classList.add("is-next-step");
 
-  if (currentLanguage === "ar") {
-    title.textContent = recordingReady
-      ? "اكتمل الاختبار — التسجيل جيد"
-      : "التسجيل غير مكتمل — يُفضّل إعادة الاختبار";
-    detail.textContent = recordingReady
-      ? "الكاميرا سجلت عددًا كافيًا من الإطارات، وظهر الوجه والعينان بوضوح في معظمها. يمكنك حفظ ملف النتائج."
-      : "بعض أجزاء التسجيل أو بيانات العين لم تكن كافية. ثبّت الكاميرا، واجعل الإضاءة أمامية، وحافظ على ظهور العينين ثم أعد الخطوات.";
-    meaning.textContent = "المهم: نتيجة الجلسة دي بتقيّم جودة التسجيل فقط. الاختبار الحالي لا يملك قياسًا طبيًا معتمدًا لمحاذاة العينين، لذلك لا يستطيع تأكيد الحَوَل أو نفيه.";
-  } else {
-    title.textContent = recordingReady
-      ? "Session complete — recording quality is good"
-      : "Recording incomplete — repeat the session";
-    detail.textContent = recordingReady
-      ? "The camera captured enough frames, with the face and eyes visible in most of them. You can save the session data."
-      : "Some recording sections or eye measurements were insufficient. Stabilize the camera, use front lighting, keep both eyes visible, and repeat the steps.";
-    meaning.textContent = "This result evaluates recording quality only. The current session does not include a clinically validated eye-alignment measurement, so it cannot confirm or rule out strabismus.";
+  if (!total) {
+    title.textContent = currentLanguage === "ar" ? "لا توجد بيانات كافية بعد" : "No session data yet";
+    detail.textContent = currentLanguage === "ar"
+      ? "أكملي خطوات الجلسة أولًا لعرض ملخص التسجيل."
+      : "Complete the session steps to display the recording summary.";
+    meaning.textContent = "";
+    return;
   }
+
+  title.textContent = currentLanguage === "ar" ? "الخطوة التالية" : "Recommended next step";
+  detail.textContent = currentLanguage === "ar"
+    ? "هذه الجلسة تسجل حركة الهدف وظهور معالم الوجه والعين، لكنها لا تقيس محاذاة العينين بطريقة طبية معتمدة. إذا لاحظتِ أنتِ أو ولي أمرك انحرافًا بإحدى العينين أو مشكلة في الرؤية، رتّبوا فحصًا لدى طبيب عيون. إذا لم توجد أي ملاحظات وكانت الفحوصات الدورية منتظمة، استمروا في مواعيد الفحص المعتادة."
+    : "This session records target-following and visible face/eye landmarks, but it does not measure eye alignment in a clinically validated way. If you or your parent/guardian has noticed an eye turn or a vision problem, arrange an eye examination. If there are no concerns and routine checks are up to date, continue the usual scheduled eye checks.";
+  meaning.textContent = currentLanguage === "ar"
+    ? "بيانات الجلسة وجودة التسجيل متاحة في زر «عرض كل البيانات والجرافات»."
+    : "Session measurements and recording-quality details are available under “Show all data and charts.”";
 }
 
 function renderDashboard() {
@@ -1715,7 +1724,6 @@ function renderDashboard() {
 
   const stats = analyzeSession();
 
-  dashboard.hidden = false;
   renderSimpleFinalResult(latestAnalysis);
 
   $("analytics-status").textContent = samples.length
@@ -2167,6 +2175,10 @@ checkImageModelAvailability();
 
 
 Object.assign(translations, {
+  "Show all data and charts": "عرض كل البيانات والجرافات",
+  "Hide data and charts": "إخفاء البيانات والجرافات",
+  "All session data and charts": "كل بيانات الجلسة والجرافات",
+  "Explore the recorded measurements, with a short explanation under every chart.": "استعرضي القياسات المسجلة، مع شرح بسيط أسفل كل جراف.",
   "A simple guided eye-tracking research session.": "جلسة بحثية مبسطة لتتبّع حركة العين.",
   "Follow the star through 17 guided steps. StarbSense records camera-based measurements and organizes them into an easy-to-read session report.": "اتبع النجمة خلال 17 خطوة واضحة. يسجل StarbSense قياسات الكاميرا وينظمها في تقرير سهل الفهم.",
   "Session steps": "خطوات الجلسة",
