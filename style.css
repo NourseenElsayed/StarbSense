@@ -1181,3 +1181,17 @@ body.is-rtl .site-footer { direction: rtl; }
 
 /* Keep internal readiness checks active without showing alert-style panels */
 .readiness-panel { display: none !important; }
+
+.main-nav { display:flex; align-items:center; justify-content:center; gap:8px; flex:1; }
+.main-nav a { padding:10px 14px; border-radius:999px; color:var(--muted); text-decoration:none; font-weight:700; white-space:nowrap; }
+.main-nav a.active { color:var(--accent-dark); background:#efedff; }
+.app-page[hidden] { display:none !important; }
+.app-page { display:block; }
+#analytics-dashboard { display:block; }
+#analytics-toggle { text-decoration:none; }
+.readiness-panel, .care-guidance, .privacy-note { display:none !important; }
+@media (max-width:760px) {
+  .site-header { flex-wrap:wrap; }
+  .main-nav { order:3; width:100%; justify-content:space-between; gap:4px; }
+  .main-nav a { padding:9px 10px; font-size:.88rem; }
+}
