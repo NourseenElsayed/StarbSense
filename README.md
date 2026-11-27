@@ -13,10 +13,10 @@ StarbSense is an experimental, child-friendly visual-target-following and facial
 - Per-frame technical metadata: timestamps, camera resolution/frame rate where exposed, task metadata, page visibility, and non-identifying lighting summaries.
 - CSV export and local Flask/Python analysis.
 - Data-quality summaries and seven charts, including task-level and task-group coverage and heuristic lighting trends.
-- A separate image-model inference stage that automatically crops eye-pair images from the live camera session. It analyzes up to five evenly distributed valid crops with two local HOG + SVM baselines and summarizes their per-frame votes. It does not use the session CSV as model input.
+- A separate image-model inference stage that automatically crops eye-pair images from the live camera session. It analyzes up to 17 valid protocol-stage crops with two local HOG + SVM baselines and summarizes their per-frame votes. It does not use the session CSV as model input.
 - A local, rule-based evidence guide for project FAQs and general eye-care next steps; it is not a generative AI model and never diagnoses.
 
-The browser processes the live camera stream and sends derived numeric session measurements to the local Flask service for chart analysis. For image-model inference, up to five selected eye-pair crops from the current session are also sent to the local Flask process for in-memory inference; the prediction endpoint does not write those crops to disk. Raw video, audio, and camera device identifiers are not sent.
+The browser processes the live camera stream and sends derived numeric session measurements to the local Flask service for chart analysis. For image-model inference, up to 17 selected eye-pair crops from the current session are also sent to the local Flask process for in-memory inference; the prediction endpoint does not write those crops to disk. Raw video, audio, and camera device identifiers are not sent.
 
 ## Run locally
 
