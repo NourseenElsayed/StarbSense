@@ -1288,6 +1288,7 @@ function showPythonChart(id, src, alt) {
     heading.textContent = t(alt);
     const explanation = document.createElement("p");
     explanation.className = "chart-explanation";
+    explanation.dataset.translationKey = `chart-description:${alt}`;
     explanation.textContent = descriptions[alt] || "";
 
     image = document.createElement("img");
@@ -2219,6 +2220,14 @@ Object.assign(translations, {
   "Image model label:": "تصنيف نموذج الصور:",
   "This is a dataset label predicted by the image model, not a confirmed diagnosis for a person.": "هذه تسمية من مجموعة البيانات توقعها نموذج الصور، وليست تشخيصًا مؤكدًا لشخص.",
   "The camera-session report measures recording quality and landmark availability; it does not classify a person as having or not having strabismus.": "يقيس تقرير جلسة الكاميرا جودة التسجيل وتوفر معالم العين، ولا يصنف الشخص على أنه لديه حَوَل أو لا."
+
+  "chart-description:Face detection by task": "يوضح عدد الإطارات التي ظهر فيها الوجه أو لم يظهر في كل خطوة. يساعد على معرفة الخطوات التي كانت فيها بيانات الوجه أقل.",
+  "chart-description:Raw iris coordinates over time": "يعرض تغيّر إحداثيات القزحية التي التقطتها MediaPipe أثناء الجلسة. هذه إحداثيات داخل الصورة وليست قياسًا مُعايرًا لاتجاه النظر.",
+  "chart-description:Relative iris position": "يعرض موضع القزحية نسبةً إلى نقاط العين المسجلة. يتأثر بجودة الصورة ووضع الرأس، ولا يثبت وجود مشكلة في محاذاة العين.",
+  "chart-description:Experimental head-rotation proxies": "يعرض تقديرات تجريبية لوضع الرأس المستخرجة من معالم الوجه. هي مؤشرات تقريبية وليست قياسات طبية لحركة الرأس.",
+  "chart-description:Relative iris comparison by task": "يقارن موضع القزحية النسبي بين مجموعات خطوات الاختبار لتسهيل مراجعة البيانات.",
+  "chart-description:Frame lighting quality over time": "يتابع مستوى الإضاءة المرصود في الإطارات. التغيّر الكبير قد يؤثر في وضوح معالم الوجه والعين.",
+  "chart-description:Technical data availability by task group": "يلخص مدى توفر القياسات التقنية في كل مجموعة من خطوات الاختبار، ويساعد في تحديد الأجزاء التي تحتوي على بيانات ناقصة.",
 });
 Object.assign(reverseTranslations, Object.fromEntries(
   Object.entries(translations).map(([english, arabic]) => [arabic, english])
