@@ -25,17 +25,24 @@
     <main class="page-content">
       <section class="intro">
         <p class="eyebrow">TRACK · MEASURE · UNDERSTAND</p>
-        <h1>A playful visual-tracking experience for research.</h1>
+        <h1>A simple guided eye-tracking research session.</h1>
         <p class="intro-copy">
-          Follow the moving star while StarbSense records experimental facial-landmark and eye-region measurements for research analysis.
+          Follow the star through 17 guided steps. StarbSense records camera-based measurements and organizes them into an easy-to-read session report.
         </p>
       </section>
+
+      <nav class="quick-nav" aria-label="Session steps">
+        <a href="#setup-title"><span>1</span> Get ready</a>
+        <a href="#game-title"><span>2</span> Start the test</a>
+        <a href="#report-title"><span>3</span> View results</a>
+        <a href="#assistant-title"><span>4</span> Ask a question</a>
+      </nav>
 
       <section class="setup-panel" aria-labelledby="setup-title">
         <div class="section-heading">
           <div>
             <p class="eyebrow">GETTING READY</p>
-            <h2 id="setup-title">Prepare your adventure</h2>
+            <h2 id="setup-title">Step 1 · Get ready</h2>
           </div>
           <span id="camera-status" class="status-pill">Camera off</span>
         </div>
@@ -58,10 +65,9 @@
           </div>
 
           <div class="setup-controls">
-            <h3>Ready when you are</h3>
+            <h3>Camera setup</h3>
             <p>
-              Place your face comfortably in front of the camera and try to
-              keep the lighting steady.
+              Sit comfortably facing the camera. Keep both eyes visible and use steady front lighting.
             </p>
 
             <button id="camera-btn" class="button button-primary" type="button">
@@ -89,10 +95,9 @@
         <div class="protocol-heading">
           <div>
             <p class="eyebrow">STRUCTURED RESEARCH SESSION · V2</p>
-            <h2 id="protocol-title">A planned path, not random movement</h2>
+            <h2 id="protocol-title">What will happen?</h2>
             <p class="section-description">
-              The star follows a fixed sequence of center, horizontal, vertical, and diagonal screen targets.
-              This provides a repeatable experimental stimulus path; its positions and timings are design parameters, not clinical test standards.
+              The star will appear at the center, sides, top, bottom, and diagonal positions. Follow it with your eyes while keeping your head comfortably still.
             </p>
           </div>
           <span class="protocol-count">17 FIXATION STEPS</span>
@@ -104,16 +109,14 @@
           <span>04 · Diagonals</span>
           <span>05 · Center</span>
         </div>
-        <p class="protocol-caution">
-          This sequence is an experimental visual-following task. The star shape is an engagement choice, and the directions are used to sample screen locations. Neither the shape, path, nor timing is clinically validated. This is not a cover test, calibrated gaze test, or validated strabismus screening protocol.
-        </p>
+        <p class="protocol-caution">The session takes about 22 seconds and contains 17 steps.</p>
       </section>
 
       <section class="game-section" aria-labelledby="game-title">
         <div class="section-heading">
           <div>
             <p class="eyebrow">THE ADVENTURE</p>
-            <h2 id="game-title">Follow the star</h2>
+            <h2 id="game-title">Step 2 · Follow the star</h2>
           </div>
           <span id="round-counter" class="status-pill">Waiting to start</span>
         </div>
@@ -171,12 +174,12 @@
         <div class="section-heading">
           <div>
             <p class="eyebrow">YOUR SESSION</p>
-            <h2 id="report-title">Session data</h2>
+            <h2 id="report-title">Step 3 · Your session results</h2>
           </div>
         </div>
 
         <p id="report-message" class="message" role="status" aria-live="polite">
-          Complete or stop a session to review and export recorded data.
+          After the session, your summary and charts will appear here.
         </p>
 
         <button id="export-btn" class="button button-secondary" type="button" disabled>
@@ -196,9 +199,9 @@
         <div class="section-heading analytics-heading">
           <div>
             <p class="eyebrow">SESSION ANALYTICS</p>
-            <h2 id="analytics-title">Session dashboard</h2>
+            <h2 id="analytics-title">Session summary</h2>
             <p class="section-description">
-              Experimental data-quality statistics and landmark visualizations.
+              A clear summary of the recorded session, followed by optional technical charts.
             </p>
           </div>
           <span id="analytics-status" class="status-pill">Waiting for a session</span>
@@ -223,6 +226,7 @@
           </article>
         </div>
 
+        <details class="advanced-details"><summary>Technical charts and measurements</summary>
         <div class="analytics-grid">
           <article class="analytics-panel">
             <h3>Iris landmark coordinates over time</h3>
@@ -245,15 +249,16 @@
             </div>
           </article>
         </div>
+        </details>
 
         <article class="analytics-panel analytics-notice">
-          <h3>Interpretation and limitations</h3>
+          <h3>What this session tells you</h3>
           <div id="technical-session-result" class="technical-session-result" hidden></div>
           <p id="analytics-summary">
             Complete a session to generate its summary.
           </p>
           <p>
-            StarbSense is an experimental prototype. These experimental measurements are not clinically validated and cannot diagnose or rule out strabismus or any other eye condition.
+            The session report describes how well the camera recorded the task. It does not determine whether a person has strabismus.
           </p>
         </article>
       </section>
@@ -263,11 +268,12 @@
         <div class="section-heading">
           <div>
             <p class="eyebrow">OFFLINE IMAGE-MODEL EXPERIMENTS</p>
-            <h2 id="model-research-title">Research model baselines</h2>
+            <h2 id="model-research-title">Image-model experiments</h2>
             <p class="section-description">Results from two separate image-classification experiments using the uploaded research datasets. These are not results from your live camera session.</p>
           </div>
           <span class="status-pill">Offline evaluation</span>
         </div>
+        <details class="advanced-details"><summary>Model accuracy and research details</summary>
         <div class="model-results-grid">
           <article class="model-result-card">
             <p class="model-task-label">BINARY CLASSIFICATION</p>
@@ -299,12 +305,13 @@
           <p>These are offline image experiments. They accept pre-cropped eye-pair images; the current browser session records MediaPipe landmarks and experimental image measurements. The image models are not connected to the webcam stream and do not analyze the session CSV.</p>
           <p>Accuracy on these datasets does not establish performance on real-world webcam recordings. These experimental models must not be used to diagnose or rule out an eye condition or decide whether someone needs medical care.</p>
         </div>
+        </details>
 
         <div class="model-upload-panel" aria-labelledby="model-upload-title">
           <div class="model-upload-heading">
             <div>
               <p class="eyebrow">SEPARATE IMAGE EXPERIMENT</p>
-              <h3 id="model-upload-title">Try a trained image model</h3>
+              <h3 id="model-upload-title">Optional · Classify an eye-pair image</h3>
               <p class="section-description">Upload a pre-cropped image containing both eyes. This experiment does not use your webcam stream or session measurements.</p>
             </div>
             <span id="model-api-status" class="status-pill" role="status">Checking local model files…</span>
@@ -325,7 +332,7 @@
             <strong>Waiting for an image</strong>
             <p>Choose an image and run one of the offline experiments.</p>
           </div>
-          <p class="model-upload-disclaimer">Experimental dataset-label output only — not a diagnosis, not a screening result, and not a reason to delay or avoid an eye-care examination. Uploaded image bytes are processed in memory and are not saved by this endpoint.</p>
+          <p class="model-upload-disclaimer">The model returns one label from its training dataset. The image is processed in memory and is not saved by this endpoint.</p>
         </div>
 
         <p class="model-report-link"><a href="/research/model-baseline-results.json" target="_blank" rel="noopener">View machine-readable results (JSON)</a></p>
@@ -333,49 +340,45 @@
 
       <section class="guidance-panel" aria-labelledby="guidance-title">
         <p class="eyebrow">UNDERSTANDING YOUR SESSION</p>
-        <h2 id="guidance-title">What should I do with this result?</h2>
-        <p>
-          StarbSense reports experimental tracking and data-quality measurements only. It cannot decide whether
-          someone's eyes are healthy, diagnose or rule out strabismus, or determine that an eye examination is unnecessary.
-        </p>
+        <h2 id="guidance-title">How to read your result</h2>
+        <p>There are two different outputs: the camera-session report describes recording quality, while the optional image experiment predicts a dataset label for one uploaded image.</p>
         <div class="guidance-grid">
           <article>
-            <strong>If there is an eye-related concern</strong>
+            <strong>Camera-session result</strong>
             <span>
-              Ask a parent or guardian to arrange a comprehensive examination with an eye-care professional,
-              especially if an eye appears to turn, vision seems different between the eyes, or double vision occurs.
+              This shows whether enough usable frames and eye landmarks were recorded. It is not a strabismus classification.
             </span>
           </article>
           <article>
-            <strong>If symptoms begin suddenly</strong>
+            <strong>Image-model result</strong>
             <span>
-              Sudden new double vision, a sudden change in eye alignment, or sudden vision loss needs urgent medical assessment.
+              This shows the model’s predicted label for the uploaded image: “strabismus” or “strabismus-free”, or one of the five image classes.
             </span>
           </article>
         </div>
         <p class="guidance-footnote">
-          A reassuring-looking StarbSense session does not replace routine eye care or a professional examination.
+          If you have a concern about your vision or eye alignment, discuss it with a parent or guardian and an eye-care professional.
         </p>
       </section>
 
 
       <section class="assistant-panel" aria-labelledby="assistant-title">
         <p class="eyebrow">STARBSENSE GUIDE · LOCAL ASSISTANT</p>
-        <h2 id="assistant-title">Ask about your session or eye-health next steps</h2>
-        <p class="assistant-intro">This on-device, rule-based guide explains project measurements and evidence-based next steps. It is not a generative AI model, medical examination, or diagnostic service. Your question is handled in this browser.</p>
+        <h2 id="assistant-title">Step 4 · Ask StarbSense</h2>
+        <p class="assistant-intro">Ask about your session, charts, image-model labels, camera quality, or how StarbSense works. The assistant uses the project data available in this browser.</p>
         <div id="care-guidance" class="care-guidance" role="status" aria-live="polite">
           <strong>Medical next steps</strong>
           <p>StarbSense measurements alone cannot decide whether an eye examination is needed. If you have a concern about vision or eye alignment, arrange an eye-care assessment.</p>
         </div>
         <div id="assistant-messages" class="assistant-messages" aria-live="polite">
-          <p class="assistant-message assistant-message-system">You can ask about the session summary, data quality, the star-following protocol, privacy, or when to seek professional eye care.</p>
+          <p class="assistant-message assistant-message-system">Ask about your session summary, camera quality, charts, model labels, or the test steps.</p>
         </div>
         <form id="assistant-form" class="assistant-form">
           <label for="assistant-input">Your question</label>
-          <textarea id="assistant-input" rows="2" maxlength="500" required placeholder="For example: What do these session results mean?"></textarea>
+          <textarea id="assistant-input" rows="2" maxlength="500" required placeholder="For example: Explain my session results in simple words."></textarea>
           <button class="button button-primary" type="submit">Ask StarbSense Guide</button>
         </form>
-        <p class="assistant-disclaimer">This assistant uses a limited local knowledge base and simple rules. It does not understand every possible question, provide a diagnosis, or replace a clinician.</p>
+        <p class="assistant-disclaimer">For questions outside the project, the assistant may not have enough information.</p>
       </section>
 
       <section class="privacy-note">
@@ -389,7 +392,7 @@
     </main>
 
     <footer class="site-footer">
-      StarbSense · ISEF research prototype · Not a medical device
+      StarbSense · ISEF research prototype
     </footer>
   </body>
 </html>
