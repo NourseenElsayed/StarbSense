@@ -2465,3 +2465,6 @@ Object.assign(translations, {
 Object.assign(reverseTranslations, Object.fromEntries(
   Object.entries(translations).map(([english, arabic]) => [arabic, english])
 ));
+
+// Re-apply the active language after registering the live-camera experiment labels.
+applyLanguage(currentLanguage);
