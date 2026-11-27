@@ -335,7 +335,7 @@ function setMessage(element, message, type = "") {
 }
 
 function setBusy(busy) {
-  cameraButton.disabled = busy;
+  if (cameraButton) cameraButton.disabled = busy;
 }
 
 function stopCameraTracks() {
@@ -532,14 +532,16 @@ async function enableCamera() {
 
     camera.style.display = "block";
     cameraPlaceholder.style.display = "none";
-    cameraStatus.textContent = t("Camera on");
+    if (cameraStatus) cameraStatus.textContent = t("Camera on");
     cameraReady = true;
 
     await loadFaceLandmarker();
 
     startButton.disabled = true;
-    cameraButton.textContent = t("Disable camera");
-    cameraButton.onclick = disableCamera;
+    if (cameraButton) {
+      cameraButton.textContent = t("Disable camera");
+      cameraButton.onclick = disableCamera;
+    }
 
     try {
       await loadOpenCV();
@@ -567,10 +569,12 @@ async function enableCamera() {
     cameraReady = false;
     camera.style.display = "none";
     cameraPlaceholder.style.display = "flex";
-    cameraStatus.textContent = t("Camera off");
+    if (cameraStatus) cameraStatus.textContent = t("Camera off");
     startButton.disabled = true;
-    cameraButton.textContent = t("Enable camera");
-    cameraButton.onclick = enableCamera;
+    if (cameraButton) {
+      cameraButton.textContent = t("Enable camera");
+      cameraButton.onclick = enableCamera;
+    }
 
     let message = `Setup error: ${error.message || error.name}`;
 
@@ -636,12 +640,14 @@ function disableCamera() {
   cameraReady = false;
   camera.style.display = "none";
   cameraPlaceholder.style.display = "flex";
-  cameraStatus.textContent = t("Camera off");
+  if (cameraStatus) cameraStatus.textContent = t("Camera off");
 
   startButton.disabled = true;
   stopButton.disabled = true;
-  cameraButton.textContent = t("Enable camera");
-  cameraButton.onclick = enableCamera;
+  if (cameraButton) {
+    cameraButton.textContent = t("Enable camera");
+    cameraButton.onclick = enableCamera;
+  }
 
   setMessage(setupMessage, "Camera turned off.");
 }
