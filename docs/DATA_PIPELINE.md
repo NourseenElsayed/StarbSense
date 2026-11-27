@@ -11,8 +11,8 @@ This document defines a safe, reproducible path from an approved research datase
 - Existing quality checks assess whether a face/eye sample is usable; they do not establish a diagnosis.
 - The current star-following task is not an Alternate Cover Test.
 - No strabismus-labelled dataset is currently integrated.
-- No custom strabismus classifier has been trained or deployed.
-- Flask currently receives numerical analysis samples; do not add raw face/eye images or video uploads without a separately reviewed privacy and security design.
+- Two exploratory HOG + SVM image classifiers (binary and five-class) have been trained from the supplied static-image archives. The app can apply them to selected eye-pair crops from a live session, but this camera-to-dataset transfer has not been validated.
+- Flask receives derived numeric session measurements and selected eye-pair crops for in-memory inference. Raw video/audio are not sent, and the image-prediction endpoint does not save submitted crops.
 
 ## Data modalities must stay separate
 
@@ -108,7 +108,7 @@ A model may be considered for a research-only application integration only after
 
 ## What this means for the current StarbSense build
 
-Do not add an AI result, diagnostic label, or “go to doctor / no need to go” decision based on the current heuristics. The current app can report technical capture quality and explain that a clinician is the appropriate person to assess concerns. A future research model must remain separate from the existing landmark pipeline until it has passed the integration gate above.
+The current app includes experimental image-model labels from live-session eye crops, but these outputs are not a diagnosis, validated screening result, or referral decision. The app may report technical capture quality and explain that a clinician is the appropriate person to assess concerns. Any stronger model claim or clinical use remains blocked until the integration and validation gates above are satisfied.
 
 
 ## Implemented local tooling (2026-11-24)
@@ -137,7 +137,7 @@ The audit report is a data-integrity report, not a clinical validation report. T
 
 **Implemented:** local data inventory, manifest schema, deterministic participant-level split generation, integrity/leakage checks, synthetic tests, Git ignore protections, package commands, and CI compilation coverage.
 
-**Not performed:** downloading restricted patient data, uploading identifiable images, training a strabismus model, selecting diagnostic thresholds, or integrating a medical decision into the app. Those steps require a verified lawful dataset, appropriate research oversight, and qualified clinical review.
+**Not performed:** independent participant-level clinical validation of the image baselines, validating their performance on ordinary webcam crops, selecting clinical thresholds, or integrating a medical decision into the app. Those steps require a verified lawful dataset, appropriate research oversight, and qualified clinical review.
 
 
 ## Approved small reference-data acquisition path
