@@ -1,17 +1,24 @@
-
 from flask import Flask, jsonify, request
 from pathlib import Path
 import base64
 import csv
 import tempfile
 
+import cv2
+import joblib
+import numpy as np
+
 from analyze_starb_sense import analyze
 
 app = Flask(__name__)
 
+ROOT_DIR = Path(__file__).resolve().parent
+MODEL_DIR = ROOT_DIR / "models"
 MAX_ROWS = 5000
-app.config['MAX_CONTENT_LENGTH'] = 8 * 1024 * 1024
+MAX_IMAGE_PIXELS = 20_000_000
+app.config["MAX_CONTENT_LENGTH"] = 8 * 1024 * 1024
 ALLOWED_ORIGIN = "http://127.0.0.1:5173"
+_IMAGE_MODELS_CACHE = None
 
 CHART_FILES = {
     "face_detection_chart": "face_detection_by_task.png",
@@ -21,6 +28,16 @@ CHART_FILES = {
     "relative_iris_task_chart": "relative_iris_by_task.png",
     "lighting_quality_chart": "lighting_quality_over_time.png",
     "task_group_chart": "technical_data_availability_by_task_group.png",
+}
+
+MODEL_FILES = {
+    "binary": "binary_grouped_hog_svm.joblib",
+    "five_class": "five_class_hog_svm.joblib",
+}
+
+MODEL_LABELS = {
+    "binary": ["strabismus", "strabismus_free"],
+    "five_class": ["esotropia", "exotropia", "hypertropia", "hypotropia", "normal"],
 }
 
 
@@ -36,7 +53,7 @@ def add_headers(response):
 
 @app.errorhandler(413)
 def request_too_large(_error):
-    return jsonify({"error": "Request is too large. Reduce the session sample count."}), 413
+    return jsonify({"error": "Request is too large. Reduce the session sample count or image size."}), 413
 
 
 @app.get("/api/health")
@@ -45,6 +62,122 @@ def health():
         "status": "ok",
         "service": "StarbSense research analysis server",
     })
+
+
+def load_image_models():
+    """Load local, user-installed model artifacts once per server process."""
+    global _IMAGE_MODELS_CACHE
+    if _IMAGE_MODELS_CACHE is not None:
+        return _IMAGE_MODELS_CACHE
+
+    missing = [
+        filename for filename in MODEL_FILES.values()
+        if not (MODEL_DIR / filename).is_file()
+    ]
+    if missing:
+        raise FileNotFoundError(
+            "Model files are not installed. Extract the supplied trained-models ZIP "
+            "into the project root so the files appear under models/."
+        )
+
+    loaded = {}
+    for task, filename in MODEL_FILES.items():
+        artifact = joblib.load(MODEL_DIR / filename)
+        if not isinstance(artifact, dict) or "model" not in artifact:
+            raise ValueError(f"Invalid model artifact: {filename}")
+        if list(map(str, artifact.get("labels", []))) != MODEL_LABELS[task]:
+            raise ValueError(f"Unexpected class labels in {filename}")
+        loaded[task] = artifact
+    _IMAGE_MODELS_CACHE = loaded
+    return loaded
+
+
+def extract_eye_pair_features(image_bytes):
+    """Apply the 96x96 grayscale HOG representation used by the baselines."""
+    encoded = np.frombuffer(image_bytes, dtype=np.uint8)
+    image = cv2.imdecode(encoded, cv2.IMREAD_COLOR)
+    if image is None:
+        raise ValueError("The uploaded file is not a readable image.")
+
+    height, width = image.shape[:2]
+    if height < 32 or width < 32:
+        raise ValueError("Image is too small. Upload a clear, tightly cropped eye-pair image.")
+    if height * width > MAX_IMAGE_PIXELS:
+        raise ValueError("Image dimensions are too large. Resize the image before uploading.")
+
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    resized = cv2.resize(gray, (96, 96), interpolation=cv2.INTER_AREA)
+    hog = cv2.HOGDescriptor((96, 96), (16, 16), (8, 8), (8, 8), 9)
+    features = hog.compute(resized)
+    if features is None or features.size != 4356:
+        raise ValueError("Could not calculate the expected image features.")
+    return features.reshape(1, -1)
+
+
+@app.get("/api/model-health")
+def model_health():
+    missing = [
+        filename for filename in MODEL_FILES.values()
+        if not (MODEL_DIR / filename).is_file()
+    ]
+    return jsonify({
+        "available": not missing,
+        "tasks": list(MODEL_FILES.keys()) if not missing else [],
+        "missing_files": missing,
+        "message": "Models ready." if not missing else "Install the trained model files in the local models/ folder.",
+    })
+
+
+@app.post("/api/model-predict")
+def predict_eye_pair_image():
+    if "image" not in request.files:
+        return jsonify({"error": "Choose an eye-pair image to upload."}), 400
+
+    image_file = request.files["image"]
+    if not image_file.filename:
+        return jsonify({"error": "Choose an image file first."}), 400
+    if not (image_file.mimetype or "").startswith("image/"):
+        return jsonify({"error": "The selected file must be an image."}), 400
+
+    task = request.form.get("task", "binary")
+    if task not in MODEL_FILES:
+        return jsonify({"error": "Choose a supported research model."}), 400
+
+    image_bytes = image_file.read()
+    if not image_bytes:
+        return jsonify({"error": "The selected image is empty."}), 400
+
+    try:
+        models = load_image_models()
+        features = extract_eye_pair_features(image_bytes)
+        model = models[task]["model"]
+        predicted_label = str(model.predict(features)[0])
+        raw_scores = np.asarray(model.decision_function(features)).reshape(-1).tolist()
+        labels = list(map(str, model.classes_))
+        score_by_label = {
+            label: round(float(score), 5)
+            for label, score in zip(labels, raw_scores)
+        }
+
+        return jsonify({
+            "task": task,
+            "predicted_label": predicted_label,
+            "decision_scores": score_by_label,
+            "score_type": "SVM decision score (not a probability or confidence)",
+            "model_input": "one pre-cropped eye-pair image, resized to 96x96 grayscale HOG features",
+            "image_stored": False,
+            "interpretation": (
+                "Exploratory model output for this uploaded image only. "
+                "It is not a diagnosis, a screening result, or a substitute for an eye-care examination."
+            ),
+        })
+    except FileNotFoundError as error:
+        return jsonify({"error": str(error)}), 503
+    except (ValueError, KeyError) as error:
+        return jsonify({"error": str(error)}), 400
+    except Exception:
+        app.logger.exception("StarbSense image-model inference failed")
+        return jsonify({"error": "Image-model inference failed. Check the Python server terminal."}), 500
 
 
 @app.post("/api/analyze")
@@ -119,8 +252,4 @@ def analyze_session():
 
 
 if __name__ == "__main__":
-    app.run(
-        host="127.0.0.1",
-        port=5000,
-        debug=False,
-    )
+    app.run(host="127.0.0.1", port=5000, debug=False)
