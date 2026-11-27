@@ -1533,8 +1533,8 @@ function answerAssistantQuestion(rawQuestion) {
         : `For the last image analyzed, the model selected "${label}". That is a dataset label predicted by the image model, not a confirmed diagnosis for a person. The camera session itself cannot confirm or rule out strabismus.`;
     }
     return ar
-      ? "لسه مفيش تصنيف صورة متاح. تقرير جلسة الكاميرا يقيس جودة التسجيل وتوفر نقاط العين فقط، ومش بيصنّف الشخص إلى عنده حَوَل أو لا. لو استخدمت تجربة الصورة، هتظهر تسمية النموذج بوضوح."
-      : "There is no image-model label yet. The camera-session report measures recording quality and landmark availability; it does not classify a person as having or not having strabismus. Run the separate image experiment to see its predicted dataset label.";
+      ? "لسه مفيش تصنيف تلقائي متاح. كمّلي جلسة الكاميرا مع ظهور العينين بوضوح وتأكدي إن خادم Python شغال. التسمية التجريبية مش تشخيص طبي."
+      : "There is no automatic image-model label yet. Complete a camera session with a usable eye-pair crop and a running local Python server. The experimental label is not a diagnosis.";
   }
 
   if (asksImage) {
@@ -1548,8 +1548,8 @@ function answerAssistantQuestion(rawQuestion) {
         : `Latest image result: "${label}" from the ${task} experiment. SVM decision values: ${scoreText || "not available"}. These values are not confidence percentages or probabilities.`;
     }
     return ar
-      ? "مفيش صورة اتحللت لسه. افتح قسم «تجربة الصور»، اختار التصنيف الثنائي أو الخماسي، وارفع صورة واضحة ومقصوصة للعينين معًا."
-      : "No image has been analyzed yet. Open the Image-model experiments section, choose binary or five-class classification, and upload a clear, tightly cropped image of both eyes.";
+      ? "لسه مفيش صورة من الاختبار اتحللت تلقائيًا. كمّل جلسة الكاميرا مع ظهور العينين بوضوح، وتأكد إن خادم Python شغال."
+      : "No automatic image label is available yet. Complete a camera session with a usable eye-pair crop and keep the local Python server running. This experimental label is not a diagnosis.";
   }
 
   if (asksSession) {
@@ -1576,8 +1576,8 @@ function answerAssistantQuestion(rawQuestion) {
 
   if (hasAny("how does it work", "how it works", "algorithm", "hog", "svm", "بيشتغل ازاي", "بيشتغل إزاي", "الخوارزمية", "الموديل")) {
     return ar
-      ? "المشروع فيه مسارين منفصلين: جلسة الكاميرا تستخدم MediaPipe لاستخراج نقاط الوجه والقزحية وتراجع جودة الإطارات؛ وتجربة الصور تستخدم خصائص HOG مع مصنف SVM على صورة عينين مقصوصة. نموذج الصور لا يحلل فيديو الجلسة أو ملف CSV."
-      : "The project has two separate paths: the camera session uses MediaPipe to extract face and iris landmarks and checks frame quality; the image experiment uses HOG features and an SVM classifier on a cropped eye-pair image. The image model does not analyze session video or CSV data.";
+      ? "جلسة الكاميرا تستخدم MediaPipe لاستخراج نقاط الوجه والقزحية ومراجعة جودة الإطارات. وأثناء الجلسة يقص StarbSense تلقائيًا لقطة للعينين ويرسلها إلى نماذج HOG/SVM المحلية للحصول على تسمية بحثية تجريبية. ولا تمثل أي من النتيجتين تشخيصًا طبيًا."
+      : "The camera session uses MediaPipe to extract face and iris landmarks and checks frame quality. During the session, StarbSense also crops an eye-pair frame automatically and sends it to the local HOG/SVM image models for an experimental dataset label. Neither output is a clinical diagnosis.";
   }
 
   if (hasAny("camera", "lighting", "face", "eyes visible", "كاميرا", "الإضاءة", "النور", "الوجه", "العينين")) {
