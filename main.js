@@ -1221,6 +1221,14 @@ function runSequence() {
 }
 
 function startAdventure() {
+  // Clear the previous session's prediction so every new session gets a fresh result.
+  latestModelPrediction = null;
+  const previousModelResult = $("automatic-model-result");
+  if (previousModelResult) {
+    previousModelResult.replaceChildren();
+    previousModelResult.hidden = true;
+  }
+
   if (!cameraReady || !landmarker || gameRunning || !latestCameraQuality.ready) return;
 
   stopQualityMonitor();
@@ -2254,22 +2262,22 @@ function renderAutomaticModelResults(results = [], stageIndex = null, errorMessa
   panel.replaceChildren();
 
   const heading = document.createElement("strong");
-  heading.textContent = currentLanguage === "ar"
-    ? "نتيجة تحليل العينين"
-    : "Eye analysis result";
+  heading.className = "automatic-result-heading";
+  heading.textContent = currentLanguage === "ar" ? "نتيجة تحليل العينين" : "Eye analysis result";
   panel.appendChild(heading);
 
   const intro = document.createElement("p");
   intro.textContent = currentLanguage === "ar"
-    ? "حلّل StarbSense لقطة تلقائية من كاميرا الاختبار باستخدام نموذجَي التصنيف."
-    : "StarbSense analyzed an eye-pair frame captured automatically during the test using two classification models.";
+    ? "النتيجة التالية محسوبة تلقائيًا من لقطة كاميرا هذه الجلسة."
+    : "The following result was generated automatically from this session's camera frame.";
   panel.appendChild(intro);
 
   if (errorMessage) {
     const error = document.createElement("p");
+    error.className = "automatic-result-error";
     error.textContent = currentLanguage === "ar"
-      ? `تعذّر إكمال التحليل: ${errorMessage}. تحقّق من تشغيل خادم Python وتثبيت ملفات النماذج.`
-      : `The analysis could not be completed: ${errorMessage}. Check the Python server and model files.`;
+      ? `تعذّر إكمال التحليل: ${errorMessage}. تحقّق من تشغيل خادم Python ووجود ملفات النماذج.`
+      : `Analysis could not be completed: ${errorMessage}. Check the Python server and model files.`;
     panel.appendChild(error);
   }
 
@@ -2277,21 +2285,44 @@ function renderAutomaticModelResults(results = [], stageIndex = null, errorMessa
   const fiveClass = results.find(result => result.task === "five_class");
 
   if (binary) {
-    const resultLine = document.createElement("p");
     const predictsStrabismus = binary.predicted_label === "strabismus";
-    resultLine.textContent = currentLanguage === "ar"
-      ? `تقدير النموذج لوجود الحَوَل: ${predictsStrabismus ? "يرجّح وجود مؤشرات مرتبطة بالحَوَل" : "لا يرجّح وجود مؤشرات مرتبطة بالحَوَل في اللقطة"}.`
-      : `Model estimate for strabismus: ${predictsStrabismus ? "features associated with strabismus are predicted" : "features associated with strabismus are not predicted in this frame"}.`;
-    panel.appendChild(resultLine);
+    const resultCard = document.createElement("section");
+    resultCard.className = `automatic-diagnosis-card ${predictsStrabismus ? "is-positive" : "is-negative"}`;
+
+    const resultLabel = document.createElement("span");
+    resultLabel.className = "automatic-diagnosis-kicker";
+    resultLabel.textContent = currentLanguage === "ar" ? "هل يرجّح النموذج وجود حول؟" : "Does the model predict strabismus?";
+    resultCard.appendChild(resultLabel);
+
+    const resultValue = document.createElement("strong");
+    resultValue.className = "automatic-diagnosis-value";
+    resultValue.textContent = currentLanguage === "ar"
+      ? (predictsStrabismus ? "يرجّح وجود مؤشرات مرتبطة بالحَوَل" : "لا يرجّح وجود مؤشرات مرتبطة بالحَوَل")
+      : (predictsStrabismus ? "Features associated with strabismus predicted" : "No strabismus-associated features predicted");
+    resultCard.appendChild(resultValue);
+
+    const resultHint = document.createElement("small");
+    resultHint.textContent = currentLanguage === "ar"
+      ? (predictsStrabismus ? "تصنيف النموذج لهذه الجلسة: حَوَل" : "تصنيف النموذج لهذه الجلسة: دون حَوَل")
+      : (predictsStrabismus ? "This session's model class: strabismus" : "This session's model class: strabismus-free");
+    resultCard.appendChild(resultHint);
+    panel.appendChild(resultCard);
   }
 
   if (fiveClass) {
-    const typeLine = document.createElement("p");
+    const typeCard = document.createElement("section");
+    typeCard.className = "automatic-type-card";
+    const typeHeading = document.createElement("strong");
+    typeHeading.textContent = currentLanguage === "ar" ? "النوع الذي رجّحه تصنيف النموذج" : "Type predicted by the model";
+    typeCard.appendChild(typeHeading);
+    const typeValue = document.createElement("p");
+    typeValue.className = "automatic-type-value";
     const isNormal = fiveClass.predicted_label === "normal";
-    typeLine.textContent = currentLanguage === "ar"
-      ? `النوع الذي رجّحه تصنيف النموذج: ${isNormal ? "لم يُرجّح نوعًا محددًا (الفئة الطبيعية)" : displayModelLabel(fiveClass.predicted_label)}.`
-      : `Type predicted by the classification model: ${isNormal ? "no specific type predicted (normal class)" : fiveClass.predicted_label}.`;
-    panel.appendChild(typeLine);
+    typeValue.textContent = currentLanguage === "ar"
+      ? (isNormal ? "لم يُرجّح نوعًا محددًا (الفئة الطبيعية)" : displayModelLabel(fiveClass.predicted_label))
+      : (isNormal ? "No specific type predicted (normal class)" : fiveClass.predicted_label);
+    typeCard.appendChild(typeValue);
+    panel.appendChild(typeCard);
   }
 
   if (binary && fiveClass) {
@@ -2299,27 +2330,31 @@ function renderAutomaticModelResults(results = [], stageIndex = null, errorMessa
     const classPositive = fiveClass.predicted_label !== "normal";
     if (binaryPositive !== classPositive) {
       const mismatch = document.createElement("p");
+      mismatch.className = "automatic-result-mismatch";
       mismatch.textContent = currentLanguage === "ar"
-        ? "ملاحظة: النموذجان أعطيا تصنيفين غير متطابقين؛ لذلك لا ينبغي اعتبار النتيجة حاسمة."
-        : "Note: the two models returned different classifications, so the output should not be treated as conclusive.";
+        ? "النموذجان اختلفا في التصنيف لهذه الجلسة؛ لذلك تُعرض النتيجة كتقدير بحثي غير حاسم."
+        : "The models disagreed in this session, so this is shown as an inconclusive research estimate.";
       panel.appendChild(mismatch);
     }
   }
 
   const supervision = document.createElement("small");
+  supervision.className = "automatic-result-supervision";
   supervision.textContent = currentLanguage === "ar"
     ? "المشروع تحت إشراف طبيب عيون مختص."
     : "The project is supervised by an ophthalmologist.";
   panel.appendChild(supervision);
 
   const note = document.createElement("small");
+  note.className = "automatic-result-note";
   note.textContent = currentLanguage === "ar"
-    ? "هذه تنبؤات آلية بحثية من لقطة واحدة، وليست تشخيصًا طبيًا مؤكدًا. يفسّر الطبيب المختص النتيجة في سياق الفحص السريري."
-    : "These are research-model predictions from a single frame, not a confirmed medical diagnosis. The ophthalmologist interprets them in the context of a clinical examination.";
+    ? "هذه نتيجة نموذج بحثي تتغير مع كل جلسة، وليست تشخيصًا طبيًا مؤكدًا. يراجع الطبيب المختص النتيجة ضمن الفحص السريري."
+    : "This research-model result is recalculated for every session and is not a confirmed medical diagnosis. The ophthalmologist reviews it as part of a clinical examination.";
   panel.appendChild(note);
 
   if (stageIndex !== null) {
     const source = document.createElement("small");
+    source.className = "automatic-result-source";
     source.textContent = currentLanguage === "ar"
       ? `مصدر التحليل: لقطة تلقائية من المرحلة ${stageIndex + 1} من ${sequence.length}.`
       : `Analysis source: automatically captured frame from stage ${stageIndex + 1} of ${sequence.length}.`;
