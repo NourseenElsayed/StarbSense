@@ -154,44 +154,33 @@
         </p>
       </section>
 
-      <section class="stats-strip" aria-label="Live session counters">
-        <article class="mini-stat">
-          <span>Tasks completed</span>
-          <strong id="tasks-completed">0</strong>
-        </article>
-        <article class="mini-stat">
-          <span>Frames processed</span>
-          <strong id="frames-count">0</strong>
-        </article>
-        <article class="mini-stat">
-          <span>Frames with a face</span>
-          <strong id="face-count">0</strong>
-        </article>
-      </section>
-
       <section class="report-section" aria-labelledby="report-title">
         <div class="section-heading">
           <div>
             <p class="eyebrow">YOUR SESSION</p>
-            <h2 id="report-title">Step 3 · Your session results</h2>
+            <h2 id="report-title">Step 3 · Your result</h2>
           </div>
         </div>
 
-        <p id="report-message" class="message" role="status" aria-live="polite">
-          After the session, your summary and charts will appear here.
-        </p>
+        <p id="report-message" class="message" role="status" aria-live="polite">Complete the 17 steps to see your result.</p>
+        <article id="final-result-card" class="final-result-card" hidden aria-live="polite">
+          <span class="final-result-kicker">YOUR RESULT</span>
+          <h3 id="final-result-title">Your session result will appear here</h3>
+          <p id="final-result-detail"></p>
+          <p id="final-result-meaning" class="final-result-meaning"></p>
+        </article>
 
         <button id="export-btn" class="button button-secondary" type="button" disabled>
           Export CSV
         </button>
       </section>
 
-      <section
+      <details
         id="analytics-dashboard"
-        class="analytics-dashboard"
-        aria-labelledby="analytics-title"
+        class="analytics-dashboard advanced-details technical-appendix"
         hidden
       >
+        <summary>Technical details for researchers</summary>
       
 <div id="python-charts" class="python-charts"></div>
 
@@ -260,10 +249,11 @@
             Your session report summarizes recording quality and how much of the test was captured.
           </p>
         </article>
-      </section>
+      </details>
 
       
-      <section class="model-research-panel" aria-labelledby="model-research-title">
+      <details class="model-research-panel advanced-details">
+        <summary>Optional research tools and image-model experiments</summary> aria-labelledby="model-research-title">
         <div class="section-heading">
           <div>
             <p class="eyebrow">OFFLINE IMAGE-MODEL EXPERIMENTS</p>
@@ -335,40 +325,12 @@
         </div>
 
         <p class="model-report-link"><a href="/research/model-baseline-results.json" target="_blank" rel="noopener">View machine-readable results (JSON)</a></p>
-      </section>
-
-      <section class="guidance-panel" aria-labelledby="guidance-title">
-        <p class="eyebrow">UNDERSTANDING YOUR SESSION</p>
-        <h2 id="guidance-title">How to read your result</h2>
-        <p>There are two different outputs: the camera-session report describes recording quality, while the optional image experiment predicts a dataset label for one uploaded image.</p>
-        <div class="guidance-grid">
-          <article>
-            <strong>Camera-session result</strong>
-            <span>
-              This shows whether enough usable frames and eye landmarks were recorded. It is not a strabismus classification.
-            </span>
-          </article>
-          <article>
-            <strong>Image-model result</strong>
-            <span>
-              This shows the model’s predicted label for the uploaded image: “strabismus” or “strabismus-free”, or one of the five image classes.
-            </span>
-          </article>
-        </div>
-        <p class="guidance-footnote">
-          These are research outputs, not a medical diagnosis.
-        </p>
-      </section>
-
+      </details>
 
       <section class="assistant-panel" aria-labelledby="assistant-title">
         <p class="eyebrow">STARBSENSE GUIDE · LOCAL ASSISTANT</p>
         <h2 id="assistant-title">Step 4 · Ask StarbSense</h2>
         <p class="assistant-intro">Ask about your session, charts, image-model labels, camera quality, or how StarbSense works. The assistant uses the project data available in this browser.</p>
-        <div id="care-guidance" class="care-guidance" role="status" aria-live="polite">
-          <strong>Medical next steps</strong>
-          <p>StarbSense measurements alone cannot decide whether an eye examination is needed. If you have a concern about vision or eye alignment, arrange an eye-care assessment.</p>
-        </div>
         <div id="assistant-messages" class="assistant-messages" aria-live="polite">
           <p class="assistant-message assistant-message-system">Ask about your session summary, camera quality, charts, model labels, or the test steps.</p>
         </div>
