@@ -1266,14 +1266,23 @@ function stopAdventure() {
 
 function showPythonChart(id, src, alt) {
   const descriptions = {
-    "Face detection by task": currentLanguage === "ar" ? "يوضح عدد الإطارات التي ظهر فيها الوجه أو لم يظهر في كل خطوة. يساعد على معرفة الخطوات التي كانت فيها بيانات الوجه أقل." : "Shows how many frames contained a detected face in each task. It helps identify steps with fewer usable face frames.",
-    "Raw iris coordinates over time": currentLanguage === "ar" ? "يعرض تغيّر إحداثيات القزحية التي التقطتها MediaPipe أثناء الجلسة. هذه إحداثيات داخل الصورة وليست قياسًا مُعايرًا لاتجاه النظر." : "Plots iris landmark coordinates detected by MediaPipe during the session. These are image coordinates, not calibrated gaze measurements.",
-    "Relative iris position": currentLanguage === "ar" ? "يعرض موضع القزحية نسبةً إلى نقاط العين المسجلة. يتأثر بجودة الصورة ووضع الرأس، ولا يثبت وجود مشكلة في محاذاة العين." : "Shows iris position relative to recorded eye landmarks. It can be affected by image quality and head pose and does not establish an alignment problem.",
-    "Experimental head-rotation proxies": currentLanguage === "ar" ? "يعرض تقديرات تجريبية لوضع الرأس المستخرجة من معالم الوجه. هي مؤشرات تقريبية وليست قياسات طبية لحركة الرأس." : "Shows experimental estimates of head pose derived from face landmarks. They are approximate proxies, not clinical head-movement measurements.",
-    "Relative iris comparison by task": currentLanguage === "ar" ? "يقارن متوسطات أو توزيعات موضع القزحية بين مجموعات خطوات الاختبار لتسهيل مراجعة البيانات." : "Compares relative iris-position values across task groups to make the recorded data easier to review.",
-    "Frame lighting quality over time": currentLanguage === "ar" ? "يتابع مستوى الإضاءة الذي رُصد في الإطارات. التغيّر الكبير قد يؤثر في وضوح معالم الوجه والعين." : "Tracks the lighting level detected in frames. Large changes may affect how clearly face and eye landmarks are detected.",
-    "Technical data availability by task group": currentLanguage === "ar" ? "يلخص مدى توفر القياسات التقنية في كل مجموعة من خطوات الاختبار، ويساعد في تحديد الأجزاء التي تحتوي على بيانات ناقصة." : "Summarizes how much technical measurement data is available in each task group and helps locate sections with missing data."
-  };
+  "Face detection by task": "يوضح عدد الإطارات التي ظهر فيها الوجه أو لم يظهر في كل خطوة. يساعد على معرفة الخطوات التي كانت فيها بيانات الوجه أقل.",
+  "Raw iris coordinates over time": "يعرض تغيّر إحداثيات القزحية التي التقطتها MediaPipe أثناء الجلسة. هذه إحداثيات داخل الصورة وليست قياسًا مُعايرًا لاتجاه النظر.",
+  "Relative iris position": "يعرض موضع القزحية نسبةً إلى نقاط العين المسجلة. يتأثر بجودة الصورة ووضع الرأس، ولا يثبت وجود مشكلة في محاذاة العين.",
+  "Experimental head-rotation proxies": "يعرض تقديرات تجريبية لوضع الرأس المستخرجة من معالم الوجه. هي مؤشرات تقريبية وليست قياسات طبية لحركة الرأس.",
+  "Relative iris comparison by task": "يقارن موضع القزحية النسبي بين مجموعات خطوات الاختبار لتسهيل مراجعة البيانات.",
+  "Frame lighting quality over time": "يتابع مستوى الإضاءة المرصود في الإطارات. التغيّر الكبير قد يؤثر في وضوح معالم الوجه والعين.",
+  "Technical data availability by task group": "يلخص مدى توفر القياسات التقنية في كل مجموعة من خطوات الاختبار، ويساعد في تحديد الأجزاء التي تحتوي على بيانات ناقصة."
+};
+  const englishDescriptions = {
+  "Face detection by task": "Shows how many frames contained a detected face in each task. It helps identify steps with fewer usable face frames.",
+  "Raw iris coordinates over time": "Plots iris landmark coordinates detected by MediaPipe during the session. These are image coordinates, not calibrated gaze measurements.",
+  "Relative iris position": "Shows iris position relative to recorded eye landmarks. It can be affected by image quality and head pose and does not establish an alignment problem.",
+  "Experimental head-rotation proxies": "Shows experimental estimates of head pose derived from face landmarks. They are approximate proxies, not clinical measurements.",
+  "Relative iris comparison by task": "Compares relative iris-position values across task groups to make the recorded data easier to review.",
+  "Frame lighting quality over time": "Tracks the lighting level detected in frames. Large changes may affect how clearly face and eye landmarks are detected.",
+  "Technical data availability by task group": "Summarizes how much technical measurement data is available in each task group and helps locate sections with missing data."
+};
   const container = document.getElementById("python-charts");
   if (!container || !src) return;
 
@@ -1288,8 +1297,8 @@ function showPythonChart(id, src, alt) {
     heading.textContent = t(alt);
     const explanation = document.createElement("p");
     explanation.className = "chart-explanation";
-    explanation.dataset.translationKey = `chart-description:${alt}`;
-    explanation.textContent = descriptions[alt] || "";
+    explanation.dataset.translationKey = englishDescriptions[alt] || alt;
+    explanation.textContent = currentLanguage === "ar" ? (descriptions[alt] || "") : (englishDescriptions[alt] || "");
 
     image = document.createElement("img");
     image.id = id;
@@ -2228,6 +2237,14 @@ Object.assign(translations, {
   "chart-description:Relative iris comparison by task": "يقارن موضع القزحية النسبي بين مجموعات خطوات الاختبار لتسهيل مراجعة البيانات.",
   "chart-description:Frame lighting quality over time": "يتابع مستوى الإضاءة المرصود في الإطارات. التغيّر الكبير قد يؤثر في وضوح معالم الوجه والعين.",
   "chart-description:Technical data availability by task group": "يلخص مدى توفر القياسات التقنية في كل مجموعة من خطوات الاختبار، ويساعد في تحديد الأجزاء التي تحتوي على بيانات ناقصة.",
+
+  "Shows how many frames contained a detected face in each task. It helps identify steps with fewer usable face frames.": "يوضح عدد الإطارات التي ظهر فيها الوجه أو لم يظهر في كل خطوة. يساعد على معرفة الخطوات التي كانت فيها بيانات الوجه أقل.",
+  "Plots iris landmark coordinates detected by MediaPipe during the session. These are image coordinates, not calibrated gaze measurements.": "يعرض تغيّر إحداثيات القزحية التي التقطتها MediaPipe أثناء الجلسة. هذه إحداثيات داخل الصورة وليست قياسًا مُعايرًا لاتجاه النظر.",
+  "Shows iris position relative to recorded eye landmarks. It can be affected by image quality and head pose and does not establish an alignment problem.": "يعرض موضع القزحية نسبةً إلى نقاط العين المسجلة. يتأثر بجودة الصورة ووضع الرأس، ولا يثبت وجود مشكلة في محاذاة العين.",
+  "Shows experimental estimates of head pose derived from face landmarks. They are approximate proxies, not clinical measurements.": "يعرض تقديرات تجريبية لوضع الرأس المستخرجة من معالم الوجه. هي مؤشرات تقريبية وليست قياسات طبية لحركة الرأس.",
+  "Compares relative iris-position values across task groups to make the recorded data easier to review.": "يقارن موضع القزحية النسبي بين مجموعات خطوات الاختبار لتسهيل مراجعة البيانات.",
+  "Tracks the lighting level detected in frames. Large changes may affect how clearly face and eye landmarks are detected.": "يتابع مستوى الإضاءة المرصود في الإطارات. التغيّر الكبير قد يؤثر في وضوح معالم الوجه والعين.",
+  "Summarizes how much technical measurement data is available in each task group and helps locate sections with missing data.": "يلخص مدى توفر القياسات التقنية في كل مجموعة من خطوات الاختبار، ويساعد في تحديد الأجزاء التي تحتوي على بيانات ناقصة.",
 });
 Object.assign(reverseTranslations, Object.fromEntries(
   Object.entries(translations).map(([english, arabic]) => [arabic, english])
