@@ -261,52 +261,6 @@
       </section>
 
       
-      <details class="model-research-panel advanced-details">
-        <summary>Optional research tools and image-model experiments</summary>
-        <div class="section-heading">
-          <div>
-            <p class="eyebrow">OFFLINE IMAGE-MODEL EXPERIMENTS</p>
-            <h2 id="model-research-title">Image-model experiments</h2>
-            <p class="section-description">Results from two separate image-classification experiments using the uploaded research datasets. These are not results from your live camera session.</p>
-          </div>
-          <span class="status-pill">Offline evaluation</span>
-        </div>
-        <details class="advanced-details"><summary>Model accuracy and research details</summary>
-        <div class="model-results-grid">
-          <article class="model-result-card">
-            <p class="model-task-label">BINARY CLASSIFICATION</p>
-            <h3>Strabismus / strabismus-free</h3>
-            <div class="model-primary-metric"><strong>83.3%</strong><span>Held-out test accuracy</span></div>
-            <dl class="model-metrics">
-              <div><dt>Macro-F1</dt><dd>0.832</dd></div>
-              <div><dt>Balanced accuracy</dt><dd>83.2%</dd></div>
-              <div><dt>Test images</dt><dd>305</dd></div>
-              <div><dt>Dataset images</dt><dd>1,525</dd></div>
-            </dl>
-            <p>HOG features (grayscale 96×96) with an RBF support-vector machine. Source-image variants were grouped for splitting using the available class and numeric image ID.</p>
-          </article>
-          <article class="model-result-card">
-            <p class="model-task-label">FIVE-CLASS CLASSIFICATION</p>
-            <h3>Five supplied image labels</h3>
-            <div class="model-primary-metric"><strong>65.7%</strong><span>Held-out test accuracy</span></div>
-            <dl class="model-metrics">
-              <div><dt>Macro-F1</dt><dd>0.655</dd></div>
-              <div><dt>Balanced accuracy</dt><dd>65.8%</dd></div>
-              <div><dt>Test images</dt><dd>102</dd></div>
-              <div><dt>Dataset images</dt><dd>509</dd></div>
-            </dl>
-            <p>HOG features (grayscale 96×96) with an RBF support-vector machine. The available dataset had no participant/source IDs, so participant-level separation could not be verified.</p>
-          </article>
-        </div>
-        <div class="model-connection-note">
-          <strong>How these models relate to StarbSense</strong>
-          <p>The offline dataset metrics above describe model development only. After a live session, StarbSense automatically sends up to five evenly distributed eye-pair crops from that session to both local image models and summarizes their per-frame votes. The live outputs are experimental image labels only and are not clinically validated.</p>
-          <p>Accuracy on these datasets does not establish performance on real-world webcam recordings. These experimental models must not be used to diagnose or rule out an eye condition or decide whether someone needs medical care.</p>
-        </div>
-        </details>
-
-        <p class="model-report-link"><a href="/research/model-baseline-results.json" target="_blank" rel="noopener">View machine-readable results (JSON)</a></p>
-      </details>
       </section>
 
       <section class="app-page" id="page-assistant" data-page="assistant" hidden>
