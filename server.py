@@ -19,6 +19,7 @@ MAX_IMAGE_PIXELS = 20_000_000
 app.config["MAX_CONTENT_LENGTH"] = 8 * 1024 * 1024
 ALLOWED_ORIGIN = "http://127.0.0.1:5173"
 _IMAGE_MODELS_CACHE = None
+_MENDELEY_NASNET = None
 
 CHART_FILES = {
     "face_detection_chart": "face_detection_by_task.png",
@@ -187,6 +188,117 @@ def predict_eye_pair_image():
     except Exception:
         app.logger.exception("StarbSense image-model inference failed")
         return jsonify({"error": "Image-model inference failed. Check the Python server terminal."}), 500
+
+
+def load_mendeley_nasnet():
+    """Load the Mendeley NASNet TFLite artifact once; outputs remain unlabeled."""
+    global _MENDELEY_NASNET
+    if _MENDELEY_NASNET is not None:
+        return _MENDELEY_NASNET
+
+    model_path = ROOT_DIR / "models" / "mendeley" / "NASNETLARGE.tflite"
+    if not model_path.is_file():
+        raise FileNotFoundError("Mendeley NASNet model file is missing.")
+
+    from ai_edge_litert.interpreter import Interpreter
+
+    interpreter = Interpreter(model_path=str(model_path), num_threads=2)
+    interpreter.allocate_tensors()
+    inputs = interpreter.get_input_details()
+    outputs = interpreter.get_output_details()
+
+    if not inputs or not outputs:
+        raise ValueError("NASNet model has no input or output tensors.")
+
+    input_shape = tuple(int(x) for x in inputs[0]["shape"])
+    if input_shape != (1, 331, 331, 3):
+        raise ValueError(f"Unexpected NASNet input shape: {input_shape}")
+
+    _MENDELEY_NASNET = {
+        "interpreter": interpreter,
+        "input": inputs[0],
+        "output": outputs[0],
+    }
+    return _MENDELEY_NASNET
+
+
+def predict_mendeley_nasnet(image_bytes):
+    """Run the original NASNet RGB/331 preprocessing; do not infer class names."""
+    image = cv2.imdecode(
+        np.frombuffer(image_bytes, dtype=np.uint8),
+        cv2.IMREAD_COLOR
+    )
+    if image is None:
+        raise ValueError("The captured image could not be decoded.")
+
+    height, width = image.shape[:2]
+    if height < 32 or width < 32 or height * width > MAX_IMAGE_PIXELS:
+        raise ValueError("Captured image dimensions are outside the accepted range.")
+
+    image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    resized = cv2.resize(image_rgb, (331, 331), interpolation=cv2.INTER_LINEAR)
+    tensor = resized.astype(np.float32) / 127.5 - 1.0
+    tensor = np.expand_dims(tensor, axis=0)
+
+    model = load_mendeley_nasnet()
+    interpreter = model["interpreter"]
+    interpreter.set_tensor(model["input"]["index"], tensor)
+    interpreter.invoke()
+
+    output = np.asarray(
+        interpreter.get_tensor(model["output"]["index"]),
+        dtype=np.float64
+    ).reshape(-1)
+
+    if output.size != 2 or not np.all(np.isfinite(output)):
+        raise ValueError("NASNet returned an unexpected output vector.")
+
+    return [round(float(value), 7) for value in output]
+
+
+@app.get("/api/mendeley-nasnet-health")
+def mendeley_nasnet_health():
+    model_path = ROOT_DIR / "models" / "mendeley" / "NASNETLARGE.tflite"
+    return jsonify({
+        "available": model_path.is_file(),
+        "model": "Mendeley NASNetLARGE TFLite",
+        "input": "331x331 RGB float32, scaled to [-1, 1]",
+        "output_count": 2,
+        "class_order": "unverified; raw outputs only",
+        "clinical_validation": "not established"
+    })
+
+
+@app.post("/api/mendeley-nasnet-predict")
+def mendeley_nasnet_predict():
+    if "image" not in request.files:
+        return jsonify({"error": "No captured eye image was supplied."}), 400
+
+    image_file = request.files["image"]
+    if not image_file.filename or not (image_file.mimetype or "").startswith("image/"):
+        return jsonify({"error": "A valid captured image is required."}), 400
+
+    image_bytes = image_file.read()
+    if not image_bytes:
+        return jsonify({"error": "The captured image is empty."}), 400
+
+    try:
+        values = predict_mendeley_nasnet(image_bytes)
+        return jsonify({
+            "task": "mendeley_nasnet",
+            "output_vector": values,
+            "output_meaning": "Unlabeled model outputs; class order and calibration are unverified.",
+            "model_input": "automatic camera eye-region crop, RGB 331x331, NASNet preprocessing",
+            "image_stored": False,
+            "interpretation": "Experimental research output only; not a diagnosis or validated screening result."
+        })
+    except FileNotFoundError as error:
+        return jsonify({"error": str(error)}), 503
+    except (ValueError, KeyError) as error:
+        return jsonify({"error": str(error)}), 400
+    except Exception:
+        app.logger.exception("Mendeley NASNet inference failed")
+        return jsonify({"error": "NASNet inference failed. Check the Python server terminal."}), 500
 
 
 @app.post("/api/analyze")

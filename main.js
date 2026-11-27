@@ -2264,6 +2264,40 @@ async function requestAutomaticModelPrediction(blob, task) {
   return result;
 }
 
+
+async function requestMendeleyNasnetPrediction(blob) {
+  const payload = new FormData();
+  payload.append("image", blob, "starbsense-nasnet-eye-crop.jpg");
+  const response = await fetch("/api/mendeley-nasnet-predict", {
+    method: "POST",
+    body: payload
+  });
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.error || "Mendeley NASNet analysis failed.");
+  return result;
+}
+
+function aggregateMendeleyNasnetOutputs(frameResults, capturedFrameCount) {
+  const vectors = frameResults
+    .map(frame => frame.nasnet?.output_vector)
+    .filter(vector => Array.isArray(vector) && vector.length === 2 &&
+      vector.every(value => Number.isFinite(value)));
+
+  if (!vectors.length) return null;
+
+  const mean = [0, 1].map(index =>
+    vectors.reduce((sum, vector) => sum + vector[index], 0) / vectors.length
+  );
+
+  return {
+    task: "mendeley_nasnet",
+    mean_outputs: mean.map(value => Number(value.toFixed(7))),
+    original_label: mean[0] > 0.5 ? "strabismus" : "normal",
+    evaluated_frames: vectors.length,
+    captured_frames: capturedFrameCount
+  };
+}
+
 function aggregateSessionPredictions(frameResults, task, capturedFrameCount) {
   const predictions = frameResults.map(frame => frame[task])
     .filter(result => result && typeof result.predicted_label === "string");
@@ -2360,6 +2394,53 @@ function renderAutomaticModelResults(results = [], stageIndex = null, errorMessa
     panel.appendChild(typeCard);
   }
 
+
+  const nasnet = results.find(result => result.task === "mendeley_nasnet");
+  if (nasnet) {
+    const nasnetCard = document.createElement("section");
+    nasnetCard.className = "automatic-type-card";
+
+    const nasnetHeading = document.createElement("strong");
+    nasnetHeading.textContent = currentLanguage === "ar"
+      ? "Mendeley NASNet - \u0646\u062a\u064a\u062c\u0629 \u062a\u062c\u0631\u064a\u0628\u064a\u0629"
+      : "Mendeley NASNet - Experimental result";
+    nasnetCard.appendChild(nasnetHeading);
+
+    const values = nasnet.mean_outputs || [];
+    const firstOutput = Number(values[0]);
+    const hasInterpretation = Number.isFinite(firstOutput);
+    const predictsStrabismus = nasnet.original_label === "strabismus";
+
+    const nasnetValue = document.createElement("p");
+    nasnetValue.className = "automatic-type-value";
+    nasnetValue.textContent =
+      "Output 0: " + (values[0] ?? "N/A") +
+      " | Output 1: " + (values[1] ?? "N/A");
+    nasnetCard.appendChild(nasnetValue);
+
+    const interpretation = document.createElement("strong");
+    interpretation.className = "automatic-diagnosis-value";
+    interpretation.textContent = !hasInterpretation
+      ? (currentLanguage === "ar"
+          ? "\u0644\u0627 \u062a\u062a\u0648\u0641\u0631 \u0642\u064a\u0645\u0629 \u0643\u0627\u0641\u064a\u0629 \u0644\u0644\u062a\u0641\u0633\u064a\u0631"
+          : "No valid output available for interpretation")
+      : currentLanguage === "ar"
+        ? (predictsStrabismus
+            ? "\u062a\u0641\u0633\u064a\u0631 \u0627\u0644\u0646\u0645\u0648\u0630\u062c \u0627\u0644\u0623\u0635\u0644\u064a: \u0645\u0624\u0634\u0631 \u0645\u0631\u062a\u0628\u0637 \u0628\u0627\u0644\u062d\u0648\u0644"
+            : "\u062a\u0641\u0633\u064a\u0631 \u0627\u0644\u0646\u0645\u0648\u0630\u062c \u0627\u0644\u0623\u0635\u0644\u064a: \u062a\u0635\u0646\u064a\u0641 \u0637\u0628\u064a\u0639\u064a")
+        : (predictsStrabismus
+            ? "Original model interpretation: Strabismus"
+            : "Original model interpretation: Normal");
+    nasnetCard.appendChild(interpretation);
+
+    const nasnetNote = document.createElement("small");
+    nasnetNote.textContent = currentLanguage === "ar"
+      ? "\u064a\u0633\u062a\u062e\u062f\u0645 \u0647\u0630\u0627 \u0627\u0644\u062a\u0641\u0633\u064a\u0631 \u0639\u062a\u0628\u0629 \u0627\u0644\u0646\u0645\u0648\u0630\u062c \u0627\u0644\u0623\u0635\u0644\u064a: Output 0 \u0623\u0643\u0628\u0631 \u0645\u0646 0.5 \u064a\u0635\u0646\u0651\u0641\u0647 \u0643\u062d\u0648\u0644\u060c \u0648\u0645\u0627 \u0639\u062f\u0627 \u0630\u0644\u0643 \u0637\u0628\u064a\u0639\u064a. \u0647\u0630\u0647 \u0646\u062a\u064a\u062c\u0629 \u0628\u062d\u062b\u064a\u0629 \u062a\u062c\u0631\u064a\u0628\u064a\u0629 \u0648\u0644\u064a\u0633\u062a \u062a\u0634\u062e\u064a\u0635\u064b\u0627 \u0637\u0628\u064a\u064b\u0627."
+      : "Uses the original application's threshold: Output 0 > 0.5 is labeled strabismus; otherwise normal. Experimental research output only, not a diagnosis.";
+    nasnetCard.appendChild(nasnetNote);
+    panel.appendChild(nasnetCard);
+  }
+
   if (binary && fiveClass && binary.predicted_label !== "inconclusive" && fiveClass.predicted_label !== "inconclusive") {
     const binaryPositive = binary.predicted_label === "strabismus";
     const classPositive = fiveClass.predicted_label !== "normal";
@@ -2429,9 +2510,15 @@ async function finalizeAutomaticEyeCrops() {
     try {
       const pair = await Promise.all([
         requestAutomaticModelPrediction(entry.blob, "binary"),
-        requestAutomaticModelPrediction(entry.blob, "five_class")
+        requestAutomaticModelPrediction(entry.blob, "five_class"),
+        requestMendeleyNasnetPrediction(entry.blob)
       ]);
-      frameResults.push({ stageIndex: entry.stageIndex, binary: pair[0], five_class: pair[1] });
+      frameResults.push({
+        stageIndex: entry.stageIndex,
+        binary: pair[0],
+        five_class: pair[1],
+        nasnet: pair[2]
+      });
     } catch (error) {
       failure = error.message || String(error);
       break;
@@ -2448,6 +2535,8 @@ async function finalizeAutomaticEyeCrops() {
     aggregateSessionPredictions(frameResults, "binary", validEntries.length),
     aggregateSessionPredictions(frameResults, "five_class", validEntries.length)
   ];
+  const nasnetResult = aggregateMendeleyNasnetOutputs(frameResults, validEntries.length);
+  if (nasnetResult) results.push(nasnetResult);
   latestModelPrediction = results[0];
   renderAutomaticModelResults(results, null, failure);
 

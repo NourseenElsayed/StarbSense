@@ -18,7 +18,11 @@ data/interim/
 data/processed/
 data/splits/
 data/reports/
+data/external/
 !data/manifests/dataset_manifest.template.csv
 
 # Model artifacts are installed locally from the supplied archive.
 models/*.joblib
+
+# Large local Mendeley inference models (install locally; do not commit)
+models/mendeley/*.tflite
