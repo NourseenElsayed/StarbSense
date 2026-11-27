@@ -1,6 +1,6 @@
 # StarbSense offline image-model baseline results
 
-These are exploratory image-classification baselines trained from the two supplied image archives. They are separate from the browser webcam/MediaPipe session pipeline.
+These are exploratory image-classification baselines trained offline from the two supplied static-image archives. The current app can apply the trained models to selected eye-pair crops captured during a live browser session, but the models were not trained on webcam data and this camera-to-dataset transfer has not been validated.
 
 ## Binary experiment
 
@@ -27,4 +27,4 @@ These are exploratory image-classification baselines trained from the two suppli
 
 ## Pipeline boundary
 
-Both models consume pre-cropped eye-pair images. They are not connected to the live webcam stream, do not consume MediaPipe landmark CSVs, and have not been validated on ordinary webcam recordings. These metrics are dataset-specific experimental results, not clinical performance estimates. Do not use the models to diagnose or rule out an eye condition or decide whether someone needs medical care.
+Both models consume pre-cropped eye-pair images. The app now automatically sends up to five selected crops from the current camera session to the local inference endpoint and summarizes per-frame votes; the models do not consume MediaPipe landmark CSVs. They have not been validated on ordinary webcam recordings or against an independent clinical reference standard. These metrics are dataset-specific experimental results, not clinical performance estimates. Do not use the models to diagnose or rule out an eye condition or decide whether someone needs medical care.
