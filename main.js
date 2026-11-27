@@ -238,12 +238,14 @@ function updateReadiness(state) {
   latestCameraQuality = state;
   const copy = readinessCopy[state.code] || readinessCopy.waiting;
   const ready = Boolean(state.ready);
-  readinessTitle.textContent = t(ready ? readinessCopy.ready[0] : copy[0]);
-  readinessMessage.textContent = t(ready ? readinessCopy.ready[1] : copy[1]);
-  readinessDetail.textContent = t("We check that your face and both eyes are clearly visible.");
+  // The visual readiness panel is optional in the simplified UI.
+  // Keep the quality state and start-button gate working when its markup is absent.
+  if (readinessTitle) readinessTitle.textContent = t(ready ? readinessCopy.ready[0] : copy[0]);
+  if (readinessMessage) readinessMessage.textContent = t(ready ? readinessCopy.ready[1] : copy[1]);
+  if (readinessDetail) readinessDetail.textContent = t("We check that your face and both eyes are clearly visible.");
   readinessPanel?.classList.toggle("is-ready", ready);
   readinessPanel?.classList.toggle("is-warning", !ready);
-  startButton.disabled = !cameraReady || !ready || gameRunning;
+  if (startButton) startButton.disabled = !cameraReady || !ready || gameRunning;
 }
 
 function startQualityMonitor() {
