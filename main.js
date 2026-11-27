@@ -2254,6 +2254,20 @@ Object.assign(translations, {
   "Compares relative iris-position values across task groups to make the recorded data easier to review.": "يقارن موضع القزحية النسبي بين مجموعات خطوات الاختبار لتسهيل مراجعة البيانات.",
   "Tracks the lighting level detected in frames. Large changes may affect how clearly face and eye landmarks are detected.": "يتابع مستوى الإضاءة المرصود في الإطارات. التغيّر الكبير قد يؤثر في وضوح معالم الوجه والعين.",
   "Summarizes how much technical measurement data is available in each task group and helps locate sections with missing data.": "يلخص مدى توفر القياسات التقنية في كل مجموعة من خطوات الاختبار، ويساعد في تحديد الأجزاء التي تحتوي على بيانات ناقصة.",
+
+  "Open full analysis": "افتحي التحليلات كاملة",
+  "Test": "الاختبار",
+  "Analytics": "التحليلات",
+  "Assistant": "المساعد",
+  "StarbSense Assistant": "مساعد StarbSense",
+  "YOUR RESULT": "نتيجة الجلسة",
+  "Session recording completed": "اكتمل تسجيل الجلسة",
+  "Recording incomplete": "التسجيل غير مكتمل",
+  "No session recorded yet": "لم تُسجّل جلسة بعد",
+  "Complete the test to display a result.": "ابدئي الاختبار لإظهار النتيجة.",
+  "Enough session data was recorded according to the current recording-quality checks.": "تم تسجيل قدر كافٍ من بيانات الجلسة وفق معايير جودة التسجيل الحالية.",
+  "The recorded data did not meet the current session-completeness checks. Review recording quality or repeat the session.": "البيانات المسجلة لا تحقق معايير اكتمال الجلسة الحالية. راجعي جودة التسجيل أو أعيدي الجلسة.",
+  "This reports recording completeness only; it does not determine whether strabismus is present. Open Analytics to review the measurements.": "هذه نتيجة اكتمال التسجيل فقط، وليست تحديدًا لوجود الحَوَل أو عدمه. افتحي صفحة التحليلات لمراجعة القياسات.",
 });
 Object.assign(reverseTranslations, Object.fromEntries(
   Object.entries(translations).map(([english, arabic]) => [arabic, english])
