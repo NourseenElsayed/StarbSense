@@ -2556,3 +2556,26 @@ Object.assign(reverseTranslations, Object.fromEntries(
   Object.entries(translations).map(([english, arabic]) => [arabic, english])
 ));
 applyLanguage(currentLanguage);
+
+
+// Keep medical/model interpretation notes together at the end of the page.
+function centralizeMedicalNotes() {
+  const destination = document.getElementById("medical-notes-content");
+  if (!destination) return;
+  const warningPattern = /not (a |an )?(medical diagnosis|diagnosis|validated|calibrated|clinical|screening)|cannot diagnose|cannot rule out|does not (replace|determine)|not a cover test|not clinically validated|لا (تغني|يمكنها تشخيص|يحدد)|ليست (تشخيص|قياسًا معتمدًا|اختبار)|غير معتمدة سريريًا|مش تشخيص|مش مقياسًا لدقة|لا يثبت وجود مشكلة|ليست قياسات طبية/i;
+  document.querySelectorAll("p, small, li").forEach((node) => {
+    if (destination.contains(node) || node.closest("#medical-notes")) return;
+    const text = (node.textContent || "").trim();
+    if (text.length > 24 && warningPattern.test(text)) {
+      node.classList.add("centralized-medical-note");
+      destination.appendChild(node);
+    }
+  });
+}
+const medicalNotesObserver = new MutationObserver(centralizeMedicalNotes);
+medicalNotesObserver.observe(document.body, { childList: true, subtree: true });
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", centralizeMedicalNotes, { once: true });
+} else {
+  centralizeMedicalNotes();
+}
