@@ -1281,3 +1281,37 @@ body.is-rtl .site-footer { direction: rtl; }
   background: rgba(245, 158, 11, 0.10);
   color: inherit;
 }
+
+
+/* Consolidated medical and model interpretation notes at the end of the page. */
+.medical-notes {
+  width: min(1120px, calc(100% - 36px));
+  margin: 0 auto 22px;
+  padding: 22px clamp(18px, 3vw, 28px);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--card-background);
+  color: var(--text-color);
+  text-align: start;
+}
+.medical-notes h2 { margin: 0 0 14px; font-size: 1.05rem; }
+.medical-notes-content { display: grid; gap: 8px; }
+.medical-notes-content:empty { display: none; }
+.medical-notes-content > * {
+  margin: 0;
+  padding: 10px 12px;
+  border-inline-start: 3px solid var(--accent);
+  border-radius: 8px;
+  background: rgb(101 88 211 / 5%);
+  color: var(--muted);
+  font-size: .9rem;
+  line-height: 1.65;
+}
+.medical-footer-reminder {
+  margin: 14px 0 0;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  font-weight: 700;
+  line-height: 1.7;
+}
+.site-footer-brand { padding: 10px 18px 24px; text-align: center; }
